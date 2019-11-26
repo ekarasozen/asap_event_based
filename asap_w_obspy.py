@@ -142,9 +142,9 @@ for e, lab in enumerate(event_id):
        client = Client()
        gc_distaz_tp = client.distaz(stalat=stalat_tp, stalon=stalon_tp, evtlat=evlat, evtlon=evlon)
        gc_dist_tp = gc_distaz_tp['distance']
-       arrivals = model_l.get_travel_times(float(evdep),float(gc_dist_tp),phase_list=["P", "Pn", "Pg"])
+       arrivals = model_l.get_travel_times(float(evdep),float(gc_dist_tp),phase_list=["P", "Pn", "Pg", "p"])
        if len(arrivals) == 0:
-          print('There are no available P, Pn or Pg picks from Taup')
+          print('There are no available Pg, Pn, P or p picks from Taup')
           continue
 #       arrivals_2 = model_l.get_travel_times(float(evdep),float(gc_dist_tp))
        else: 
