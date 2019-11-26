@@ -1,1 +1,1 @@
-# Alaska Seismic Array Project seismic array processing code using obspy's default array processing tool.
+# Alaska Seismic Array Project's seismic array processing code using obspy's default array processing tool.
