@@ -33,14 +33,14 @@ model_l = TauPyModel(model="northak")
 
 
 #event_list = ['ak018aap2cqu'] #kaktovik mag6 mainshock
-#event_list = ['ak018vt8d37', 'ak0198jpaeek']
+event_list = ['ak018aaq826y']
 #event_list = ['us2000cr6x', 'us2000cr8c', 'us2000cr37', 'us2000crj9', 'us2000cyn8', 'us2000cynn', 'us2000czdu', 'us2000czh4', 'us2000d0qp', 'us2000d1c0', 'us2000d097', 'us2000cnv4', 'us2000cp5m', 'us2000cp6u', 'us2000cp8n', 'us2000cpc1', 'us2000cplq', 'us2000cpmf', 'us2000cpuq', 'us2000cq7b', 'us2000cq9c', 'us2000cq9u', 'us2000cq92', 'us2000cqaw', 'us2000cqbt', 'us2000cqbw', 'us2000cqe7', 'us2000cqs2', 'us2000cqsv', 'us2000cquh', 'us2000cqus', 'us2000cqv1', 'us2000cqv9', 'us2000cqwq', 'us2000cn2c', 'us2000cn06', 'us2000cn9g', 'us2000cn17', 'us2000cn20', 'us2000cnbp', 'us2000cncp', 'us2000cnfc', 'us2000cnhe', 'us2000cnih', 'us2000cniv', 'us2000cnlq', 'us2000cnlx', 'us2000cnnb', 'us2000cnp3', 'us2000cnsa', 'ak018njcg8s', 'ak018vt8d37', 'ak0181u649m5', 'ak0181749ev4', 'us1000cd95', 'us1000cdnj', 'us1000cfjg', 'us1000cg4d', 'us1000cg7h', 'us1000che9', 'us1000chh4', 'us1000chqm', 'us1000chx1', 'us1000ci6q', 'us2000cmy9', 'us2000cmyb', 'us2000cmyc', 'us2000cmz0', 'us2000cn0n', 'us2000cn0y', 'us1000d6nh', 'us1000d5r5', 'ak0183b4m226', 'us1000d3mt', 'us1000d3m0', 'us1000d324', 'us1000d24j', 'ak01834kwkl7', 'us1000d1xl', 'us1000d1sj', 'us1000d1a0', 'us2000dduj', 'us2000dc5x', 'us2000dc1e', 'us2000dbwl', 'us2000dbw6', 'us2000dbvy', 'us2000dajg', 'us2000d93z', 'ak0182plgsrf', 'us2000d8bf', 'us2000d85j', 'ak0182ksu6cf', 'us2000d6lb', 'us2000d4wt', 'ak0182azrhvn', 'us2000d417', 'us2000d415', 'us2000d277', 'us2000d1pc', 'us1000e3ks', 'us1000e2re', 'us1000e1bp', 'us1000e1bk', 'us1000e0fk', 'us1000dxwb', 'us1000dvgc', 'us1000du7s', 'us1000du7f', 'us1000dtv0', 'us1000dq27', 'us1000dpy4', 'us2000e1sw', 'us2000e0z5', 'us2000e0qc', 'us2000e0kw', 'us2000e0jm', 'us2000e02w', 'ak0184nb2fzw', 'us2000dxyb', 'us2000dvrd', 'us2000dvr1', 'us1000ddgh', 'us1000dcsb', 'us1000dcd4', 'us1000dc6e', 'us1000dc0e', 'ak01843dldfm', 'us1000daza', 'us1000dayk', 'us1000d9vq', 'us1000d9ry', 'us1000d9et', 'ak0183tcw7lk', 'us1000d7kc', 'us1000e9md', 'us1000e96z', 'us1000e6b7', 'us1000e5dl', 'ak018aaq826y', 'ak018aapimtg', 'ak018aapf6fw', 'ak018aapea91', 'ak0189ni53xo', 'ak0189f3mjil', 'us2000g8u6', 'us2000g4lk', 'ak0188x5as43', 'ak0188rwahak', 'ak0188n4v5yj', 'ak0188laqakg', 'us2000ftxh', 'ak0188dbg38e', 'ak0188d4oyaj', 'us2000fsrv', 'us2000fqup', 'us2000fq8q', 'ak01881pylyd', 'us1000ez1v', 'ak0187o88z87', 'us1000erwb', 'us1000ermm', 'us1000eb8x', 'us1000eb7g', 'ak018b4lg4sy', 'ak018b13lw5m', 'us1000ghkn', 'us1000h3hd', 'ak018aswvwj1', 'ak018aspusyi', 'ak018anu8lce', 'ak018amcmumm', 'ak018am92po3', 'ak018akht57l', 'ak018akgatno', 'ak018akg7zql', 'ak018aixywwk', 'ak018ah6tyku', 'ak018ah6ang1', 'ak018ae1ar10', 'ak018ae034ky', 'ak018acfg224', 'ak018acbvbfa', 'ak018acahybq', 'ak018ac8zxt5', 'ak018ac6wakp', 'ak018aaufgk0', 'ak018aathb7x', 'ak018aat5b5o', 'ak018aat3zpq', 'ak018dtutpev', 'ak018dd9hnq1', 'ak018da83wwq', 'ak018d8nlpcd', 'ak018d04tq82', 'ak018cyhsaze', 'ak018cqboglj', 'us1000h62f', 'ak018cl5lkrj', 'us1000h4kd', 'us2000hfk6', 'us2000hfc8', 'ak20254307', 'ak20238992', 'ak018ep9y178', 'ak018fcoysc3', 'us1000hxdt', 'us1000huua']
 #event_list = ['ak0181u649m5', 'ak0181749ev4', 'us1000cd95', 'us1000cdnj', 'us1000cfjg', 'us1000cg4d', 'us1000cg7h', 'us1000che9', 'us1000chh4', 'us1000chqm', 'us1000chx1', 'us1000ci6q', 'us2000cmy9', 'us2000cmyb', 'us2000cmyc', 'us2000cmz0', 'us2000cn0n', 'us2000cn0y', 'us1000d6nh', 'us1000d5r5', 'ak0183b4m226', 'us1000d3mt', 'us1000d3m0', 'us1000d324', 'us1000d24j', 'ak01834kwkl7', 'us1000d1xl', 'us1000d1sj', 'us1000d1a0', 'us2000dduj', 'us2000dc5x', 'us2000dc1e', 'us2000dbwl', 'us2000dbw6', 'us2000dbvy', 'us2000dajg', 'us2000d93z', 'ak0182plgsrf', 'us2000d8bf', 'us2000d85j', 'ak0182ksu6cf', 'us2000d6lb', 'us2000d4wt', 'ak0182azrhvn', 'us2000d417', 'us2000d415', 'us2000d277', 'us2000d1pc', 'us1000e3ks', 'us1000e2re', 'us1000e1bp', 'us1000e1bk', 'us1000e0fk', 'us1000dxwb', 'us1000dvgc', 'us1000du7s', 'us1000du7f', 'us1000dtv0', 'us1000dq27', 'us1000dpy4', 'us2000e1sw', 'us2000e0z5', 'us2000e0qc', 'us2000e0kw', 'us2000e0jm', 'us2000e02w', 'ak0184nb2fzw', 'us2000dxyb', 'us2000dvrd', 'us2000dvr1', 'us1000ddgh', 'us1000dcsb', 'us1000dcd4', 'us1000dc6e', 'us1000dc0e', 'ak01843dldfm', 'us1000daza', 'us1000dayk', 'us1000d9vq', 'us1000d9ry', 'us1000d9et', 'ak0183tcw7lk', 'us1000d7kc', 'us1000e9md', 'us1000e96z', 'us1000e6b7', 'us1000e5dl', 'ak018aaq826y', 'ak018aapimtg', 'ak018aapf6fw', 'ak018aapea91', 'ak0189ni53xo', 'ak0189f3mjil', 'us2000g8u6', 'us2000g4lk', 'ak0188x5as43', 'ak0188rwahak', 'ak0188n4v5yj', 'ak0188laqakg', 'us2000ftxh', 'ak0188dbg38e', 'ak0188d4oyaj', 'us2000fsrv', 'us2000fqup', 'us2000fq8q', 'ak01881pylyd', 'us1000ez1v', 'ak0187o88z87', 'us1000erwb', 'us1000ermm', 'us1000eb8x', 'us1000eb7g', 'ak018b4lg4sy', 'ak018b13lw5m', 'us1000ghkn', 'us1000h3hd', 'ak018aswvwj1', 'ak018aspusyi', 'ak018anu8lce', 'ak018amcmumm', 'ak018am92po3', 'ak018akht57l', 'ak018akgatno', 'ak018akg7zql', 'ak018aixywwk', 'ak018ah6tyku', 'ak018ah6ang1', 'ak018ae1ar10', 'ak018ae034ky', 'ak018acfg224', 'ak018acbvbfa', 'ak018acahybq', 'ak018ac8zxt5', 'ak018ac6wakp', 'ak018aaufgk0', 'ak018aathb7x', 'ak018aat5b5o', 'ak018aat3zpq', 'ak018dtutpev', 'ak018dd9hnq1', 'ak018da83wwq', 'ak018d8nlpcd', 'ak018d04tq82', 'ak018cyhsaze', 'ak018cqboglj', 'us1000h62f', 'ak018cl5lkrj', 'us1000h4kd', 'us2000hfk6', 'us2000hfc8', 'ak20254307', 'ak20238992', 'ak018ep9y178', 'ak018fcoysc3', 'us1000hxdt', 'us1000huua']
-event_list = ['ak0198gdhuwa','ak0198jpaeek'] #test events
+#event_list = ['ak0198gdhuwa','ak0198jpaeek'] #test events
 #run_name = input("Run Name (for output file names):") #YOU CAN CHANGE THIS TO FOLDER NAME MAYBE. 
 path = input("Enter the path of your file: ")
 event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
-array_code = input("Array Code (BC, BM, IL, IM):")
+array_code = input("Array Code (bc, bm, il, im):")
 
 filter_type = "bandpass" # waveform filtering
 freqmin = 1 # waveform & array processing filtering
@@ -96,7 +96,7 @@ for e, lab in enumerate(event_id):
     for i in picks:
        station_code = i.waveform_id.station_code
        network_code = i.waveform_id.network_code
-       if array_code == "BC":
+       if array_code == "bc":
           if (network_code=="IM" or network_code=="XM") and station_code[0:3]=="BC0":
              time_array = np.append(time_array, [i.time])
              t=i.time
@@ -106,17 +106,17 @@ for e, lab in enumerate(event_id):
              time_array = np.append(time_array, [i.time])
              t=i.time
              stn_pick = station_code # p pick is from this station
-       if array_code == "BM":
+       if array_code == "bm":
           if (network_code=="IM" or network_code=="XM") and station_code[0:3]=="BM0":
              time_array = np.append(time_array, [i.time])
              t=i.time
              stn_pick = station_code # p pick is from this station
-       if array_code == "IL":
+       if array_code == "il":
           if (network_code=="IM" or network_code=="XM") and station_code[0:2]=="IL": #this also covers IL31
              time_array = np.append(time_array, [i.time])
              t=i.time
              stn_pick = station_code # p pick is from this station
-       if array_code == "IM":
+       if array_code == "im":
           if (network_code=="IM" or network_code=="XM") and station_code[0:3]=="IM0":
              time_array = np.append(time_array, [i.time])
              t=i.time
@@ -128,13 +128,13 @@ for e, lab in enumerate(event_id):
        print("There are no available picks from the quakeml file, pick time will be calculated by the Taup")
        st_lat_tp = np.empty((0, 100))
        st_lon_tp = np.empty((0, 100))
-       if array_code == "BC":
+       if array_code == "bc":
           inventory_tp = client_wm.get_stations(network="IM", station="BC*")
-       if array_code == "BM":
+       if array_code == "bm":
           inventory_tp = client_wm.get_stations(network="IM", station="BM*")
-       if array_code == "IL":
+       if array_code == "il":
           inventory_tp = client_wm.get_stations(network="IM", station="IL*")
-       if array_code == "IM":
+       if array_code == "im":
           inventory_tp = client_wm.get_stations(network="IM", station="IM*")
        nos_tp = len(inventory_tp[0])
        for tp in range (nos_tp):
@@ -157,7 +157,7 @@ for e, lab in enumerate(event_id):
        #print(arrivals[0])
        #continue #this was being used before taup integration
     #WAVEFORMS FROM IRIS
-    if array_code == "BC":
+    if array_code == "bc":
        array_name = "Beaver Creek"
        inventory = client_wm.get_stations(network="IM", station="BC*")
        try: #FOR THE CASES WHEN THERE ARE NO WAVEFORMS
@@ -167,7 +167,7 @@ for e, lab in enumerate(event_id):
        except Exception:
              print('No waveform data found!')
              continue
-    if array_code == "BM":
+    if array_code == "bm":
        array_name = "Burnt Mountain"
        inventory = client_wm.get_stations(network="IM", station="BM*")
        try:
@@ -177,7 +177,7 @@ for e, lab in enumerate(event_id):
        except Exception:
              print('No waveform data found!')
              continue
-    if array_code == "IL":
+    if array_code == "il":
        array_name = "Eielson"
        inventory = client_wm.get_stations(network="IM", station="IL*")
        try:
@@ -187,7 +187,7 @@ for e, lab in enumerate(event_id):
        except Exception:
              print('No waveform data found!')
              continue
-    if array_code == "IM":
+    if array_code == "im":
        array_name = "Indian Mountain"
        inventory = client_wm.get_stations(network="IM", station="IM*")
        try:
@@ -229,10 +229,11 @@ for e, lab in enumerate(event_id):
         ax2.text(0.10, 0.95, text, transform=ax2.transAxes, fontsize=8, fontweight='bold', verticalalignment='top')
         st_trim = st[s].trim(t - (ts_win+0.1), t + (te_win+0.1)) #trim is done inside the loop, because otherwise st changes and whole wf cannot be plotted
         wf_trim = st_trim.taper(max_percentage=0.1, type='cosine')
-        #wf_y_min = np.nanmin(wf_trim[:]) #for y axis to share same min and max values within all wfs
-        #wf_y_max = np.nanmax(wf_trim[:])
         ax3 = fig1.add_subplot(nos, 4, ((4*s)+3))
-        ax3.set_ylim(ymin=y_min, ymax=y_max)
+        if y_max >= 1000: #until we figure out a better way to do this, it seems to work. 
+           ax3.set_ylim(ymin=y_min/10, ymax=y_max/10)
+        else:
+           ax3.set_ylim(ymin=y_min, ymax=y_max)        
         ax3.plot(wf_trim.times("matplotlib"), wf_trim.data, "k-", linewidth=0.3)
         ax3.xaxis_date()
         ax3.axvline(date2num((t-ts_win).datetime), lw=0.8, c='darkblue', ls='--', label='time win.')
