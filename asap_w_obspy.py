@@ -31,12 +31,10 @@ model_l = TauPyModel(model="northak")
 #model_l = TauPyModel(model="scak")
 #model_l = TauPyModel(model="kaktovik")
 
+event_list = ['ak013gruwywy', 'ak014a5ub3cb', 'ak014adv1x8g', 'ak014b5xf1in', 'ak014b7kdriu', 'ak014b9aftmg', 'ak014b60f27t', 'ak014b62vsxt', 'ak014b68fwpp', 'ak014bck7b9g', 'ak014cou8d9l', 'ak014di87vgp', 'ak014dlss56k', 'ak014dltci5h', 'ak014e8xt2cn', 'ak014frher8l', 'ak014ft3m0mj', 'ak014fy4p2ie', 'ak015cn4d0eh', 'ak015dyswg6d', 'ak015e8owu57', 'ak015f2i7ddl', 'ak016aw4yt72', 'ak016bjapymo', 'ak016c6edk4t', 'ak016d02wlg5', 'ak016d518fru', 'ak016djy97vd', 'ak016exvhy2o', 'ak016frfe9e2', 'ak016ggavb4a', 'ak016nguz3k', 'ak017aar9fid', 'ak017b65zkfy', 'ak017bodzh0t', 'ak017bv19dof', 'ak017crsm45v', 'ak017df0437h', 'ak017e7b798p', 'ak017ec3jenv', 'ak018a0vq7zd', 'ak018acfg224', 'ak018ae1ar10', 'ak018afourf2', 'ak018aixywwk', 'ak018akg7zql', 'ak018akht57l', 'ak018am92po3', 'ak018amcmumm', 'ak018aw96dn0', 'ak018b13lw5m', 'ak018b160qu2', 'ak018cbizgzx', 'ak018coiadru', 'ak018cyhsaze', 'ak018d8dv7u8', 'ak018d718yqc', 'ak018da4zt40', 'ak018dlecu0', 'ak018dnafpg3', 'ak018dtutpev', 'ak018ekig6gu', 'ak018em0mbpl', 'ak018exsi6u4', 'ak018fcoysc3', 'ak018fe8g0c9', 'ak018ffr9ir9', 'ak018ggaykit', 'ak018lmayyr', 'ak018njcg8s', 'ak018votkl8', 'ak018vt8d37', 'ak019aalxkjy', 'ak019by1s99x', 'ak019ddh6gwg', 'ak019fcqqncm', 'ak019sbd0aw', 'ak0142zpz7gu', 'ak0143elpe3h', 'ak0144f1g1sr', 'ak0146arywc2', 'ak0146uon19t', 'ak0153elsnkx', 'ak0161ae7d1u', 'ak0161ui3nog', 'ak0161w3grph', 'ak0162cceroh', 'ak0162kq0d9f', 'ak0164s3150k', 'ak0165m3p95m', 'ak0166arin7w', 'ak0168s0m9ds', 'ak0169f6vp18', 'ak0171fkpvxq', 'ak0172b22lil', 'ak0172cmv3bz', 'ak0175vrtiuu', 'ak0176ukq2m', 'ak0178ry7omj', 'ak0181u649m5', 'ak0181u649m5', 'ak0182ksu6cf', 'ak0182plgsrf', 'ak0183b4m226', 'ak0184nb2fzw', 'ak0186uo9bc4', 'ak0188d4oyaj', 'ak0188dbg38e', 'ak0188laqakg', 'ak0188n4v5yj', 'ak0188n4v5yj', 'ak0188rwahak', 'ak0188x5as43', 'ak0188yre6y6', 'ak0189f3mjil', 'ak0191w0zgvv', 'ak0192mc2j6m', 'ak0192zumrhu', 'ak0193exoam', 'ak0193wxcfea', 'ak0193ycm3x7', 'ak0194ibqout', 'ak0194vdzjyo', 'ak0195xfh9zo', 'ak0197mmyxjj', 'ak0198ey5yyy', 'ak0198gbkbu4', 'ak0199za3yf', 'ak01418xv3ou', 'ak01439k6eg1', 'ak01548d9sgp', 'ak01613w9jul', 'ak01613z8owf', 'ak01615h8iq3', 'ak01660vze8u', 'ak01731b4jgx', 'ak01768zlboj', 'ak01834kwkl7', 'ak01834kwkl7', 'ak01834pp956', 'ak01843dldfm', 'ak01860o899o', 'ak01881pylyd', 'ak01934uh1xo', 'ak01936gujyv', 'ak01939oejs4', 'ak01959muqd', 'ak01979fs1wt', 'ak017888ov6t', 'ak019400r8q9', 'ak019574uo3u', 'ak20238992', 'us1000d1a0', 'us1000d1sj', 'us1000d1xl', 'us1000d3m0', 'us1000d3mt', 'us1000d24j', 'us1000d324', 'us1000e1bk', 'us1000ez1v', 'us2000cncp', 'us2000cr6x', 'us2000cynn', 'us2000dbw6', 'us2000dvrd']
 
 #event_list = ['ak018aap2cqu'] #kaktovik mag6 mainshock
-event_list = ['ak018aaq826y']
-#event_list = ['us2000cr6x', 'us2000cr8c', 'us2000cr37', 'us2000crj9', 'us2000cyn8', 'us2000cynn', 'us2000czdu', 'us2000czh4', 'us2000d0qp', 'us2000d1c0', 'us2000d097', 'us2000cnv4', 'us2000cp5m', 'us2000cp6u', 'us2000cp8n', 'us2000cpc1', 'us2000cplq', 'us2000cpmf', 'us2000cpuq', 'us2000cq7b', 'us2000cq9c', 'us2000cq9u', 'us2000cq92', 'us2000cqaw', 'us2000cqbt', 'us2000cqbw', 'us2000cqe7', 'us2000cqs2', 'us2000cqsv', 'us2000cquh', 'us2000cqus', 'us2000cqv1', 'us2000cqv9', 'us2000cqwq', 'us2000cn2c', 'us2000cn06', 'us2000cn9g', 'us2000cn17', 'us2000cn20', 'us2000cnbp', 'us2000cncp', 'us2000cnfc', 'us2000cnhe', 'us2000cnih', 'us2000cniv', 'us2000cnlq', 'us2000cnlx', 'us2000cnnb', 'us2000cnp3', 'us2000cnsa', 'ak018njcg8s', 'ak018vt8d37', 'ak0181u649m5', 'ak0181749ev4', 'us1000cd95', 'us1000cdnj', 'us1000cfjg', 'us1000cg4d', 'us1000cg7h', 'us1000che9', 'us1000chh4', 'us1000chqm', 'us1000chx1', 'us1000ci6q', 'us2000cmy9', 'us2000cmyb', 'us2000cmyc', 'us2000cmz0', 'us2000cn0n', 'us2000cn0y', 'us1000d6nh', 'us1000d5r5', 'ak0183b4m226', 'us1000d3mt', 'us1000d3m0', 'us1000d324', 'us1000d24j', 'ak01834kwkl7', 'us1000d1xl', 'us1000d1sj', 'us1000d1a0', 'us2000dduj', 'us2000dc5x', 'us2000dc1e', 'us2000dbwl', 'us2000dbw6', 'us2000dbvy', 'us2000dajg', 'us2000d93z', 'ak0182plgsrf', 'us2000d8bf', 'us2000d85j', 'ak0182ksu6cf', 'us2000d6lb', 'us2000d4wt', 'ak0182azrhvn', 'us2000d417', 'us2000d415', 'us2000d277', 'us2000d1pc', 'us1000e3ks', 'us1000e2re', 'us1000e1bp', 'us1000e1bk', 'us1000e0fk', 'us1000dxwb', 'us1000dvgc', 'us1000du7s', 'us1000du7f', 'us1000dtv0', 'us1000dq27', 'us1000dpy4', 'us2000e1sw', 'us2000e0z5', 'us2000e0qc', 'us2000e0kw', 'us2000e0jm', 'us2000e02w', 'ak0184nb2fzw', 'us2000dxyb', 'us2000dvrd', 'us2000dvr1', 'us1000ddgh', 'us1000dcsb', 'us1000dcd4', 'us1000dc6e', 'us1000dc0e', 'ak01843dldfm', 'us1000daza', 'us1000dayk', 'us1000d9vq', 'us1000d9ry', 'us1000d9et', 'ak0183tcw7lk', 'us1000d7kc', 'us1000e9md', 'us1000e96z', 'us1000e6b7', 'us1000e5dl', 'ak018aaq826y', 'ak018aapimtg', 'ak018aapf6fw', 'ak018aapea91', 'ak0189ni53xo', 'ak0189f3mjil', 'us2000g8u6', 'us2000g4lk', 'ak0188x5as43', 'ak0188rwahak', 'ak0188n4v5yj', 'ak0188laqakg', 'us2000ftxh', 'ak0188dbg38e', 'ak0188d4oyaj', 'us2000fsrv', 'us2000fqup', 'us2000fq8q', 'ak01881pylyd', 'us1000ez1v', 'ak0187o88z87', 'us1000erwb', 'us1000ermm', 'us1000eb8x', 'us1000eb7g', 'ak018b4lg4sy', 'ak018b13lw5m', 'us1000ghkn', 'us1000h3hd', 'ak018aswvwj1', 'ak018aspusyi', 'ak018anu8lce', 'ak018amcmumm', 'ak018am92po3', 'ak018akht57l', 'ak018akgatno', 'ak018akg7zql', 'ak018aixywwk', 'ak018ah6tyku', 'ak018ah6ang1', 'ak018ae1ar10', 'ak018ae034ky', 'ak018acfg224', 'ak018acbvbfa', 'ak018acahybq', 'ak018ac8zxt5', 'ak018ac6wakp', 'ak018aaufgk0', 'ak018aathb7x', 'ak018aat5b5o', 'ak018aat3zpq', 'ak018dtutpev', 'ak018dd9hnq1', 'ak018da83wwq', 'ak018d8nlpcd', 'ak018d04tq82', 'ak018cyhsaze', 'ak018cqboglj', 'us1000h62f', 'ak018cl5lkrj', 'us1000h4kd', 'us2000hfk6', 'us2000hfc8', 'ak20254307', 'ak20238992', 'ak018ep9y178', 'ak018fcoysc3', 'us1000hxdt', 'us1000huua']
-#event_list = ['ak0181u649m5', 'ak0181749ev4', 'us1000cd95', 'us1000cdnj', 'us1000cfjg', 'us1000cg4d', 'us1000cg7h', 'us1000che9', 'us1000chh4', 'us1000chqm', 'us1000chx1', 'us1000ci6q', 'us2000cmy9', 'us2000cmyb', 'us2000cmyc', 'us2000cmz0', 'us2000cn0n', 'us2000cn0y', 'us1000d6nh', 'us1000d5r5', 'ak0183b4m226', 'us1000d3mt', 'us1000d3m0', 'us1000d324', 'us1000d24j', 'ak01834kwkl7', 'us1000d1xl', 'us1000d1sj', 'us1000d1a0', 'us2000dduj', 'us2000dc5x', 'us2000dc1e', 'us2000dbwl', 'us2000dbw6', 'us2000dbvy', 'us2000dajg', 'us2000d93z', 'ak0182plgsrf', 'us2000d8bf', 'us2000d85j', 'ak0182ksu6cf', 'us2000d6lb', 'us2000d4wt', 'ak0182azrhvn', 'us2000d417', 'us2000d415', 'us2000d277', 'us2000d1pc', 'us1000e3ks', 'us1000e2re', 'us1000e1bp', 'us1000e1bk', 'us1000e0fk', 'us1000dxwb', 'us1000dvgc', 'us1000du7s', 'us1000du7f', 'us1000dtv0', 'us1000dq27', 'us1000dpy4', 'us2000e1sw', 'us2000e0z5', 'us2000e0qc', 'us2000e0kw', 'us2000e0jm', 'us2000e02w', 'ak0184nb2fzw', 'us2000dxyb', 'us2000dvrd', 'us2000dvr1', 'us1000ddgh', 'us1000dcsb', 'us1000dcd4', 'us1000dc6e', 'us1000dc0e', 'ak01843dldfm', 'us1000daza', 'us1000dayk', 'us1000d9vq', 'us1000d9ry', 'us1000d9et', 'ak0183tcw7lk', 'us1000d7kc', 'us1000e9md', 'us1000e96z', 'us1000e6b7', 'us1000e5dl', 'ak018aaq826y', 'ak018aapimtg', 'ak018aapf6fw', 'ak018aapea91', 'ak0189ni53xo', 'ak0189f3mjil', 'us2000g8u6', 'us2000g4lk', 'ak0188x5as43', 'ak0188rwahak', 'ak0188n4v5yj', 'ak0188laqakg', 'us2000ftxh', 'ak0188dbg38e', 'ak0188d4oyaj', 'us2000fsrv', 'us2000fqup', 'us2000fq8q', 'ak01881pylyd', 'us1000ez1v', 'ak0187o88z87', 'us1000erwb', 'us1000ermm', 'us1000eb8x', 'us1000eb7g', 'ak018b4lg4sy', 'ak018b13lw5m', 'us1000ghkn', 'us1000h3hd', 'ak018aswvwj1', 'ak018aspusyi', 'ak018anu8lce', 'ak018amcmumm', 'ak018am92po3', 'ak018akht57l', 'ak018akgatno', 'ak018akg7zql', 'ak018aixywwk', 'ak018ah6tyku', 'ak018ah6ang1', 'ak018ae1ar10', 'ak018ae034ky', 'ak018acfg224', 'ak018acbvbfa', 'ak018acahybq', 'ak018ac8zxt5', 'ak018ac6wakp', 'ak018aaufgk0', 'ak018aathb7x', 'ak018aat5b5o', 'ak018aat3zpq', 'ak018dtutpev', 'ak018dd9hnq1', 'ak018da83wwq', 'ak018d8nlpcd', 'ak018d04tq82', 'ak018cyhsaze', 'ak018cqboglj', 'us1000h62f', 'ak018cl5lkrj', 'us1000h4kd', 'us2000hfk6', 'us2000hfc8', 'ak20254307', 'ak20238992', 'ak018ep9y178', 'ak018fcoysc3', 'us1000hxdt', 'us1000huua']
-#event_list = ['ak0198gdhuwa','ak0198jpaeek'] #test events
+#event_list = ['ak014azdbz0f'] #test events
 #run_name = input("Run Name (for output file names):") #YOU CAN CHANGE THIS TO FOLDER NAME MAYBE. 
 path = input("Enter the path of your file: ")
 event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
@@ -78,6 +76,7 @@ for e, lab in enumerate(event_id):
     st_lon = np.empty((0, 100))
     st_nam = np.empty((0, 100))
     cat = read_events(event_id[e])
+    evmag = (cat[0].magnitudes[0].mag)
     evot = (cat[0].origins[0].time)
     evlat = cat[0].origins[0].latitude
     evlon= cat[0].origins[0].longitude
@@ -90,9 +89,11 @@ for e, lab in enumerate(event_id):
     event_time = cat[0].origins[0].time.time.replace(microsecond=0)#TRICK TO CUT MILLISECONDS = ADD .replace(microsecond=0)
     cat.plot(fig=fig1, show=False, title="", color="date", colorbar=False)
     ax1.annotate(("{}"*5).format("Event time: ", event_date," ",event_time,"\n"), xy=(0, (1.1)), xycoords='axes fraction', fontsize=11)
-    ax1.annotate(("{0:8}{1:6.3f}{2:2}{3:7.3f}{4:2}{5:3.0f}{6:2}").format("Origin: ", evlat,"\u00b0"" ", evlon,"\u00b0"" ", evdep,"km"), xy=(0, (1.05)), xycoords='axes fraction', fontsize=11)
+    ax1.annotate(("{0:8}{1:6.3f}{2:2}{3:7.3f}{4:2}{5:3.0f}{6:3}").format("Origin: ", evlat,"\u00b0"" ", evlon,"\u00b0"" ", evdep," km"), xy=(0, (1.05)), xycoords='axes fraction', fontsize=11)
     #ARRAY PICKS FROM QUAKEML
     picks = cat[0].picks
+#    print(cat[0])
+#    print(cat[0].origins[0].arrivals[0].pick_id)
     for i in picks:
        station_code = i.waveform_id.station_code
        network_code = i.waveform_id.network_code
@@ -152,7 +153,7 @@ for e, lab in enumerate(event_id):
 #       arrivals_2 = model_l.get_travel_times(float(evdep),float(gc_dist_tp))
        else: 
           t = evot + arrivals[0].time #make sure this is the earliest one 
-       stn_pick = "Calculated with Taup"
+       stn_pick = "Taup"
        #print(arrivals_2)
        #print(arrivals[0])
        #continue #this was being used before taup integration
@@ -230,10 +231,11 @@ for e, lab in enumerate(event_id):
         st_trim = st[s].trim(t - (ts_win+0.1), t + (te_win+0.1)) #trim is done inside the loop, because otherwise st changes and whole wf cannot be plotted
         wf_trim = st_trim.taper(max_percentage=0.1, type='cosine')
         ax3 = fig1.add_subplot(nos, 4, ((4*s)+3))
-        if y_max >= 1000: #until we figure out a better way to do this, it seems to work. 
-           ax3.set_ylim(ymin=y_min/10, ymax=y_max/10)
-        else:
-           ax3.set_ylim(ymin=y_min, ymax=y_max)        
+        ax3.set_ylim(ymin=y_min/10, ymax=y_max/10)
+#         if y_max >= 1000: #until we figure out a better way to do this, it seems to work. 
+#            ax3.set_ylim(ymin=y_min/10, ymax=y_max/10)
+#         else:
+#            ax3.set_ylim(ymin=y_min, ymax=y_max)        
         ax3.plot(wf_trim.times("matplotlib"), wf_trim.data, "k-", linewidth=0.3)
         ax3.xaxis_date()
         ax3.axvline(date2num((t-ts_win).datetime), lw=0.8, c='darkblue', ls='--', label='time win.')
@@ -325,7 +327,8 @@ for e, lab in enumerate(event_id):
 #         ax4.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
 #     ax4.annotate(("{}"*1).format("Array Processing with Obspy"), xy=(0, 4.08), xycoords='axes fraction', fontsize=11)
     fig1.subplots_adjust(left=0.15, top=0.95, right=0.95, bottom=0.2, hspace=0)
-    file1.write("{0:14} {1:4.2f} {2:6.2f} {3:4.2f}".format(event_list[e],float(cl_rlp),float(cl_baz),float(cl_slw)))
+    #file1.write("EVENT_ID"+"\t"+" AN"+"\t"+"DATE"+"\t"+"   TIME"+"\t"+" MAG"+"\t"+"LAT"+"\t"+"LON"+"\t"+"DEPT"+"\t"+"DIST"+"\t"+"TBAZ"+"\t"+"MBAZ"+"\t"+"RPOW"+"\t"+"SLOW"+"\t"+"PICK"+"\t"+"NOS"+"\n")
+    file1.write("{0:12} {1:2} {2:} {3:} {4:3.1f} {5:6.3f} {6:7.3f} {7:3.0f} {8:6.3f} {9:6.2f} {10:6.2f} {11:4.2f} {12:5.3f} {13:4} {14:2}".format(event_list[e],array_code,event_date,event_time,evmag,evlat,evlon,evdep,float(gc_dist),float(gc_baz),float(cl_baz),float(cl_rlp),float(cl_slw),stn_pick,nos))
     file1.write("\n")
     #TEXT TO APPEND
     ax1.annotate(("{}"*7).format("Filter type: ",filter_type, " ", freqmin, " - ", freqmax, " Hz" ), xy=(0, (-0.1)), xycoords='axes fraction', fontsize=11)
@@ -333,7 +336,7 @@ for e, lab in enumerate(event_id):
     ax1.annotate(("{}"*3).format("Time window length: ",win_len, " sec."), xy=(0, (-0.3)), xycoords='axes fraction', fontsize=11)
     ax1.annotate(("{0:10}{1:6.2f}{2:1}").format("True BAZ: ",float(gc_baz),"\u00b0"), xy=(0, (-0.4)), xycoords='axes fraction', fontsize=11)
     ax1.annotate(("{0:14}{1:4.2f}{2:1}").format("Apparent BAZ: ",float(np.mean(cl_baz)),"\u00b0"), xy=(0, (-0.5)), xycoords='axes fraction', fontsize=11)
-    ax1.annotate(("{0:18}{1:4.2f}{2:1}").format("Apparent slowness: ",np.mean(cl_slw)," s/km"), xy=(0, (-0.6)), xycoords='axes fraction', fontsize=11)
+    ax1.annotate(("{0:18}{1:5.3f}{2:1}").format("Apparent slowness: ",np.mean(cl_slw)," s/km"), xy=(0, (-0.6)), xycoords='axes fraction', fontsize=11)
     ax1.annotate(("{0:18}{1:4.2f}").format("Relative power: ",np.mean(cl_rlp)), xy=(0, (-0.7)), xycoords='axes fraction', fontsize=11)
     fig1.suptitle(("{}"*4).format("Event Name: ", event_list[e][2:], ", Array: ", array_name), y=1.04,fontweight='bold')
     fig1.savefig(path + event_list[e] + "_" + array_code + '.pdf', bbox_inches='tight')
