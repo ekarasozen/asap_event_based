@@ -1,5 +1,3 @@
-import sys
-import os
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 from matplotlib.colorbar import ColorbarBase
@@ -11,20 +9,22 @@ import numpy as np
 from obspy.clients.fdsn import Client
 client_wm = Client("IRIS")
 from obspy.clients.iris import Client  #this is needed for gc_distaz calculation, for some reason it doesn't accept fdsn
-import obspy
 from obspy.core.util import AttribDict
 from obspy.imaging.cm import obspy_sequential
 from obspy.signal.invsim import corn_freq_2_paz
 from obspy.signal.array_analysis import array_processing
 from obspy.core.event import read_events
+from obspy.core.event import ResourceIdentifier
+# could also do:
+# from obspy.core.event import *
 from obspy import UTCDateTime
 from obspy import read_inventory, read_events
 from obspy import read
 from matplotlib.ticker import FormatStrFormatter
 # -*- coding: utf-8 -*-
-
 from obspy.taup import TauPyModel
 from obspy.taup import plot_travel_times
+
 #CHOOSE FROM LOCAL V MODELS FOR TAUP CALCULATION
 #model_t = TauPyModel(model="ak135")
 model_l = TauPyModel(model="northak")
@@ -50,6 +50,7 @@ te_win = 3 # for trimmed waveform P pick window +/- (in seconds)
 win_len = te_win+ts_win #should be x2 of t_win in seconds
 
 file1 = open(path + array_code + "_obspy_processing.out","w")
+file1.write("EVENT_ID"+"\t"+" AN"+"\t"+"DATE"+"\t"+"   TIME"+"\t"+"    MAG"+"\t"+"LAT"+"\t"+"   LON"+"\t"+"     DP"+"\t"+" DIST"+"\t"+" TBAZ"+"\t"+"MBAZ"+"\t"+"EBAZ"+" "+"RPW"+"  "+"SLW"+"\t"+"PICK"+"  "+"NOS"+"\t"+"TYPE"+"\n")
 
 
 #plot waveforms wrt distance not alphabetically. 
@@ -81,6 +82,7 @@ for e, lab in enumerate(event_id):
     evlat = cat[0].origins[0].latitude
     evlon= cat[0].origins[0].longitude
     evdep= (cat[0].origins[0].depth) / 1000 #convert to km
+    evtype= cat[0].event_type
     print(event_id[e])
     if cat[0].origins[0].evaluation_mode == "automatic":
        print("This event is not yet revised")
@@ -92,35 +94,48 @@ for e, lab in enumerate(event_id):
     ax1.annotate(("{0:8}{1:6.3f}{2:2}{3:7.3f}{4:2}{5:3.0f}{6:3}").format("Origin: ", evlat,"\u00b0"" ", evlon,"\u00b0"" ", evdep," km"), xy=(0, (1.05)), xycoords='axes fraction', fontsize=11)
     #ARRAY PICKS FROM QUAKEML
     picks = cat[0].picks
-#    print(cat[0])
-#    print(cat[0].origins[0].arrivals[0].pick_id)
+    arrivals = cat[0].origins[0].arrivals
     for i in picks:
        station_code = i.waveform_id.station_code
        network_code = i.waveform_id.network_code
        if array_code == "bc":
           if (network_code=="IM" or network_code=="XM") and station_code[0:3]=="BC0":
-             time_array = np.append(time_array, [i.time])
-             t=i.time
+             for j in arrivals:
+                if j.pick_id.id==i.resource_id and j.phase=="P": #done to make sure this is a P pick. for loops are most probably redundant but couldn't figure out a better way to solve this *yet*
+                   time_array = np.append(time_array, [i.time])
+                   t=i.time
              stn_pick = station_code # p pick is from this station
           #for cases when there are no picks from BC array but from the nearby TA
           elif network_code=="TA" and station_code=="L27K":
              time_array = np.append(time_array, [i.time])
-             t=i.time
+             for j in arrivals:
+                if j.pick_id.id==i.resource_id and j.phase=="P":
+                   time_array = np.append(time_array, [i.time])
+                   t=i.time
              stn_pick = station_code # p pick is from this station
        if array_code == "bm":
           if (network_code=="IM" or network_code=="XM") and station_code[0:3]=="BM0":
              time_array = np.append(time_array, [i.time])
-             t=i.time
+             for j in arrivals:
+                if j.pick_id.id==i.resource_id and j.phase=="P":
+                   time_array = np.append(time_array, [i.time])
+                   t=i.time
              stn_pick = station_code # p pick is from this station
        if array_code == "il":
           if (network_code=="IM" or network_code=="XM") and station_code[0:2]=="IL": #this also covers IL31
              time_array = np.append(time_array, [i.time])
-             t=i.time
+             for j in arrivals:
+                if j.pick_id.id==i.resource_id and j.phase=="P":
+                   time_array = np.append(time_array, [i.time])
+                   t=i.time
              stn_pick = station_code # p pick is from this station
        if array_code == "im":
           if (network_code=="IM" or network_code=="XM") and station_code[0:3]=="IM0":
              time_array = np.append(time_array, [i.time])
-             t=i.time
+             for j in arrivals:
+                if j.pick_id.id==i.resource_id and j.phase=="P":
+                   time_array = np.append(time_array, [i.time])
+                   t=i.time
              stn_pick = station_code # p pick is from this station
        #IF YOU WANT TO TAKE EARLIEST PICK FOR START TIME:
        #t = (np.amin(time_array))
@@ -231,8 +246,8 @@ for e, lab in enumerate(event_id):
         st_trim = st[s].trim(t - (ts_win+0.1), t + (te_win+0.1)) #trim is done inside the loop, because otherwise st changes and whole wf cannot be plotted
         wf_trim = st_trim.taper(max_percentage=0.1, type='cosine')
         ax3 = fig1.add_subplot(nos, 4, ((4*s)+3))
-        ax3.set_ylim(ymin=y_min/10, ymax=y_max/10)
-#         if y_max >= 1000: #until we figure out a better way to do this, it seems to work. 
+        #ax3.set_ylim(ymin=y_min/10, ymax=y_max/10) #until we figure out a better way to do this, it seems to work. or the following.
+#         if y_max >= 1000: 
 #            ax3.set_ylim(ymin=y_min/10, ymax=y_max/10)
 #         else:
 #            ax3.set_ylim(ymin=y_min, ymax=y_max)        
@@ -326,9 +341,14 @@ for e, lab in enumerate(event_id):
 #         ax4.xaxis.set_major_locator(xlocator)
 #         ax4.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
 #     ax4.annotate(("{}"*1).format("Array Processing with Obspy"), xy=(0, 4.08), xycoords='axes fraction', fontsize=11)
+    err_baz = gc_baz - cl_baz
+    if err_baz > 180:
+       err_baz = err_baz - 360
+    else:
+       err_baz = err_baz
+    #print(gc_baz,float(cl_baz),err_baz)
     fig1.subplots_adjust(left=0.15, top=0.95, right=0.95, bottom=0.2, hspace=0)
-    #file1.write("EVENT_ID"+"\t"+" AN"+"\t"+"DATE"+"\t"+"   TIME"+"\t"+" MAG"+"\t"+"LAT"+"\t"+"LON"+"\t"+"DEPT"+"\t"+"DIST"+"\t"+"TBAZ"+"\t"+"MBAZ"+"\t"+"RPOW"+"\t"+"SLOW"+"\t"+"PICK"+"\t"+"NOS"+"\n")
-    file1.write("{0:12} {1:2} {2:} {3:} {4:3.1f} {5:6.3f} {6:7.3f} {7:3.0f} {8:6.3f} {9:6.2f} {10:6.2f} {11:4.2f} {12:5.3f} {13:4} {14:2}".format(event_list[e],array_code,event_date,event_time,evmag,evlat,evlon,evdep,float(gc_dist),float(gc_baz),float(cl_baz),float(cl_rlp),float(cl_slw),stn_pick,nos))
+    file1.write("{0:12} {1:2} {2:} {3:} {4:3.1f} {5:6.3f} {6:7.3f} {7:3.0f} {8:6.3f} {9:6.2f} {10:6.2f} {11:7.2f} {12:4.2f} {13:5.3f} {14:4} {15:2}     {16:10}".format(event_list[e],array_code,event_date,event_time,evmag,evlat,evlon,evdep,float(gc_dist),float(gc_baz),float(cl_baz),float(err_baz),float(cl_rlp),float(cl_slw),stn_pick,nos,evtype))
     file1.write("\n")
     #TEXT TO APPEND
     ax1.annotate(("{}"*7).format("Filter type: ",filter_type, " ", freqmin, " - ", freqmax, " Hz" ), xy=(0, (-0.1)), xycoords='axes fraction', fontsize=11)
