@@ -33,7 +33,7 @@ model_l = TauPyModel(model="northak")
 
 event_list = ['ak01743krbh2', 'ak0173ylxr8d', 'ak0171dm7fc5', 'ak017a95ih8', 'ak0167hy1d59', 'ak0166y3vho0', 'ak0166fx3f0m', 'ak0165h6po0t', 'ak0164u18ywd', 'ak0164k3z03c', 'ak0164gsjups', 'ak0164a41tzu', 'ak0163ylihyn', 'ak0163wxwn70', 'ak0163oocsvm', 'ak01637s98ri', 'ak0162zhxu4q', 'ak0162w6v3nk', 'ak0162nx85ru', 'ak0162kmqt2b', 'ak0161shz9cp', 'ak0161lvujcv', 'ak01615cgrp2', 'ak01610duz03', 'ak016evvbbc', 'ak015gbfpd44', 'ak015ft8vcrv', 'ak015f93ukeq', 'ak015ek9z6j7', 'ak015e8oqtm0', 'ak015dxhl4kt', 'ak015d3pxpm0', 'ak015c1b588a', 'ak015bwq413k', 'ak015bv2m0tt', 'ak015bl54jdp', 'ak015bct4cs7', 'ak015b4jejcs', 'ak015appz2xo', 'ak015ac5diey', 'ak0159h21fd0', 'ak0158x7ylke', 'ak0158s79jft', 'ak0158ew0dxq', 'ak0157jlwjqp', 'ak0157813cgc', 'ak0156o48o5o', 'ak0156kvkkbh', 'ak0153wwpwby', 'ak0152fnkuvs', 'ak015291c43f']
 
-#event_list = ['ak01743krbh2', 'ak0173ylxr8d', 'ak017a95ih8', 'ak0167hy1d59', 'ak0166y3vho0']
+#event_list = ['ak0153wwpwby']
 
 
 
@@ -70,8 +70,8 @@ for e, lab in enumerate(event_id):
                 urcrnrlon=235, urcrnrlat=72,
                 lon_0=212.5, lat_0=61, ax=ax1)
     m.drawcoastlines()
-    m.drawcountries()
-    m.drawstates()
+    #m.drawcountries()
+    #m.drawstates()
     m.fillcontinents(color='antiquewhite', lake_color='tab:blue')
     m.drawparallels(np.arange(-80., 81., 10.)) # draw parallels and meridians.
     m.drawmeridians(np.arange(-180., 181., 10.))
@@ -88,7 +88,7 @@ for e, lab in enumerate(event_id):
     evlon= cat[0].origins[0].longitude
     evdep= (cat[0].origins[0].depth) / 1000 #convert to km
     evtype= cat[0].event_type
-    print(event_id[e])
+    print('##########################',event_list[e],'##########################')
     if cat[0].origins[0].evaluation_mode == "automatic":
        print("This event is not yet revised")
        continue
@@ -144,6 +144,10 @@ for e, lab in enumerate(event_id):
              stn_pick = station_code # p pick is from this station
        #IF YOU WANT TO TAKE EARLIEST PICK FOR START TIME:
        #t = (np.amin(time_array))
+
+
+
+
     #OBSPY TAUP FOR THE CASES WHEN THERE ARE NO AVAILABLE PICKS FROM QUAKEML
     if time_array.size == 0:
        print("There are no available picks from the quakeml file, pick time will be calculated by the Taup")
@@ -177,7 +181,11 @@ for e, lab in enumerate(event_id):
        #print(arrivals_2)
        #print(arrivals[0])
        #continue #this was being used before taup integration
+       print('===== tt: ',arrivals[0].time)     #####################
+
+    
     #WAVEFORMS FROM IRIS
+    print('========= array code: ',array_code)     ################
     if array_code == "bc":
        array_name = "Beaver Creek"
        inventory = client_wm.get_stations(network="IM", station="BC*")
@@ -210,6 +218,9 @@ for e, lab in enumerate(event_id):
              continue
     if array_code == "im":
        array_name = "Indian Mountain"
+       print('====before: ',t)           #####################
+       t = evot + 45.5
+       print('====after: ',t)
        inventory = client_wm.get_stations(network="IM", station="IM*")
        try:
           st = client_wm.get_waveforms("IM", "IM*", "*", "SHZ", t - (ts_full+0.1), t + (te_full+0.1), attach_response=True)
@@ -351,7 +362,7 @@ for e, lab in enumerate(event_id):
        err_baz = err_baz - 360
     else:
        err_baz = err_baz
-    #print(gc_baz,float(cl_baz),err_baz)
+    #print('------>  ',gc_baz,float(cl_baz),err_baz) ######
     fig1.subplots_adjust(left=0.15, top=0.95, right=0.95, bottom=0.2, hspace=0)
     file1.write("{0:12} {1:2} {2:} {3:} {4:3.1f} {5:6.3f} {6:7.3f} {7:3.0f} {8:6.3f} {9:6.2f} {10:6.2f} {11:7.2f} {12:4.2f} {13:5.3f} {14:4} {15:2}     {16:10}".format(event_list[e],array_code,event_date,event_time,evmag,evlat,evlon,evdep,float(gc_dist),float(gc_baz),float(cl_baz),float(err_baz),float(cl_rlp),float(cl_slw),stn_pick,nos,evtype))
     file1.write("\n")
