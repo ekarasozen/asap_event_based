@@ -53,6 +53,12 @@ te_full = 80 #for full waveform P + te_full (in seconds)
 ts_win = -6 # for trimmed waveform P pick window +/- (in seconds)
 te_win = 11 # for trimmed waveform P pick window +/- (in seconds)
 win_len = te_win+ts_win #should be x2 of t_win in seconds
+ttIM = 45.5
+ttBM = 45.5
+ttBC = 45.5
+ttIL = 45.5
+
+
 
 file1 = open(path + array_code + "_obspy_processing.out","w")
 file1.write("EVENT_ID"+"\t"+" AN"+"\t"+"DATE"+"\t"+"   TIME"+"\t"+"    MAG"+"\t"+"LAT"+"\t"+"   LON"+"\t"+"     DP"+"\t"+" DIST"+"\t"+" TBAZ"+"\t"+"MBAZ"+"\t"+"EBAZ"+" "+"RPW"+"  "+"SLW"+"\t"+"PICK"+"  "+"NOS"+"\t"+"TYPE"+"\n")
@@ -100,94 +106,17 @@ for e, lab in enumerate(event_id):
     #ARRAY PICKS FROM QUAKEML
     picks = cat[0].picks
     arrivals = cat[0].origins[0].arrivals
-    for i in picks:
-       station_code = i.waveform_id.station_code
-       network_code = i.waveform_id.network_code
-       if array_code == "bc":
-          if (network_code=="IM" or network_code=="XM") and station_code[0:3]=="BC0":
-             for j in arrivals:
-                if j.pick_id.id==i.resource_id and j.phase=="P": #done to make sure this is a P pick. for loops are most probably redundant but couldn't figure out a better way to solve this *yet*
-                   time_array = np.append(time_array, [i.time])
-                   t=i.time
-             stn_pick = station_code # p pick is from this station
-          #for cases when there are no picks from BC array but from the nearby TA
-          elif network_code=="TA" and station_code=="L27K":
-             time_array = np.append(time_array, [i.time])
-             for j in arrivals:
-                if j.pick_id.id==i.resource_id and j.phase=="P":
-                   time_array = np.append(time_array, [i.time])
-                   t=i.time
-             stn_pick = station_code # p pick is from this station
-       if array_code == "bm":
-          if (network_code=="IM" or network_code=="XM") and station_code[0:3]=="BM0":
-             time_array = np.append(time_array, [i.time])
-             for j in arrivals:
-                if j.pick_id.id==i.resource_id and j.phase=="P":
-                   time_array = np.append(time_array, [i.time])
-                   t=i.time
-             stn_pick = station_code # p pick is from this station
-       if array_code == "il":
-          if (network_code=="IM" or network_code=="XM") and station_code[0:2]=="IL": #this also covers IL31
-             time_array = np.append(time_array, [i.time])
-             for j in arrivals:
-                if j.pick_id.id==i.resource_id and j.phase=="P":
-                   time_array = np.append(time_array, [i.time])
-                   t=i.time
-             stn_pick = station_code # p pick is from this station
-       if array_code == "im":
-          if (network_code=="IM" or network_code=="XM") and station_code[0:3]=="IM0":
-             time_array = np.append(time_array, [i.time])
-             for j in arrivals:
-                if j.pick_id.id==i.resource_id and j.phase=="P":
-                   time_array = np.append(time_array, [i.time])
-                   t=i.time
-             stn_pick = station_code # p pick is from this station
-       #IF YOU WANT TO TAKE EARLIEST PICK FOR START TIME:
-       #t = (np.amin(time_array))
-
-
-
-
-    #OBSPY TAUP FOR THE CASES WHEN THERE ARE NO AVAILABLE PICKS FROM QUAKEML
-    if time_array.size == 0:
-       print("There are no available picks from the quakeml file, pick time will be calculated by the Taup")
-       st_lat_tp = np.empty((0, 100))
-       st_lon_tp = np.empty((0, 100))
-       if array_code == "bc":
-          inventory_tp = client_wm.get_stations(network="IM", station="BC*")
-       if array_code == "bm":
-          inventory_tp = client_wm.get_stations(network="IM", station="BM*")
-       if array_code == "il":
-          inventory_tp = client_wm.get_stations(network="IM", station="IL*")
-       if array_code == "im":
-          inventory_tp = client_wm.get_stations(network="IM", station="IM*")
-       nos_tp = len(inventory_tp[0])
-       for tp in range (nos_tp):
-          st_lat_tp = np.append(st_lat_tp, [inventory_tp[0][tp].latitude])
-          st_lon_tp = np.append(st_lon_tp, [inventory_tp[0][tp].longitude])
-       stalat_tp = np.mean(st_lat_tp)
-       stalon_tp = np.mean(st_lon_tp)
-       client = Client()
-       gc_distaz_tp = client.distaz(stalat=stalat_tp, stalon=stalon_tp, evtlat=evlat, evtlon=evlon)
-       gc_dist_tp = gc_distaz_tp['distance']
-       arrivals = model_l.get_travel_times(float(evdep),float(gc_dist_tp),phase_list=["P", "Pn", "Pg", "p"])
-       if len(arrivals) == 0:
-          print('There are no available Pg, Pn, P or p picks from Taup')
-          continue
-#       arrivals_2 = model_l.get_travel_times(float(evdep),float(gc_dist_tp))
-       else: 
-          t = evot + arrivals[0].time #make sure this is the earliest one 
-       stn_pick = "Taup"
-       #print(arrivals_2)
-       #print(arrivals[0])
-       #continue #this was being used before taup integration
-       print('===== tt: ',arrivals[0].time)     #####################
+    # REMOVED LARGE SECTION SCANNING OVER PHASE PICKS .....
+  
+    # REMOVED LARGE TAUP SECTION ...
 
     
     #WAVEFORMS FROM IRIS
     print('========= array code: ',array_code)     ################
+    stn_pick = "man"
     if array_code == "bc":
        array_name = "Beaver Creek"
+       t = evot + ttBC
        inventory = client_wm.get_stations(network="IM", station="BC*")
        try: #FOR THE CASES WHEN THERE ARE NO WAVEFORMS
           st = client_wm.get_waveforms("IM", "BC*", "*", "SHZ", t - (ts_full+0.1), t + (te_full+0.1), attach_response=True)
@@ -198,6 +127,7 @@ for e, lab in enumerate(event_id):
              continue
     if array_code == "bm":
        array_name = "Burnt Mountain"
+       t = evot + ttBM
        inventory = client_wm.get_stations(network="IM", station="BM*")
        try:
           st = client_wm.get_waveforms("IM", "BM*", "*", "SHZ", t - (ts_full+0.1), t + (te_full+0.1), attach_response=True)
@@ -208,6 +138,7 @@ for e, lab in enumerate(event_id):
              continue
     if array_code == "il":
        array_name = "Eielson"
+       t = evot + ttIL
        inventory = client_wm.get_stations(network="IM", station="IL*")
        try:
           st = client_wm.get_waveforms("IM", "IL*", "*", "SHZ", t - (ts_full+0.1), t + (te_full+0.1), attach_response=True)
@@ -218,9 +149,7 @@ for e, lab in enumerate(event_id):
              continue
     if array_code == "im":
        array_name = "Indian Mountain"
-       print('====before: ',t)           #####################
-       t = evot + 45.5
-       print('====after: ',t)
+       t = evot + ttIM
        inventory = client_wm.get_stations(network="IM", station="IM*")
        try:
           st = client_wm.get_waveforms("IM", "IM*", "*", "SHZ", t - (ts_full+0.1), t + (te_full+0.1), attach_response=True)
