@@ -213,8 +213,9 @@ for e, lab in enumerate(event_id):
        except Exception:
              print('No waveform data found!')
              continue
-    st.filter(filter_type, freqmin=freqmin, freqmax=freqmax)
+    st.detrend(type='simple')
     st.taper(max_percentage=0.05, type='cosine')
+    st.filter(filter_type, freqmin=freqmin, freqmax=freqmax)
     #PLOT STATIONS
     inventory.plot(fig=fig1, show=False)
     try:

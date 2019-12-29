@@ -31,9 +31,9 @@ model_l = TauPyModel(model="northak")
 #model_l = TauPyModel(model="scak")
 #model_l = TauPyModel(model="kaktovik")
 
-event_list = ['ak01743krbh2', 'ak0173ylxr8d', 'ak0171dm7fc5', 'ak017a95ih8', 'ak0167hy1d59', 'ak0166y3vho0', 'ak0166fx3f0m', 'ak0165h6po0t', 'ak0164u18ywd', 'ak0164k3z03c', 'ak0164gsjups', 'ak0164a41tzu', 'ak0163ylihyn', 'ak0163wxwn70', 'ak0163oocsvm', 'ak01637s98ri', 'ak0162zhxu4q', 'ak0162w6v3nk', 'ak0162nx85ru', 'ak0162kmqt2b', 'ak0161shz9cp', 'ak0161lvujcv', 'ak01615cgrp2', 'ak01610duz03', 'ak016evvbbc', 'ak015gbfpd44', 'ak015ft8vcrv', 'ak015f93ukeq', 'ak015ek9z6j7', 'ak015e8oqtm0', 'ak015dxhl4kt', 'ak015d3pxpm0', 'ak015c1b588a', 'ak015bwq413k', 'ak015bv2m0tt', 'ak015bl54jdp', 'ak015bct4cs7', 'ak015b4jejcs', 'ak015appz2xo', 'ak015ac5diey', 'ak0159h21fd0', 'ak0158x7ylke', 'ak0158s79jft', 'ak0158ew0dxq', 'ak0157jlwjqp', 'ak0157813cgc', 'ak0156o48o5o', 'ak0156kvkkbh', 'ak0153wwpwby', 'ak0152fnkuvs', 'ak015291c43f']
+#event_list = ['ak01743krbh2', 'ak0173ylxr8d', 'ak0171dm7fc5', 'ak017a95ih8', 'ak0167hy1d59', 'ak0166y3vho0', 'ak0166fx3f0m', 'ak0165h6po0t', 'ak0164u18ywd', 'ak0164k3z03c', 'ak0164gsjups', 'ak0164a41tzu', 'ak0163ylihyn', 'ak0163wxwn70', 'ak0163oocsvm', 'ak01637s98ri', 'ak0162zhxu4q', 'ak0162w6v3nk', 'ak0162nx85ru', 'ak0162kmqt2b', 'ak0161shz9cp', 'ak0161lvujcv', 'ak01615cgrp2', 'ak01610duz03', 'ak016evvbbc', 'ak015gbfpd44', 'ak015ft8vcrv', 'ak015f93ukeq', 'ak015ek9z6j7', 'ak015e8oqtm0', 'ak015dxhl4kt', 'ak015d3pxpm0', 'ak015c1b588a', 'ak015bwq413k', 'ak015bv2m0tt', 'ak015bl54jdp', 'ak015bct4cs7', 'ak015b4jejcs', 'ak015appz2xo', 'ak015ac5diey', 'ak0159h21fd0', 'ak0158x7ylke', 'ak0158s79jft', 'ak0158ew0dxq', 'ak0157jlwjqp', 'ak0157813cgc', 'ak0156o48o5o', 'ak0156kvkkbh', 'ak0153wwpwby', 'ak0152fnkuvs', 'ak015291c43f']
 
-#event_list = ['ak0153wwpwby']
+event_list = ['ak017a95ih8', 'ak0164a41tzu', 'ak0153wwpwby']
 
 
 
@@ -46,17 +46,17 @@ event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for 
 array_code = input("Array Code (bc, bm, il, im):")
 
 filter_type = "bandpass" # waveform filtering
-freqmin = 1 # waveform & array processing filtering
-freqmax = 3 # waveform & array processing filtering
-ts_full = 20 #for full waveform P - ts_full (in seconds)
-te_full = 80 #for full waveform P + te_full (in seconds)
-ts_win = -6 # for trimmed waveform P pick window +/- (in seconds)
-te_win = 11 # for trimmed waveform P pick window +/- (in seconds)
+freqmin = 2 # waveform & array processing filtering
+freqmax = 4 # waveform & array processing filtering
+ts_full = 10 #for full waveform P - ts_full (in seconds)
+te_full = 10 #for full waveform P + te_full (in seconds)
+ts_win = 1 # for trimmed waveform P pick window +/- (in seconds)
+te_win = 4 # for trimmed waveform P pick window +/- (in seconds)
 win_len = te_win+ts_win #should be x2 of t_win in seconds
 ttIM = 45.5
-ttBM = 45.5
-ttBC = 45.5
-ttIL = 45.5
+ttBM = 44.1
+ttBC = 48.7
+ttIL =  5.5
 
 
 
@@ -158,8 +158,9 @@ for e, lab in enumerate(event_id):
        except Exception:
              print('No waveform data found!')
              continue
-    st.filter(filter_type, freqmin=freqmin, freqmax=freqmax)
+    st.detrend(type='simple')
     st.taper(max_percentage=0.05, type='cosine')
+    st.filter(filter_type, freqmin=freqmin, freqmax=freqmax)
     #PLOT STATIONS
     inventory.plot(fig=fig1, show=False)
     try:
