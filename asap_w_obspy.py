@@ -213,13 +213,24 @@ for e, lab in enumerate(event_id):
        except Exception:
              print('No waveform data found!')
              continue
-    st.filter(filter_type, freqmin=freqmin, freqmax=freqmax)
+    st.detrend("linear")
+    st.detrend("demean")
     st.taper(max_percentage=0.05, type='cosine')
+    st.filter(filter_type, freqmin=freqmin, freqmax=freqmax)
     #PLOT STATIONS
     inventory.plot(fig=fig1, show=False)
     try:
        y_min = np.nanmin(st[:]) #for y axis to share same min and max values within all wfs
        y_max = np.nanmax(st[:])
+    except NotImplementedError: #not sure why there is an error like this but this is the way around:
+        print('To ambiguous, therefore not implemented, skipping this event')
+        continue
+    tr= st.copy()
+    st_trim = st.trim(t - (ts_win+0.1), t + (te_win+0.1)) #trim is done inside the loop, because otherwise st changes and whole wf cannot be plotted
+#    st_trim_t = st_trim+t.taper(max_percentage=0.1, type='cosine')
+    try:
+        y_min_trim = np.nanmin(st_trim[:]) #for y axis to share same min and max values within all wfs
+        y_max_trim = np.nanmax(st_trim[:])
     except NotImplementedError: #not sure why there is an error like this but this is the way around:
         print('To ambiguous, therefore not implemented, skipping this event')
         continue
@@ -234,24 +245,21 @@ for e, lab in enumerate(event_id):
         st_lon = np.append(st_lon, [inventory[0][s].longitude])
         st_nam = np.append(st_nam, [st[s].stats.station])
         ax2 = fig1.add_subplot(nos, 4, ((4*s)+2))
-        wf_all = st[s]
+        wf_all = tr[s]
         ax2.plot(wf_all.times("matplotlib"), wf_all.data, "k-", linewidth=0.3)
         text = (st[s].stats.station)
+        wf_trim= st_trim[s]
         ax2.set_ylim(ymin=y_min, ymax=y_max)
         ax2.xaxis_date()
         ax2.axvline(date2num((t-ts_win).datetime), lw=0.8, c='darkblue', ls='--', label='time win.')
         ax2.axvline(date2num((t+te_win).datetime), lw=0.8, c='darkblue', ls='--')
         ax2.axvline(date2num(t.datetime), lw=0.8, c='darkred', label='P pick')
         ax2.text(0.10, 0.95, text, transform=ax2.transAxes, fontsize=8, fontweight='bold', verticalalignment='top')
-        st_trim = st[s].trim(t - (ts_win+0.1), t + (te_win+0.1)) #trim is done inside the loop, because otherwise st changes and whole wf cannot be plotted
-        wf_trim = st_trim.taper(max_percentage=0.1, type='cosine')
+        #st_trim = st[s].trim(t - (ts_win+0.1), t + (te_win+0.1)) #trim is done inside the loop, because otherwise st changes and whole wf cannot be plotted
+        #wf_trim = st_trim.taper(max_percentage=0.1, type='cosine')
         ax3 = fig1.add_subplot(nos, 4, ((4*s)+3))
-        #ax3.set_ylim(ymin=y_min/10, ymax=y_max/10) #until we figure out a better way to do this, it seems to work. or the following.
-#         if y_max >= 1000: 
-#            ax3.set_ylim(ymin=y_min/10, ymax=y_max/10)
-#         else:
-#            ax3.set_ylim(ymin=y_min, ymax=y_max)        
         ax3.plot(wf_trim.times("matplotlib"), wf_trim.data, "k-", linewidth=0.3)
+        ax3.set_ylim(ymin=y_min_trim, ymax=y_max_trim)
         ax3.xaxis_date()
         ax3.axvline(date2num((t-ts_win).datetime), lw=0.8, c='darkblue', ls='--', label='time win.')
         ax3.axvline(date2num((t+te_win).datetime), lw=0.8, c='darkblue', ls='--')
@@ -344,6 +352,8 @@ for e, lab in enumerate(event_id):
     err_baz = gc_baz - cl_baz
     if err_baz > 180:
        err_baz = err_baz - 360
+    elif err_baz < -180:
+       err_baz = err_baz + 360
     else:
        err_baz = err_baz
     #print(gc_baz,float(cl_baz),err_baz)
@@ -362,4 +372,3 @@ for e, lab in enumerate(event_id):
     fig1.savefig(path + event_list[e] + "_" + array_code + '.pdf', bbox_inches='tight')
 #    fig1.savefig(run_name + "_" + event_list[e] + "_" + array_code + '_base.pdf', bbox_inches='tight')
 file1.close()
-    
