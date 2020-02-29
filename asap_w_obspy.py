@@ -24,6 +24,9 @@ from matplotlib.ticker import FormatStrFormatter
 # -*- coding: utf-8 -*-
 from obspy.taup import TauPyModel
 from obspy.taup import plot_travel_times
+import sys
+sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap_w_obspy_git/")
+from addnoise import addnoise
 
 #CHOOSE FROM LOCAL V MODELS FOR TAUP CALCULATION
 #model_t = TauPyModel(model="ak135")
@@ -31,10 +34,12 @@ model_l = TauPyModel(model="northak")
 #model_l = TauPyModel(model="scak")
 #model_l = TauPyModel(model="kaktovik")
 
-event_list = ['ak013gruwywy', 'ak014a5ub3cb', 'ak014adv1x8g', 'ak014b5xf1in', 'ak014b7kdriu', 'ak014b9aftmg', 'ak014b60f27t', 'ak014b62vsxt', 'ak014b68fwpp', 'ak014bck7b9g', 'ak014cou8d9l', 'ak014di87vgp', 'ak014dlss56k', 'ak014dltci5h', 'ak014e8xt2cn', 'ak014frher8l', 'ak014ft3m0mj', 'ak014fy4p2ie', 'ak015cn4d0eh', 'ak015dyswg6d', 'ak015e8owu57', 'ak015f2i7ddl', 'ak016aw4yt72', 'ak016bjapymo', 'ak016c6edk4t', 'ak016d02wlg5', 'ak016d518fru', 'ak016djy97vd', 'ak016exvhy2o', 'ak016frfe9e2', 'ak016ggavb4a', 'ak016nguz3k', 'ak017aar9fid', 'ak017b65zkfy', 'ak017bodzh0t', 'ak017bv19dof', 'ak017crsm45v', 'ak017df0437h', 'ak017e7b798p', 'ak017ec3jenv', 'ak018a0vq7zd', 'ak018acfg224', 'ak018ae1ar10', 'ak018afourf2', 'ak018aixywwk', 'ak018akg7zql', 'ak018akht57l', 'ak018am92po3', 'ak018amcmumm', 'ak018aw96dn0', 'ak018b13lw5m', 'ak018b160qu2', 'ak018cbizgzx', 'ak018coiadru', 'ak018cyhsaze', 'ak018d8dv7u8', 'ak018d718yqc', 'ak018da4zt40', 'ak018dlecu0', 'ak018dnafpg3', 'ak018dtutpev', 'ak018ekig6gu', 'ak018em0mbpl', 'ak018exsi6u4', 'ak018fcoysc3', 'ak018fe8g0c9', 'ak018ffr9ir9', 'ak018ggaykit', 'ak018lmayyr', 'ak018njcg8s', 'ak018votkl8', 'ak018vt8d37', 'ak019aalxkjy', 'ak019by1s99x', 'ak019ddh6gwg', 'ak019fcqqncm', 'ak019sbd0aw', 'ak0142zpz7gu', 'ak0143elpe3h', 'ak0144f1g1sr', 'ak0146arywc2', 'ak0146uon19t', 'ak0153elsnkx', 'ak0161ae7d1u', 'ak0161ui3nog', 'ak0161w3grph', 'ak0162cceroh', 'ak0162kq0d9f', 'ak0164s3150k', 'ak0165m3p95m', 'ak0166arin7w', 'ak0168s0m9ds', 'ak0169f6vp18', 'ak0171fkpvxq', 'ak0172b22lil', 'ak0172cmv3bz', 'ak0175vrtiuu', 'ak0176ukq2m', 'ak0178ry7omj', 'ak0181u649m5', 'ak0181u649m5', 'ak0182ksu6cf', 'ak0182plgsrf', 'ak0183b4m226', 'ak0184nb2fzw', 'ak0186uo9bc4', 'ak0188d4oyaj', 'ak0188dbg38e', 'ak0188laqakg', 'ak0188n4v5yj', 'ak0188n4v5yj', 'ak0188rwahak', 'ak0188x5as43', 'ak0188yre6y6', 'ak0189f3mjil', 'ak0191w0zgvv', 'ak0192mc2j6m', 'ak0192zumrhu', 'ak0193exoam', 'ak0193wxcfea', 'ak0193ycm3x7', 'ak0194ibqout', 'ak0194vdzjyo', 'ak0195xfh9zo', 'ak0197mmyxjj', 'ak0198ey5yyy', 'ak0198gbkbu4', 'ak0199za3yf', 'ak01418xv3ou', 'ak01439k6eg1', 'ak01548d9sgp', 'ak01613w9jul', 'ak01613z8owf', 'ak01615h8iq3', 'ak01660vze8u', 'ak01731b4jgx', 'ak01768zlboj', 'ak01834kwkl7', 'ak01834kwkl7', 'ak01834pp956', 'ak01843dldfm', 'ak01860o899o', 'ak01881pylyd', 'ak01934uh1xo', 'ak01936gujyv', 'ak01939oejs4', 'ak01959muqd', 'ak01979fs1wt', 'ak017888ov6t', 'ak019400r8q9', 'ak019574uo3u', 'ak20238992', 'us1000d1a0', 'us1000d1sj', 'us1000d1xl', 'us1000d3m0', 'us1000d3mt', 'us1000d24j', 'us1000d324', 'us1000e1bk', 'us1000ez1v', 'us2000cncp', 'us2000cr6x', 'us2000cynn', 'us2000dbw6', 'us2000dvrd']
+#ALL 191 FINAL SELECTION BENCHMARK DATASET AS OF FEB 12 2020
+#event_list = ['ak0147odw83x', 'ak01479cs1ql', 'ak01460tnurs', 'ak0145qxe8b6', 'ak0145qx2tq1', 'ak0145nmf4mh', 'ak0145nlz3oh', 'ak0145nlrjqg', 'ak0145nlaph8', 'ak0145nl41pp', 'ak0145nkrjaf', 'ak016gg2nkth', 'ak0153hov4fk', 'ak0145aam3cq']
 
-#event_list = ['ak018aap2cqu'] #kaktovik mag6 mainshock
-#event_list = ['ak014azdbz0f'] #test events
+#event_list = ['ak014azdbz0f'] #kaktovik mag6 mainshock
+#event_list = ['ak018aap2cqu', 'ak014azdbz0f'] #test events
+event_list = ['ak018aap2cqu', 'ak014azdbz0f'] #test events
 #run_name = input("Run Name (for output file names):") #YOU CAN CHANGE THIS TO FOLDER NAME MAYBE. 
 path = input("Enter the path of your file: ")
 event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
@@ -46,7 +51,7 @@ freqmax = 3 # waveform & array processing filtering
 ts_full = 20 #for full waveform P - ts_full (in seconds)
 te_full = 80 #for full waveform P + te_full (in seconds)
 ts_win = 1 # for trimmed waveform P pick window +/- (in seconds)
-te_win = 3 # for trimmed waveform P pick window +/- (in seconds)
+te_win = 9 # for trimmed waveform P pick window +/- (in seconds)
 win_len = te_win+ts_win #should be x2 of t_win in seconds
 
 file1 = open(path + array_code + "_obspy_processing.out","w")
@@ -213,6 +218,8 @@ for e, lab in enumerate(event_id):
        except Exception:
              print('No waveform data found!')
              continue
+    #print(st[0].stats.sampling_rate)
+    #print("STD", st.std()) 
     st.detrend("linear")
     st.detrend("demean")
     st.taper(max_percentage=0.05, type='cosine')
@@ -237,6 +244,10 @@ for e, lab in enumerate(event_id):
     #PLOT WAVEFORMS
     nos = len(st)
     for s in range(nos):
+        st[s].data = addnoise(st[s],2,20,0.1,0.4)
+        #nl=2*st[s].std() #noise level from std of each trace 
+        #noe=st[s].stats.npts #number of elements in trace
+        #st[s].data = st[s].data + np.random.normal(0,nl,noe) #ADDS RANDOM NOISE
         st[s].stats.coordinates = AttribDict({
            'latitude': inventory[0][s].latitude,
            'elevation': inventory[0][s].elevation,
@@ -294,7 +305,8 @@ for e, lab in enumerate(event_id):
        frqlow=freqmin, frqhigh=freqmax, prewhiten=0,
        # restrict output
        semb_thres=-1e9, vel_thres=-1e9, timestamp='mlabday',
-       stime=stime, etime=etime
+       stime=stime, etime=etime, 
+       method=1 #the method to use 0 == bf, 1 == capon
     )
     out = array_processing(st, **kwargs)
     cl_rlp = out[:, 1] #calculated relative power
