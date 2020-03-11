@@ -3,17 +3,15 @@ from scipy.signal import butter, lfilter
 def addnoise(st,type,amplitude,min_freq=1,max_freq=3):
     np.random.seed(42)
     nl=amplitude*st.std()
-    noe=st.stats.npts #number of elements
-    nos=st.stats.sampling_rate #sampling rate
-    #min_freq = 1 #minimum frequency to add noise
-    #max_freq = 3 #maximum frequency to add noise
+    noe=st.stats.npts 
+    nos=st.stats.sampling_rate 
     n = st.data.size #to define the size of the frequency array 
     timestep = 1/(nos) # to define the time step of the frequency array
     if type==1: #white noise, all stations
-        wn = np.random.normal(0,nl,noe) #white noise
+        wn = np.random.normal(0,nl,noe) 
         st.data = st.data + wn 
     if type==2: #band-limited white noise
-        f = np.fft.fft(st.data) #convert signal to frequency domain:
+        f = np.fft.fft(st.data) 
         #define the frequency array based on the signal size and time step
         #so that minimum - maximum frequency criteria can be applied:
         freqs = np.fft.fftfreq(n, d=timestep) 
@@ -24,7 +22,6 @@ def addnoise(st,type,amplitude,min_freq=1,max_freq=3):
         #add white noise to the frequency domain where the index criteria satisfy
         #with minimum - maximum frequency criteria, rest of the frequency array should remain same: 
         f[idx] += wn
-        #convert frequency array to time series:
         finv = np.fft.ifft(f).real
         st.data = finv
     return st.data
