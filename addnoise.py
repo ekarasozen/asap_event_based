@@ -5,22 +5,16 @@ def addnoise(st,type,amplitude,min_freq=1,max_freq=3):
     nl=amplitude*st.std()
     noe=st.stats.npts 
     nos=st.stats.sampling_rate 
-    n = st.data.size #to define the size of the frequency array 
-    timestep = 1/(nos) # to define the time step of the frequency array
+    n = st.data.size 
+    timestep = 1/(nos) 
     if type==1: #white noise, all stations
         wn = np.random.normal(0,nl,noe) 
         st.data = st.data + wn 
     if type==2: #band-limited white noise
         f = np.fft.fft(st.data) 
-        #define the frequency array based on the signal size and time step
-        #so that minimum - maximum frequency criteria can be applied:
         freqs = np.fft.fftfreq(n, d=timestep) 
-        #apply minimum - maximum frequency criteria to the frequency array indexes:
         idx = np.where(np.logical_and(freqs>=min_freq, freqs<=max_freq))[0]
-        #define white noise to be applied, size should be same with the index array:
         wn = np.random.normal(0,nl,len(idx))
-        #add white noise to the frequency domain where the index criteria satisfy
-        #with minimum - maximum frequency criteria, rest of the frequency array should remain same: 
         f[idx] += wn
         finv = np.fft.ifft(f).real
         st.data = finv
