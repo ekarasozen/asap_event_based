@@ -8,7 +8,7 @@ client_wm = Client("IRIS")
 from obspy.clients.iris import Client  #this is needed for gc_distaz calculation
 from obspy.taup import TauPyModel
 from obspy.taup import plot_travel_times
-#need to implement different network codes (,TA?)
+#TA option is not added. 
 
 def taup(inventory,evlat,evlon,evdep,model_l,phase_list):
     st_lat_tp = np.empty((0, 100))
@@ -65,5 +65,4 @@ def event(event_list, network_list, station_code, pick, channel, start_time, end
         except Exception:
                 print('No waveform data found!')
                 continue
-        return st
-
+    return st
