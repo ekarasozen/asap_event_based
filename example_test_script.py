@@ -4,17 +4,16 @@ from getdata import event
 from getdata import taup
 from prepdata import prep
 from addnoise import whitenoise
+import wavelet
 import matplotlib.pyplot as plt
 from obspy import Trace
 from obspy import Stream
-from obspy.signal.tf_misfit import cwt
 from obspy.imaging.cm import obspy_sequential
 import numpy as np
-
-
-# in your code
+import mlpy.wavelet as wave
 import json
-file = open('deneme.json')
+
+file = open('parameters.json')
 inputs = json.loads(file.read())
 event_list = inputs['event_list']
 
@@ -25,71 +24,91 @@ event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for 
 for e, lab in enumerate(event_id):
     st = event(ev_id=event_id[e], network_list=['IM','XM'], station_code="BC", pick="P", channel="SHZ", start_time=20, end_time=60)
     st = prep(st,filter_type="bandpass", freqmin=1, freqmax=3)
+    #DATA WITHOUT NOISE
+    scales = wavelet.scales(st[0])
+    t, freq = wavelet.param(st[0],scales)
+    X = wavelet.cwt(st[0],scales)
     fig1 = plt.figure()
-    dx, dy = 0.05, 0.05
-    ax1 = fig1.add_subplot(311)
-    ax1.plot(st[0].times("matplotlib"), st[0].data, "k-", linewidth=0.3)
-    ax1.xaxis_date()
-    fig3 = plt.figure()
-    npts = st[0].stats.npts
-    dt = st[0].stats.delta
-    t = np.linspace(0, dt * npts, npts)
-    st_sc = cwt(st[0].data, dt, 8, 1, 50)
-    ax21 = fig3.add_subplot(311)
-    x, y = np.meshgrid(t, np.logspace(np.log10(1), np.log10(50), st_sc.shape[0]))
-    ax21.set_xlabel("Time after %s [s]" % st[0].stats.starttime)
-    ax21.set_ylabel("Frequency [Hz]")
-    ax21.set_yscale('log')
-    ax21.set_ylim(1, 50)                        
-    st_n = st.copy()
-    noise = st.copy()
-    noise.clear()
-    trace1 = Trace()
-    trace1.stats.sampling_rate = 20.0
-    noise = Stream(traces=[trace1])
-    st_wo =noise.copy()
+    ax11 = fig1.add_axes([0.1, 0.75, 0.7, 0.2])
+    ax12 = fig1.add_axes([0.1, 0.1, 0.7, 0.60], sharex=ax11)
+    ax13 = fig1.add_axes([0.83, 0.1, 0.03, 0.6])
+    ax14 = fig1.add_axes([0.1, -0.15, 0.7, 0.2], sharex=ax11)
+    ax11.plot(t, st[0].data, 'k')
+    img = ax12.imshow(np.abs(X), extent=[t[0], t[-1], freq[-1], freq[0]],
+                     aspect='auto', interpolation='nearest', cmap=obspy_sequential)
+    # Hackish way to overlay a logarithmic scale over a linearly scaled image.
+    ax12.set_ylabel("Frequency [Hz] (log)",labelpad=30)
+    twin_ax = ax12.twinx()
+    twin_ax.set_yscale('log')
+    twin_ax.set_xlim(t[0], t[-1])
+    twin_ax.set_ylim(1, 50)
+    ax12.tick_params(which='both', labelleft=False, left=False)
+    twin_ax.tick_params(which='both', labelleft=True, left=True, labelright=False)
+    IX = wavelet.icwt(X, st[0])
+    ax14.plot(t, IX, 'k')
+    ax14.set_xlabel("Time after %s [s]" % st[0].stats.starttime)
+    fig1.colorbar(img, cax=ax13)
+    fig1.autofmt_xdate()    
+    fig1.savefig(event_list[e] + '.pdf', bbox_inches='tight')
+    #DATA WITH NOISE
     nos = len(st)
-    scal = ax21.pcolormesh(x, y, np.abs(st_sc), cmap=obspy_sequential)
-    fig3.colorbar(scal)
+    st_wn = st.copy()
     for s in range(nos):
-        #st_n[s].data = whitenoise(st_n[s],type=2,amplitude=20,min_freq=0.1,max_freq=0.4)
-        st_n[s].data = whitenoise(st_n[s],type=1,amplitude=20)
-    ax2 = fig1.add_subplot(312)
-    ax2.plot(st_n[0].times("matplotlib"), st_n[0].data, "k-", linewidth=0.3)
-    ax2.xaxis_date()
-    dt_n = st_n[0].stats.delta
-    st_n_sc = cwt(st_n[0].data, dt, 8, 1, 50)
-    ax22 = fig3.add_subplot(312)
-    x, y = np.meshgrid(t, np.logspace(np.log10(1), np.log10(50), st_n_sc.shape[0]))
-    ax22.set_xlabel("Time after %s [s]" % st_n[0].stats.starttime)
-    ax22.set_ylabel("Frequency [Hz]")
-    ax22.set_yscale('log')
-    ax22.set_ylim(1, 50)                        
-    n_scal = ax22.pcolormesh(x, y, np.abs(st_n_sc), cmap=obspy_sequential)
-    fig3.colorbar(n_scal)
-#    for s in range(nos):
-#        noise[s].data = st_n[s].data - st[s].data
- #      st_wo[s].data = st_n[s].data - noise[s].data
-    noise[0].data = st_n[0].data - st[0].data
-    st_wo[0].data = st_n[0].data - noise[0].data
-    ax3 = fig1.add_subplot(313)
-    ax3.plot(st_wo[0].times("matplotlib"), st_wo[0].data, "k-", linewidth=0.3)
-    ax3.xaxis_date()
-    noise_sc = st_n_sc-st_sc 
-    st_wo_sc = st_n_sc-noise_sc       
-    ax23 = fig3.add_subplot(313)
-    x, y = np.meshgrid(t, np.logspace(np.log10(1), np.log10(50), st_wo_sc.shape[0]))
-    ax23.set_xlabel("Time after %s [s]" % st[0].stats.starttime)
-    ax23.set_ylabel("Frequency [Hz]")
-    ax23.set_yscale('log')
-    ax23.set_ylim(1, 50) 
-    wo_scal = ax23.pcolormesh(x, y, np.abs(st_wo_sc), cmap=obspy_sequential)
-    fig3.colorbar(wo_scal)
-fig1.autofmt_xdate()    
-fig1.savefig('add_noise.pdf', bbox_inches='tight')
-    
-
-fig3.autofmt_xdate()    
-fig3.savefig('add_noise_cwt.pdf', bbox_inches='tight')
-
-
+        st_wn[s].data = whitenoise(st_wn[s],type=2,amplitude=200,min_freq=0.1,max_freq=0.4)
+        #st_wn[s].data = whitenoise(st_wn[s],type=1,amplitude=20)
+    scales = wavelet.scales(st_wn[0])
+    t, freq = wavelet.param(st_wn[0],scales)
+    X = wavelet.cwt(st_wn[0],scales)
+    fig2 = plt.figure()
+    ax21 = fig2.add_axes([0.1, 0.75, 0.7, 0.2])
+    ax22 = fig2.add_axes([0.1, 0.1, 0.7, 0.60], sharex=ax21)
+    ax23 = fig2.add_axes([0.83, 0.1, 0.03, 0.6])
+    ax24 = fig2.add_axes([0.1, -0.15, 0.7, 0.2], sharex=ax21)
+    ax21.plot(t, st_wn[0].data, 'k')
+    img = ax22.imshow(np.abs(X), extent=[t[0], t[-1], freq[-1], freq[0]],
+                     aspect='auto', interpolation='nearest', cmap=obspy_sequential)
+    # Hackish way to overlay a logarithmic scale over a linearly scaled image.
+    ax22.set_ylabel("Frequency [Hz] (log)",labelpad=30)
+    twin_ax = ax22.twinx()
+    twin_ax.set_yscale('log')
+    twin_ax.set_xlim(t[0], t[-1])
+    twin_ax.set_ylim(1, 50)
+    ax22.tick_params(which='both', labelleft=False, left=False)
+    twin_ax.tick_params(which='both', labelleft=True, left=True, labelright=False)
+    IX = wavelet.icwt(X, st_wn[0])
+    ax24.plot(t, IX, 'k')
+    ax24.set_xlabel("Time after %s [s]" % st_wn[0].stats.starttime)
+    fig2.colorbar(img, cax=ax23)
+    fig2.autofmt_xdate()    
+    fig2.savefig(event_list[e] + '_wn.pdf', bbox_inches='tight')
+    #NOISE REMOVED - THIS PART WILL HAVE ITS OWN MODULE AS "SPECTRAL SUBTRACTION METHODS"
+    nos = len(st)
+    st_won = st_wn.copy()
+    scales = wavelet.scales(st_won[0])
+    t, freq = wavelet.param(st_won[0],scales)
+    idx = np.where(np.logical_and(freq>=0.1, freq<=0.4))
+    X[idx] = 0
+    X = (X).real
+#    X = wavelet.cwt(st_won[0],scales)
+    fig3 = plt.figure()
+    ax31 = fig3.add_axes([0.1, 0.75, 0.7, 0.2])
+    ax32 = fig3.add_axes([0.1, 0.1, 0.7, 0.60], sharex=ax31)
+    ax33 = fig3.add_axes([0.83, 0.1, 0.03, 0.6])
+    ax34 = fig3.add_axes([0.1, -0.15, 0.7, 0.2], sharex=ax31)
+    ax31.plot(t, st_won[0].data, 'k')
+    img = ax32.imshow(np.abs(X), extent=[t[0], t[-1], freq[-1], freq[0]],
+                     aspect='auto', interpolation='nearest', cmap=obspy_sequential)
+    # Hackish way to overlay a logarithmic scale over a linearly scaled image.
+    ax32.set_ylabel("Frequency [Hz] (log)",labelpad=30)
+    twin_ax = ax32.twinx()
+    twin_ax.set_yscale('log')
+    twin_ax.set_xlim(t[0], t[-1])
+    twin_ax.set_ylim(1, 50)
+    ax32.tick_params(which='both', labelleft=False, left=False)
+    twin_ax.tick_params(which='both', labelleft=True, left=True, labelright=False)
+    IX = wavelet.icwt(X, st_won[0])
+    ax34.plot(t, IX, 'k')
+    ax34.set_xlabel("Time after %s [s]" % st_won[0].stats.starttime)
+    fig3.colorbar(img, cax=ax33)
+    fig3.autofmt_xdate()    
+    fig3.savefig(event_list[e] + '_won.pdf', bbox_inches='tight')
