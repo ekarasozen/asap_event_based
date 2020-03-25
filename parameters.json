@@ -1,0 +1,5 @@
+#parameter file, this will be the only file user will change. not sure this is the 
+#easiest package to use. that's why it only includes event_list for now
+{
+    "event_list": ["ak0184nb2fzw","ak014cou8d9l"]
+}
