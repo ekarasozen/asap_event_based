@@ -56,6 +56,7 @@ for e, lab in enumerate(event_id):
     for s in range(nos):
         st_wn[s].data = whitenoise(st_wn[s],type=2,amplitude=200,min_freq=0.1,max_freq=0.4)
         #st_wn[s].data = whitenoise(st_wn[s],type=1,amplitude=20)
+    print(st[0].std())
     scales = wavelet.scales(st_wn[0])
     t, freq = wavelet.param(st_wn[0],scales)
     X = wavelet.cwt(st_wn[0],scales)
