@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.signal import butter, lfilter
 def whitenoise(st,type,amplitude,min_freq=1,max_freq=3):
     np.random.seed(42)
     nl=amplitude*st.std()
