@@ -13,6 +13,8 @@ from obspy.imaging.cm import obspy_sequential
 import numpy as np
 import mlpy.wavelet as wave
 import json
+from scipy import signal
+import mlpy.wavelet as wave
 
 file = open('parameters.json')
 inputs = json.loads(file.read())
@@ -85,17 +87,26 @@ for e, lab in enumerate(event_id):
     fig2.autofmt_xdate()    
     fig2.savefig(event_list[e] + '_n.pdf', bbox_inches='tight')
     #NOISE REMOVAL
-    nos = len(st)
+    Fs=st_n[0].stats.sampling_rate #sampling rate
+    IS=st_n[0].stats.npts
+    x=st_n[0].data
+    #n=n[0].data
+    hanwin = np.hanning(IS)
+    signal.resample(hanwin,int(Fs))
+    n = x*hanwin
+    dt_n = 0.05
+    dj_n = 0.05
+    L = len(st_n[0].data)
+    scales_n = wave.autoscales(L, dt=dt_n, dj=dj_n, wf='morlet', p=6)
+    N = wave.cwt(x=n, dt=dt_n, scales=scales_n, wf='morlet', p=6)
     st_won = st_n.copy()
+    nos = len(st)
     scales = wavelet.scales(st_won[0])
     t, freq = wavelet.param(st_won[0],scales)
-    N = Xn-X #very very very simplistic
-    Xwon = ss.simple_amplitude(Xn,N)
-    #Xwon = (Xwon).real
-    #idx = np.where(np.logical_and(freq>=0.1, freq<=0.4))
-    #print(X[idx])
-    #Xn[idx] = 0
-    #Xwon = (Xn).real
+    idx = np.where(np.logical_and(freq>=0.1, freq<=0.4))
+    #N = Xn[]-X #very very very simplistic
+    Xwon = Xn
+    Xwon[idx] = ss.simple_amplitude(Xn[idx],N[idx])
 #    X = wavelet.cwt(st_won[0],scales)
     fig3 = plt.figure()
     ax31 = fig3.add_axes([0.1, 0.75, 0.7, 0.2])
