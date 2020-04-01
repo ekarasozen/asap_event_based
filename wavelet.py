@@ -18,6 +18,7 @@ def scales(st):
 def param (st,scales):
     omega0 = 6
     t = np.arange(st.stats.npts) / st.stats.sampling_rate
+    #from table 1 in Torrence & Compo '97'
     freq = (omega0 + np.sqrt(2.0 + omega0 ** 2)) / (4 * np.pi * scales[1:])
     return t, freq
 
