@@ -27,12 +27,8 @@ def cwt(st,scales):
     dj = 0.05
     signal = st.data
     omega0 = 6
-   # scales = scales(st)
     # approximate scales through frequencies
     X = wave.cwt(x=signal, dt=dt, scales=scales, wf='morlet', p=omega0)
-#    idx = np.where(np.logical_and(freq>=0.1, freq<=0.4))
-#     X[idx] = 0
-#     X = (X).real
     return X
 
 def icwt(X, st):
@@ -47,6 +43,4 @@ def icwt(X, st):
     #missing part of the eqn 11 is defined here as Sc=Scale
     Sc=(dj*math.sqrt(dt))/(Cr*Wo)
     IX = wave.icwt(X=(X*Sc), dt=dt, scales=scales, wf='morlet', p=omega0)
-    #np.savetxt('wavelet_8.out', Y, delimiter=',', newline='n')
-    #np.savetxt('inv_wavelet_8.out', IX, delimiter=' ', newline='n')
     return IX
