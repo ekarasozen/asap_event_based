@@ -23,5 +23,52 @@ def all(t, tr, X, freq, IX, fig, event_list, figname="original"):
     ax14.set_xlabel("Time after %s [s]" % tr.stats.starttime)
     fig.colorbar(img, cax=ax13)
     fig.autofmt_xdate()    
-    fig.savefig(event_list + '_'+ figname+ '.pdf', bbox_inches='tight')
+    fig.savefig(event_list + '_'+ figname + '.pdf', bbox_inches='tight')
     #fig.savefig('xx.pdf', bbox_inches='tight')
+    
+    
+def spectra(amp_o, amp_d, amp_n, amp_p, freqs_d, fig, event_list, figname="spectra_comparison"): 
+    # PLOT SAMPLE COLUMNS FROM THE DEGRADED AND PROCESSED CWT
+    mean_amp_o = np.mean(amp_o,axis=1)
+    mean_amp_n = np.mean(amp_n,axis=1)
+    mean_amp_d = np.mean(amp_d,axis=1)  
+    mean_amp_p = np.mean(amp_p,axis=1) 
+    #mean_amp_r = np.mean(amp_r,axis=1) 
+    fig, ax = plt.subplots()
+    #for i in range(1600, 1600):
+    #    ax.plot(freqs_d,amp_d[:,i], 'k-', lw=.25)
+    #    ax.plot(freqs_d,amp_p[:,i], 'y-', lw=.25)
+    #    #ax.plot(freqs_d,amp_r[:,i], 'b-', lw=.25)
+    ax.plot(freqs_d,mean_amp_o, 'b-', lw=2,label='degraded')
+    ax.plot(freqs_d,mean_amp_d, 'k-', lw=2,label='degraded')
+    ax.plot(freqs_d,mean_amp_p, 'y-', lw=2,label='processed')
+    #ax.plot(freqs_d,mean_amp_r, 'b-', lw=2,label='residual')
+    ax.plot(freqs_d,mean_amp_n, 'r-', lw=2,label='noise')
+    fig.savefig(event_list + '_'+ figname + '.pdf', bbox_inches='tight')
+    #plt.savefig('TMP_spectra_comparison.png')
+
+
+def scales_freq(freqs_d,scales_d, fig, event_list, figname="frequency_scale"): 
+    # MAKE A PLOT OF SCALES VS FREQUENCY
+    fig, ([ax1, ax2]) = plt.subplots(2,1)
+    h1 = ax1.loglog(freqs_d,scales_d) 
+    ax1.set_xlabel('frequency')
+    ax1.set_ylabel('scale')
+    plt.setp(h1, color='k', marker='o', markerfacecolor='r', markeredgecolor='k' )
+    h2 = ax2.plot(freqs_d,scales_d) 
+    ax2.set_xlabel('frequency')
+    ax2.set_ylabel('scale')
+    plt.setp(h2, color='k', marker='o', markerfacecolor='r', markeredgecolor='k' )
+    fig.savefig(event_list + '_'+ figname + '.pdf', bbox_inches='tight')
+    #plt.savefig('TMP_frequency_vs_scale.png')
+
+#def 
+#    # PLOT THE FORIER TRANSFORM OF THE FULL TRD AND TRN TRACES
+#    fig, ax = plt.subplots()
+#    line1=ax.plot(fftfreqs_d,np.abs(fft_d), 'r-', label='degraded', lw=.5)
+#    line2=ax.plot(fftfreqs_n,np.abs(fft_n), 'k-', label='noise', lw=.5)
+#    ax.set_xscale('log')
+#    ax.set_yscale('log')
+#    ax.set_xlim([0.1, 10])
+#    ax.legend()
+#    plt.savefig('TMP_ffts.png')

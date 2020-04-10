@@ -38,6 +38,7 @@ for e, lab in enumerate(event_id):
     scales = mlwt.scales(tro)
     t, freq = mlwt.param(tro,scales)
     Xo = mlwt.cwt(tro,scales)
+    amp_Xo = abs(Xo)
     IXo = mlwt.icwt(Xo, tro)
     fig1 = plt.figure()
     fig1 = plot.all(t, tro, Xo, freq, IXo, fig1, event_list[e], figname="original")
@@ -46,6 +47,7 @@ for e, lab in enumerate(event_id):
     scales_d = mlwt.scales(trd)
     t_d, freq_d = mlwt.param(trd,scales_d)
     Xd = mlwt.cwt(trd,scales_d)
+    amp_Xd = abs(Xd)
     IXd = mlwt.icwt(Xd, trd)
     fig2 = plt.figure()
     fig2 = plot.all(t_d, trd, Xd, freq_d, IXd, fig2, event_list[e], figname="garbage")
@@ -56,12 +58,18 @@ for e, lab in enumerate(event_id):
     t_n, freq_n = mlwt.param(trn,scales_n)
     Xn = mlwt.cwt(trn,scales_n)
     Xna = np.mean(Xn.real,axis=1)
-    trp = st[0].copy() # [p]rocessed version of degraded signal to remove the noise
-    amp_p = ss.simple_subtraction(Xd,Xna,2)
-    phase_d = np.exp(1j*(np.angle(Xd))) 
+    amp_Xn = abs(Xn) 
+    trp = trd.copy() # [p]rocessed version of degraded signal to remove the noise
+    amp_Xp = ss.simple_subtraction(Xd,Xna,2)
+    phase_Xd = np.exp(1j*(np.angle(Xd))) 
     scales_p = mlwt.scales(trp)
     t_p, freq_p = mlwt.param(trp,scales_p)
-    Xp = amp_p*phase_d
+    Xp = amp_Xp*phase_Xd
     IXp = mlwt.icwt((Xp), trp) 
     fig3 = plt.figure()
     fig3 = plot.all(t_p, trp, Xp, freq_p, IXp, fig3, event_list[e], figname="processed")
+    fig4 = plt.figure()
+    fig4 = plot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freq_d, fig4, event_list[e], figname="spectra_comparison")
+    fig5 = plt.figure()
+    fig5 = plot.scales_freq(freq_d, scales_d, fig5, event_list[e], figname="frequency_scale")
+
