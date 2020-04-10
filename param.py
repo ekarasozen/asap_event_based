@@ -12,8 +12,8 @@ filter_freqmax = 3
 #whitenoise parameters, trg  [g]arbage (aka, noise) used to purposefully degrade a good signals 
 noise_type = 2 #refer to addnoise for different types of whitenoise that can be added
 noise_amplitude = 200
-noise_freqmin = 0.1
-noise_freqmax = 0.4
+noise_freqmin = 1
+noise_freqmax = 4
 #noise estimation parameters, trn
 ibegin = 0
 iend = 200
