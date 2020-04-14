@@ -36,6 +36,7 @@ for e, lab in enumerate(event_id):
     st = event(ev_id=event_id[e], network_list=network_list, station_code=station_code, pick=pick_type, channel=channel, start_time=start_time, end_time=end_time)
     st = prep(st,filter_type=filter_type, freqmin=filter_freqmin, freqmax=filter_freqmax)
     tro = st[0].copy() #[o]riginal signal
+    trd = st[0].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
     scales = mlwt.scales(tro) ###mlpy
     t, freq = mlwt.param(tro,scales) ###mlpy
     Xo = mlwt.cwt(tro,scales) ###mlpy
@@ -51,7 +52,6 @@ for e, lab in enumerate(event_id):
     #IXo = wavelet.icwt(Xo, scales, dt, dj=0.05, wavelet='morlet') ###pycwt
     fig1 = plt.figure()
     fig1 = plot.all(t, tro, Xo, freq, IXo, fig1, event_list[e], figname="original")
-    trd = st[0].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
     trd.data = whitenoise(trd,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax) ###mlpy
     scales_d = mlwt.scales(trd) ###mlpy
     t_d, freq_d = mlwt.param(trd,scales_d) ###mlpy
@@ -75,14 +75,14 @@ for e, lab in enumerate(event_id):
     #Xn, scales_n, freq_n, coi_n, fft_n, fftfreqs_n = wavelet.cwt(trn.data, dt, dj, s0, J, mother)    ###pycwt
     amp_Xn = abs(Xn) 
     Xna = np.mean(Xn,axis=1)
-    trp = trd.copy() # [p]rocessed version of degraded signal to remove the noise
+    #trp = trd.copy() # [p]rocessed version of degraded signal to remove the noise, seems like there is no need for this
     amp_Xp = ss.simple_subtraction(Xd,Xna,2)
     phase_Xd = np.angle(Xd) 
     Xp = amp_Xp*(np.exp(1.j*phase_Xd))
     IXp = mlwt.icwt(Xp, trd) ###mlpy
     #IXp = wavelet.icwt(Xp, scales_d, dt, dj=0.05, wavelet='morlet') ###pycwt
     fig3 = plt.figure()
-    fig3 = plot.all(t_d, trp, Xp, freq_d, IXp, fig3, event_list[e], figname="processed")
+    fig3 = plot.all(t_d, trd, Xp, freq_d, IXp, fig3, event_list[e], figname="processed")
     fig4 = plt.figure()
     fig4 = plot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freq_d, fig4, event_list[e], figname="spectra_comparison")
     fig5 = plt.figure()
