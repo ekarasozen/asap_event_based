@@ -13,7 +13,6 @@ def all(t, tr, X, freq, IX, fig, event_list, figname="original"):
     ax14 = fig.add_axes([0.1, -0.15, 0.7, 0.2], sharex=ax11)
     ax11.plot(t, tr.data, 'k', linewidth=0.3)
     img = ax12.pcolormesh(tX, f, np.abs(X), cmap=obspy_sequential, vmin=minamp, vmax=maxamp)
-    #img = ax12.imshow(np.abs(X), cmap=obspy_sequential)
     ax12.set_ylabel("Frequency [Hz]")
     ax12.set_xlim(t[0], t[-1])
     ax12.set_ylim(freq[-1], freq[0])
@@ -21,8 +20,7 @@ def all(t, tr, X, freq, IX, fig, event_list, figname="original"):
     ax14.set_xlabel("Time after %s [s]" % tr.stats.starttime)
     fig.colorbar(img, cax=ax13)
     fig.autofmt_xdate()    
-    fig.savefig(event_list + '_'+ figname + '.pdf', bbox_inches='tight')
-    #fig.savefig('xx.pdf', bbox_inches='tight')
+    fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
 
 def all_log(t, tr, X, freq, IX, fig, event_list, figname="original"): 
     ax11 = fig.add_axes([0.1, 0.75, 0.7, 0.2])
