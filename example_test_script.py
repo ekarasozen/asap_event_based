@@ -2,7 +2,6 @@ import sys
 sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap_w_obspy_git/")
 from getdata import *
 from addnoise import whitenoise
-import param
 import spectral_subtraction as ss
 import mlwt ###mlpy
 import pycwt as wavelet  ###pycwt
@@ -13,28 +12,8 @@ from scipy import signal
 from obspy import Stream
 from obspy.imaging.cm import obspy_sequential
 
-event_list = param.event_list
-network_list = param.network_list
-station_code = param.station_code
-pick_type = param.pick_type
-channel = param.channel
-start_time = param.start_time
-end_time = param.end_time
-filter_type = param.filter_type
-filter_freqmin = param.filter_freqmin
-filter_freqmax = param.filter_freqmax
-noise_type = param.noise_type
-noise_amplitude = param.noise_amplitude
-noise_freqmin = param.noise_freqmin
-noise_freqmax = param.noise_freqmax
-ibegin = param.ibegin
-iend = param.iend
-cwt_type = param.cwt_type
-dj = param.dj
-omega0 = param.omega0
-wf = param.wf
-s0 = param.s0
-
+filename = input("Parameters file: ")
+exec(open(filename).read())
 
 event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
 for e, lab in enumerate(event_id):
@@ -83,6 +62,7 @@ for e, lab in enumerate(event_id):
         amp_Xn = abs(Xn)
         #amp_Xp = ss.simple_subtraction(amp_Xd,amp_Xn,2)
         amp_Xp = ss.over_subtraction(amp_Xd,amp_Xn,2)
+        #amp_Xp = ss.nonlin_subtraction(amp_Xd,amp_Xn)
         phase_Xd = np.angle(Xd)
         Xp = amp_Xp*(np.exp(1.j*phase_Xd))
         IXp = wavelet.icwt(Xp, scales_d, dt, dj=0.05, wavelet='morlet')
