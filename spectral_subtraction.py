@@ -65,11 +65,11 @@ def nonlin_subtraction(amp_Xd, amp_Xn):
     amp_Xna = np.mean(amp_Xn,axis=1)
     beta=0.1 #Fukane 2011
     N = np.max(amp_Xna)
-    r = 3 # no idea what r is scaling factor in Fukane. 
+    gamma = 0.5 # scaling factor, r in Fukane, gamma in Lockwood, might be the smoothing factor in Upadhyay taken as 0.5
     SNR = amp_Xda/amp_Xna
     print(N)
     print(SNR)
-    alpha = (1/r) + SNR
+    alpha = 1 / (1 + (gamma*SNR))
     for i in range(0,m):
         amp_Xp[i,:] = (amp_Xd[i,:]) - ((alpha[i])*(N)) #Fukane 11
         for j in range(0,n):
@@ -79,4 +79,61 @@ def nonlin_subtraction(amp_Xd, amp_Xn):
                 amp_Xp[i,j] = (beta)*(amp_Xd[i,j])
         #np.savetxt('amp_Xp.out', amp_Xp, delimiter=',', newline="\n")   # X is an array
     return amp_Xp   
-  
+
+
+def mulban_subtraction(tro, amp_Xd, amp_Xn): #mainly from Upadhyay and Karmakar 2013
+    p = 2 
+    SNR_min = -5 #db
+    SNR_max = 20 #db
+    alpha_min = 1
+    alpha_max = 5
+    beta=0.002 #in Kamath and Loizou
+    FS = tro.stats.sampling_rate
+    #delta :tweaking factor that can be individually set for each frequency band to customize the noise removal properties.
+    for i in range(0,m):
+    NEED a frequency scale conversion here I guess.
+        w [0.09, 0.25, 0.32, 0.25, 0.09]. #what about i? 
+        if freqs =< 1: #khz #in Kamath and Loizous
+            delta = 1
+        elif freqs > 1 and freqs <= ((FS/2) - 2):
+            delta = 2.5
+        elif freqs > ((FS/2) - 2):
+            delta = 1.5
+        SNR[i] = np.sum(amp_XdP[i,:]) / np.sum(amp_XnaP[i])
+        SNR[i] = 10*np.log10(SNR[i]) #convert snr to decibels
+        if SNR[i] < SNR_min: #this is very similar to over subtraction alpha constraints.....
+            alpha = alpha_max
+        elif SNR[i] >= SNR_min and SNR[i] <= SNR_max:
+            alpha = alpha_max + ((SNR[i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
+        elif SNR[i] > SNR_max:
+            alpha = alpha_min
+        (amp_Xp[i,:] ** p) = (amp_Xd[i,:] ** p) - (alpha)*(delta)(amp_Xna[i] ** p) 
+        for j in range(0,n):
+            if (amp_Xp[i,j] ** p) > (beta)*(amp_Xna[i] ** p): 
+                (amp_Xp[i,:] ** p) = (amp_Xp[i,:] ** p)
+            else:
+                (amp_Xp[i,:] ** p) = (beta)*(amp_Xd[i,:] ** p)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
