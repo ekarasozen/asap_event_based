@@ -44,7 +44,6 @@ def over_subtraction(amp_Xd, amp_Xn, p):
             alpha[i] = alpha0-(3/20*SNR[i])
         elif SNR[i] >= 20:
             alpha[i] = alpha0-3 
-        print(alpha)
         #amp_Xp[i,:] = (amp_Xd[i,:] ** p) - ((alpha[i])*(amp_Xna[i] ** p)) #Hassani 2011
         amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (amp_Xna[i] ** p) # Fukane 2011
         for j in range(0,n):
@@ -57,24 +56,23 @@ def over_subtraction(amp_Xd, amp_Xn, p):
     amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed
     return amp_Xp   
 
-def nonlin_subtraction(amp_Xd, amp_Xn): 
+def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
     m, n = amp_Xd.shape 
-    SNR = np.zeros((m))
     alpha = np.zeros((m))
+    rho = np.zeros((m))
+    phi = np.zeros((m))
     amp_Xp = np.zeros((m,n))
     amp_Xda = np.mean(amp_Xd,axis=1)
     amp_Xna = np.mean(amp_Xn,axis=1)
     beta=0.1 #Fukane 2011
-    N = np.max(amp_Xna)
-    gamma = 0.5 # scaling factor, r in Fukane, gamma in Lockwood, might be the smoothing factor in Upadhyay taken as 0.5
-    SNR = amp_Xda/amp_Xna
-    print(N)
-    print(SNR)
-    alpha = 1 / (1 + (gamma*SNR))
+    gamma = 0.5 # scaling factor, r in Fukane, gamma in Lockwood, is this the smoothing factor in Upadhyay taken as 0.5?
     for i in range(0,m):
-        amp_Xp[i,:] = (amp_Xd[i,:]) - ((alpha[i])*(N)) #Fukane 11
+        alpha = np.max(amp_Xna[i]) # Lockwood calculates this for the last 40 frames, not sure this is necessary in our case - yet.  
+        rho = amp_Xd[i,:]/amp_Xna[i]
+        phi = alpha / (1 + (gamma*rho[i]))
+        amp_Xp[i,:] = (amp_Xd[i,:]) - phi
         for j in range(0,n):
-            if amp_Xd[i,j] > (alpha[i])*(N) + ((beta)*(amp_Xna[i])):
+            if amp_Xd[i,j] > phi + ((beta)*(amp_Xna[i])):
                 amp_Xp[i,j] = amp_Xp[i,j]
             else:
                 amp_Xp[i,j] = (beta)*(amp_Xd[i,j])
@@ -83,45 +81,77 @@ def nonlin_subtraction(amp_Xd, amp_Xn):
 
 
 def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Karmakar 2013
-    m, n = amp_Xd.shape 
+    p = 2 
+    m, n = amp_Xd.shape
     SNR = np.zeros((m))
     alpha = np.zeros((m))
+    delta = np.zeros((m))
     amp_Xp = np.zeros((m,n))
+    amp_XdP = amp_Xd ** p
     amp_Xna = np.mean(amp_Xn,axis=1)
-    p = 2 
+    amp_XnaP = amp_Xna ** p
     SNR_min = -5 #db
     SNR_max = 20 #db
     alpha_min = 1
     alpha_max = 5
     beta=0.002 #in Kamath and Loizou
     FS = tro.stats.sampling_rate
-    print(freqs)
     #delta :tweaking factor that can be individually set for each frequency band to customize the noise removal properties.
-#    idx = np.where(np.logical_and(freqs>=min_freq, freqs<=max_freq))[0]
     for i in range(0,m):
-    #NEED a frequency scale conversion here I guess.
-    #   w [0.09, 0.25, 0.32, 0.25, 0.09]. #what about i? 
         if freqs[i] <= 1: #khz #in Kamath and Loizous
             delta = 1
+            idx = np.transpose(np.where(np.logical_and(freqs>0,freqs<1.0)))
+            SNR[i] = np.sum(amp_XdP[idx,:]) / np.sum(amp_XnaP[idx])
+            SNR[i] = 10*np.log10(SNR[i]) #convert snr to decibels
+            if SNR[i] < SNR_min: #this is very similar to over subtraction alpha constraints.....
+                alpha = alpha_max
+            elif SNR[i] >= SNR_min and SNR[i] <= SNR_max:
+                alpha = alpha_max + ((SNR[i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
+            elif SNR[i] > SNR_max:
+                alpha = alpha_min
+            amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (alpha)*(delta)*(amp_Xna[i] ** p) #or amp_XnaP, once the code is fixed, change the naming
+            amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed 
+            for j in range(0,n):
+                if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): 
+                    amp_Xp[i,:] = amp_Xp[i,:]
+                else:
+                   amp_Xp[i,:] = (beta)*(amp_Xd[i,:] ** p)
         elif freqs[i] > 1 and freqs[i] <= ((FS/2) - 2):
             delta = 2.5
+            idx = np.transpose(np.where(np.logical_and(freqs>1,freqs<(FS/2) - 2)))
+            SNR[i] = np.sum(amp_XdP[idx,:]) / np.sum(amp_XnaP[idx])
+            SNR[i] = 10*np.log10(SNR[i]) 
+            if SNR[i] < SNR_min: 
+                alpha = alpha_max
+            elif SNR[i] >= SNR_min and SNR[i] <= SNR_max:
+                alpha = alpha_max + ((SNR[i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
+            elif SNR[i] > SNR_max:
+                alpha = alpha_min
+            amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (alpha)*(delta)*(amp_Xna[i] ** p)
+            amp_Xp = amp_Xp ** (1/p)             
+            for j in range(0,n):
+                if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): 
+                    amp_Xp[i,:] = amp_Xp[i,:]
+                else:
+                   amp_Xp[i,:] = (beta)*(amp_Xd[i,:] ** p)
         elif freqs[i] > ((FS/2) - 2):
             delta = 1.5
-        SNR[i] = np.sum(amp_Xd[i,:]) / np.sum(amp_Xna[i])
-        SNR[i] = 10*np.log10(SNR[i]) #convert snr to decibels
-        if SNR[i] < SNR_min: #this is very similar to over subtraction alpha constraints.....
-            alpha = alpha_max
-        elif SNR[i] >= SNR_min and SNR[i] <= SNR_max:
-            alpha = alpha_max + ((SNR[i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
-        elif SNR[i] > SNR_max:
-            alpha = alpha_min
-        amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (alpha)*(delta)*(amp_Xna[i] ** p)
-        amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed 
-        for j in range(0,n):
-            if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): 
-                amp_Xp[i,:] = amp_Xp[i,:]
-            else:
-               amp_Xp[i,:] = (beta)*(amp_Xd[i,:] ** p)
+            idx = np.transpose(np.where(np.logical_and(freqs>((FS/2) - 2),freqs<10)))
+            SNR[i] = np.sum(amp_XdP[idx,:]) / np.sum(amp_XnaP[idx])
+            SNR[i] = 10*np.log10(SNR[i]) 
+            if SNR[i] < SNR_min: 
+                alpha = alpha_max
+            elif SNR[i] >= SNR_min and SNR[i] <= SNR_max:
+                alpha = alpha_max + ((SNR[i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
+            elif SNR[i] > SNR_max:
+                alpha = alpha_min
+            amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (alpha)*(delta)*(amp_Xna[i] ** p)
+            amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed 
+            for j in range(0,n):
+                if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): 
+                    amp_Xp[i,:] = amp_Xp[i,:]
+                else:
+                   amp_Xp[i,:] = (beta)*(amp_Xd[i,:] ** p)
     return amp_Xp
 
 
