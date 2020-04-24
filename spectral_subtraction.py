@@ -1,4 +1,5 @@
 import numpy as np
+from obspy import Stream
 #Xn: signal with noise
 #N: noise estimate - known for now (D in Fukane and Sahare)
     
@@ -81,7 +82,12 @@ def nonlin_subtraction(amp_Xd, amp_Xn):
     return amp_Xp   
 
 
-def mulban_subtraction(tro, amp_Xd, amp_Xn): #mainly from Upadhyay and Karmakar 2013
+def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Karmakar 2013
+    m, n = amp_Xd.shape 
+    SNR = np.zeros((m))
+    alpha = np.zeros((m))
+    amp_Xp = np.zeros((m,n))
+    amp_Xna = np.mean(amp_Xn,axis=1)
     p = 2 
     SNR_min = -5 #db
     SNR_max = 20 #db
@@ -89,17 +95,19 @@ def mulban_subtraction(tro, amp_Xd, amp_Xn): #mainly from Upadhyay and Karmakar 
     alpha_max = 5
     beta=0.002 #in Kamath and Loizou
     FS = tro.stats.sampling_rate
+    print(freqs)
     #delta :tweaking factor that can be individually set for each frequency band to customize the noise removal properties.
+#    idx = np.where(np.logical_and(freqs>=min_freq, freqs<=max_freq))[0]
     for i in range(0,m):
-    NEED a frequency scale conversion here I guess.
-        w [0.09, 0.25, 0.32, 0.25, 0.09]. #what about i? 
-        if freqs =< 1: #khz #in Kamath and Loizous
+    #NEED a frequency scale conversion here I guess.
+    #   w [0.09, 0.25, 0.32, 0.25, 0.09]. #what about i? 
+        if freqs[i] <= 1: #khz #in Kamath and Loizous
             delta = 1
-        elif freqs > 1 and freqs <= ((FS/2) - 2):
+        elif freqs[i] > 1 and freqs[i] <= ((FS/2) - 2):
             delta = 2.5
-        elif freqs > ((FS/2) - 2):
+        elif freqs[i] > ((FS/2) - 2):
             delta = 1.5
-        SNR[i] = np.sum(amp_XdP[i,:]) / np.sum(amp_XnaP[i])
+        SNR[i] = np.sum(amp_Xd[i,:]) / np.sum(amp_Xna[i])
         SNR[i] = 10*np.log10(SNR[i]) #convert snr to decibels
         if SNR[i] < SNR_min: #this is very similar to over subtraction alpha constraints.....
             alpha = alpha_max
@@ -107,12 +115,14 @@ def mulban_subtraction(tro, amp_Xd, amp_Xn): #mainly from Upadhyay and Karmakar 
             alpha = alpha_max + ((SNR[i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
         elif SNR[i] > SNR_max:
             alpha = alpha_min
-        (amp_Xp[i,:] ** p) = (amp_Xd[i,:] ** p) - (alpha)*(delta)(amp_Xna[i] ** p) 
+        amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (alpha)*(delta)*(amp_Xna[i] ** p)
+        amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed 
         for j in range(0,n):
-            if (amp_Xp[i,j] ** p) > (beta)*(amp_Xna[i] ** p): 
-                (amp_Xp[i,:] ** p) = (amp_Xp[i,:] ** p)
+            if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): 
+                amp_Xp[i,:] = amp_Xp[i,:]
             else:
-                (amp_Xp[i,:] ** p) = (beta)*(amp_Xd[i,:] ** p)
+               amp_Xp[i,:] = (beta)*(amp_Xd[i,:] ** p)
+    return amp_Xp
 
 
 
