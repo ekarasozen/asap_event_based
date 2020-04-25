@@ -15,8 +15,8 @@ noise_amplitude = 50
 noise_freqmin = 1
 noise_freqmax = 4
 ##################noise estimation parameters##################
-ibegin = 25
-iend = 35
+ibegin = 5
+iend = 15
 ########################cwt parameters########################
 #cwt_type = "mlwt"
 cwt_type = "pycwt"
