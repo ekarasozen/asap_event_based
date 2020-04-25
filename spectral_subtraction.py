@@ -81,6 +81,7 @@ def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
 
 
 def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Karmakar 2013
+#I'm not sure whether for loops and if statements are working properly. seems redundant and inefficient.  
     p = 2 
     m, n = amp_Xd.shape
     SNR = np.zeros((m))
