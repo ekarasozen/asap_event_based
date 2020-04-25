@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap_w_obspy_git/")
+sys.path.append("/Users/west/Repositories/asap_w_obspy/")
 from getdata import *
 from addnoise import whitenoise
 import param
