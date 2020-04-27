@@ -22,9 +22,9 @@ def simple_subtraction(amp_Xd, amp_Xn, p):
 def over_subtraction(amp_Xd, amp_Xn, p): 
     #alpha over subtraction factor, value greater than or equal to 1
     #beta spectral floor parameter value between 0 to 1
-    m, n = amp_Xd.shape   
-    SNR = np.zeros((m))
-    alpha = np.zeros((m))
+    m, n = amp_Xd.shape 
+    SNR = np.zeros((m,n))
+    alpha = np.zeros((m,n))
     amp_Xp = np.zeros((m,n))
     amp_Xda = np.mean(amp_Xd,axis=1)
     amp_XdP = amp_Xd ** p
@@ -33,27 +33,27 @@ def over_subtraction(amp_Xd, amp_Xn, p):
     alpha0=4 #vary between 3-6 (Beruiti et al'79), normally taken as 4 (Kamath & Loizou'02)
     beta=0.2 #should be between 0-1.
     #result = np.transpose(np.where(np.locgical_and(freqs_d>0.5,freqs_d<10)))
-    for i in range(0,m):
-        #SNR[i] = np.sum(amp_XdP[result,:]) / np.sum(amp_XnaP[result])
-        SNR[i] = np.sum(amp_XdP[i,:]) / np.sum(amp_XnaP[i])
-        SNR[i] = 10*np.log10(SNR[i]) #convert snr to decibels
-        #SNR[i] = (amp_Xda[i])/(amp_Xna[i])
-        if SNR[i] < -5:
-            alpha[i] = alpha0+(3/4)
-        elif SNR[i] >= -5 and SNR[i] < 20:
-            alpha[i] = alpha0-(3/20*SNR[i])
-        elif SNR[i] >= 20:
-            alpha[i] = alpha0-3 
-        #amp_Xp[i,:] = (amp_Xd[i,:] ** p) - ((alpha[i])*(amp_Xna[i] ** p)) #Hassani 2011
-        amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (amp_Xna[i] ** p) # Fukane 2011
-        for j in range(0,n):
+    for i in range(0,n):
+        for j in range(0,m):
+            #SNR[i] = np.sum(amp_XdP[result,:]) / np.sum(amp_XnaP[result])
+            SNR[j,i] = np.sum(amp_XdP[j,i]) / np.sum(amp_XnaP[j])
+            SNR[j,i] = 10*np.log10(SNR[j,i]) #convert snr to decibels
+            #SNR[i] = (amp_Xda[i])/(amp_Xna[i])
+            if SNR[j,i] < -5:
+                alpha[j,i] = alpha0+(3/4)
+            elif SNR[j,i] >= -5 and SNR[j,i] < 20:
+                alpha[j,i] = alpha0-(3/20*SNR[j,i])
+            elif SNR[j,i] >= 20:
+                alpha[j,i] = alpha0-3 
+            #amp_Xp[i,:] = (amp_Xd[i,:] ** p) - ((alpha[i])*(amp_Xna[i] ** p)) #Hassani 2011
+            amp_Xp[:,i] = (amp_Xd[:,i] ** p) - (amp_Xna ** p) # Fukane 2011
 #           if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): #Hassani 2011
-            if amp_Xp[i,j] > (beta+alpha[i])*(amp_Xna[i] ** p): # Fukane 2011
-                amp_Xp[i,j] = amp_Xp[i,j]
+            if amp_Xp[j,i] > (beta+alpha[j,i])*(amp_Xna[j] ** p): # Fukane 2011
+                amp_Xp[j,i] = amp_Xp[j,i]
             else:
-                amp_Xp[i,j] = (beta)*(amp_Xna[i] ** p)
-        #np.savetxt('amp_Xp.out', amp_Xp, delimiter=',', newline="\n")   # X is an array
-    amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed
+                amp_Xp[j,i] = (beta)*(amp_Xna[j] ** p)
+            amp_Xp[j,i] = amp_Xp[j,i] ** (1/p)             # square root has to come AFTER the negatives are removed
+    np.savetxt('SNR_n.out', SNR, delimiter=',', newline="\n")   # X is an array
     return amp_Xp   
 
 def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
@@ -102,7 +102,11 @@ def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Ka
         if freqs[i] <= 1: #khz #in Kamath and Loizous
             delta = 1
             idx = np.transpose(np.where(np.logical_and(freqs>0,freqs<1.0)))
+            #print(idx)
+            print(amp_XdP[1,:], freqs)
             SNR[i] = np.sum(amp_XdP[idx,:]) / np.sum(amp_XnaP[idx])
+#            print(amp_XdP[idx,:])
+#            print(amp_XdP[i,:])
             SNR[i] = 10*np.log10(SNR[i]) #convert snr to decibels
             if SNR[i] < SNR_min: #this is very similar to over subtraction alpha constraints.....
                 alpha = alpha_max
@@ -154,27 +158,3 @@ def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Ka
                 else:
                    amp_Xp[i,:] = (beta)*(amp_Xd[i,:] ** p)
     return amp_Xp
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
