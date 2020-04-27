@@ -22,7 +22,7 @@ def simple_subtraction(amp_Xd, amp_Xn, p):
 def over_subtraction(amp_Xd, amp_Xn, p): 
     #alpha over subtraction factor, value greater than or equal to 1
     #beta spectral floor parameter value between 0 to 1
-    m, n = amp_Xd.shape 
+    m, n = amp_Xd.shape   
     SNR = np.zeros((m))
     alpha = np.zeros((m))
     amp_Xp = np.zeros((m,n))
