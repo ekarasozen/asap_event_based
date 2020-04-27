@@ -62,7 +62,7 @@ for e, lab in enumerate(event_id):
         amp_Xn = abs(Xn)
         #amp_Xp = ss.simple_subtraction(amp_Xd,amp_Xn,2)
         #amp_Xp = ss.over_subtraction(amp_Xd,amp_Xn,2)
-        amp_Xp = ss.nonlin_subtraction(amp_Xd,amp_Xn)
+        amp_Xp = ss.nonlin_subtraction(amp_Xd,amp_Xn,2)
         #amp_Xp = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freq_d)
         phase_Xd = np.angle(Xd)
         Xp = amp_Xp*(np.exp(1.j*phase_Xd))
