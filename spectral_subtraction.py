@@ -34,8 +34,6 @@ def over_subtraction(amp_Xd, amp_Xn, p):
     beta=0.2 #should be between 0-1.
     #result = np.transpose(np.where(np.locgical_and(freqs_d>0.5,freqs_d<10)))
     for i in range(0,n):
-        #for j in range(0,m):
-            #SNR[i] = np.sum(amp_XdP[result,:]) / np.sum(amp_XnaP[result])
         SNR[:,i] = np.sum(amp_XdP[:,i]) / np.sum(amp_XnaP)
         SNR[:,i] = 10*np.log10(SNR[:,i]) #convert snr to decibels
         if SNR[:,i] < -5:
@@ -52,7 +50,7 @@ def over_subtraction(amp_Xd, amp_Xn, p):
                 amp_Xp[j,i] = amp_Xp[j,i]
             else:
                 amp_Xp[j,i] = (beta)*(amp_Xna[j] ** p)
-        amp_Xp[:,i] = amp_Xp[:,i] ** (1/p)             # square root has to come AFTER the negatives are removed
+        amp_Xp[:,i] = amp_Xp[:,i] ** (1/p)  
     return amp_Xp, SNR, alpha   
 
 def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
