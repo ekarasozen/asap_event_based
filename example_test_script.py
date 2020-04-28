@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap_w_obspy_git/")
+sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap")
 from getdata import *
 from addnoise import whitenoise
 import spectral_subtraction as ss
