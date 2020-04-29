@@ -55,25 +55,25 @@ def over_subtraction(amp_Xd, amp_Xn, p):
 
 def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
     m, n = amp_Xd.shape 
-    alpha = np.zeros((m))
-    rho = np.zeros((m))
-    phi = np.zeros((m))
+    alpha = np.zeros((m,n))
+    rho = np.zeros((m,n))
+    phi = np.zeros((m,n))
     amp_Xp = np.zeros((m,n))
     amp_Xda = np.mean(amp_Xd,axis=1)
     amp_Xna = np.mean(amp_Xn,axis=1)
     beta=0.1 #Fukane 2011
     gamma = 0.5 # scaling factor, r in Fukane, gamma in Lockwood, is this the smoothing factor in Upadhyay taken as 0.5?
-    for i in range(0,m):
-        alpha = np.max(amp_Xna[i]) # Lockwood calculates this for the last 40 frames, not sure this is necessary in our case - yet.  
-        rho = amp_Xd[i,:]/amp_Xna[i]
-        phi = alpha / (1 + (gamma*rho[i]))
-        amp_Xp[i,:] = (amp_Xd[i,:]) - phi
-        for j in range(0,n):
-            if amp_Xd[i,j] > phi + ((beta)*(amp_Xna[i])):
-                amp_Xp[i,j] = amp_Xp[i,j]
+    for i in range(0,n):
+        for j in range(0,m):
+            alpha[j,i] = np.max(amp_Xna[j]) # Lockwood calculates this for the last 40 frames, not sure this is necessary in our case - yet.  
+            rho[j,i] = amp_Xd[j,j]/amp_Xna[j]
+            phi[j,i] = alpha[j,i] / (1 + (gamma*rho[j,i]))
+            amp_Xp[j,i] = (amp_Xd[j,i]) - phi[j,i]
+            if amp_Xd[j,i] > phi[j,i] + ((beta)*(amp_Xna[j])):
+                amp_Xp[j,i] = amp_Xp[j,i]
             else:
-                amp_Xp[i,j] = (beta)*(amp_Xd[i,j])
-        #np.savetxt('amp_Xp.out', amp_Xp, delimiter=',', newline="\n")   # X is an array
+                amp_Xp[j,i] = (beta)*(amp_Xd[j,i])
+            #np.savetxt('amp_Xp.out', amp_Xp, delimiter=',', newline="\n")   # X is an array
     return amp_Xp   
 
 
