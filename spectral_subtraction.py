@@ -55,7 +55,7 @@ def over_subtraction(amp_Xd, amp_Xn, p):
 
 def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
     m, n = amp_Xd.shape 
-    alpha = np.zeros((m,n))
+    alpha = np.zeros((1))
     rho = np.zeros((m,n))
     phi = np.zeros((m,n))
     amp_Xp = np.zeros((m,n))
@@ -64,17 +64,18 @@ def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
     beta=0.1 #Fukane 2011
     gamma = 0.5 # scaling factor, r in Fukane, gamma in Lockwood, is this the smoothing factor in Upadhyay taken as 0.5?
     for i in range(0,n):
+        alpha = np.max(amp_Xna) # Lockwood calculates this for the last 40 frames, not sure this is necessary in our case - yet.  
+        print(alpha)
         for j in range(0,m):
-            alpha[j,i] = np.max(amp_Xna[j]) # Lockwood calculates this for the last 40 frames, not sure this is necessary in our case - yet.  
             rho[j,i] = amp_Xd[j,j]/amp_Xna[j]
-            phi[j,i] = alpha[j,i] / (1 + (gamma*rho[j,i]))
+            phi[j,i] = alpha / (1 + (gamma*rho[j,i]))
             amp_Xp[j,i] = (amp_Xd[j,i]) - phi[j,i]
             if amp_Xd[j,i] > phi[j,i] + ((beta)*(amp_Xna[j])):
                 amp_Xp[j,i] = amp_Xp[j,i]
             else:
                 amp_Xp[j,i] = (beta)*(amp_Xd[j,i])
-            #np.savetxt('amp_Xp.out', amp_Xp, delimiter=',', newline="\n")   # X is an array
-    return amp_Xp   
+    np.savetxt('amp_Xna.out', amp_Xna, delimiter=',', newline="\n")   # X is an array
+    return amp_Xp, phi, alpha, rho   
 
 
 def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Karmakar 2013
