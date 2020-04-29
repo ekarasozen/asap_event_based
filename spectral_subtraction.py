@@ -55,25 +55,30 @@ def over_subtraction(amp_Xd, amp_Xn, p):
 
 def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
     m, n = amp_Xd.shape 
-    alpha = np.zeros((1))
+    alpha = np.zeros((n))
     rho = np.zeros((m,n))
     phi = np.zeros((m,n))
     amp_Xp = np.zeros((m,n))
+    amp_Xds = np.zeros((m,n))
     amp_Xda = np.mean(amp_Xd,axis=1)
-    amp_Xna = np.mean(amp_Xn,axis=1)
+    amp_Xna = np.max(amp_Xn,axis=1)
+    #amp_Xna = np.mean(amp_Xn,axis=1)
     beta=0.1 #Fukane 2011
     gamma = 0.5 # scaling factor, r in Fukane, gamma in Lockwood, is this the smoothing factor in Upadhyay taken as 0.5?
+    muy = 0.3 #should be between 0.1-0.5
+    mud = 0.7 #should be between 0.5-0.9
     for i in range(0,n):
-        alpha = np.max(amp_Xna) # Lockwood calculates this for the last 40 frames, not sure this is necessary in our case - yet.  
-        print(alpha)
+#        alpha = np.max(amp_Xna) # Lockwood calculates this for the last 40 frames, not sure this is necessary in our case - yet.  
+        alpha = amp_Xna # I think this makes more sense
         for j in range(0,m):
-            rho[j,i] = amp_Xd[j,j]/amp_Xna[j]
-            phi[j,i] = alpha / (1 + (gamma*rho[j,i]))
-            amp_Xp[j,i] = (amp_Xd[j,i]) - phi[j,i]
-            if amp_Xd[j,i] > phi[j,i] + ((beta)*(amp_Xna[j])):
+            amp_Xds[j,i] = (muy)*amp_Xd[j,(i-1)]+(1-muy)*amp_Xd[j,i] #smoothed estimate of degraded signal, same should be for the noise.
+            rho[j,i] = amp_Xds[j,j]/amp_Xna[j]
+            phi[j,i] = alpha[j] / (1 + (gamma*rho[j,i]))
+            amp_Xp[j,i] = (amp_Xds[j,i]) - phi[j,i]
+            if amp_Xds[j,i] > phi[j,i] + ((beta)*(amp_Xna[j])):
                 amp_Xp[j,i] = amp_Xp[j,i]
             else:
-                amp_Xp[j,i] = (beta)*(amp_Xd[j,i])
+                amp_Xp[j,i] = (beta)*(amp_Xds[j,i])
     np.savetxt('amp_Xna.out', amp_Xna, delimiter=',', newline="\n")   # X is an array
     return amp_Xp, phi, alpha, rho   
 
