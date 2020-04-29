@@ -3,6 +3,53 @@ import matplotlib.pyplot as plt
 from obspy import Stream
 from obspy.imaging.cm import obspy_sequential
     
+def wfs(t, tro, trd, trp, fig, event_list, figname="wfs"): 
+    ax11 = fig.add_axes([0.1, 0.75, 0.7, 0.2])
+    ax12 = fig.add_axes([0.1, 0.55, 0.7, 0.2], sharex=ax11)
+    ax13 = fig.add_axes([0.1, 0.35, 0.7, 0.2], sharex=ax11)
+    ax14 = fig.add_axes([0.1, 0.15, 0.7, 0.2], sharex=ax11)
+    ax11.plot(t, tro.data, 'k', linewidth=0.3, label='original')
+    ax12.plot(t, trd.data, 'k', linewidth=0.3, linestyle='--', label='degraded')
+    ax13.plot(t, trp.data, 'b', linewidth=0.3, label='processed')
+    ax14.plot(t, tro.data, 'k', linewidth=0.3, label='original')
+    ax14.plot(t, trd.data, 'k', linewidth=0.3, linestyle='--', label='degraded')
+    ax14.plot(t, trp.data, 'b', linewidth=0.3, label='processed')
+    ax11.legend()
+    ax12.legend()
+    ax13.legend()
+    ax14.legend(loc='upper left', fontsize='medium')
+    fig.autofmt_xdate()    
+    fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
+
+def scals(t, tr, Xo, Xd, Xp, freq, fig, event_list, figname="scals"): 
+    maxamp_o = abs(Xo).max()/2           # these two lines just adjust the color scale
+    maxamp_d = abs(Xd).max()/2           # these two lines just adjust the color scale
+    maxamp_p = abs(Xp).max()/2           # these two lines just adjust the color scale
+    minamp = 0
+    tX, f = np.meshgrid(tr.times(), freq)
+    ax11 = fig.add_axes([0.1, 0.75, 0.7, 0.2])
+    ax111 = fig.add_axes([0.83, 0.75, 0.03, 0.2])
+    ax12 = fig.add_axes([0.1, 0.45, 0.7, 0.2])
+    ax121 = fig.add_axes([0.83, 0.45, 0.03, 0.2])
+    ax13 = fig.add_axes([0.1, 0.15, 0.7, 0.2])
+    ax131 = fig.add_axes([0.83, 0.15, 0.03, 0.2])
+    img_o = ax11.pcolormesh(tX, f, np.abs(Xo), cmap=obspy_sequential, vmin=minamp, vmax=maxamp_o)
+    img_d = ax12.pcolormesh(tX, f, np.abs(Xd), cmap=obspy_sequential, vmin=minamp, vmax=maxamp_d)
+    img_p = ax13.pcolormesh(tX, f, np.abs(Xp), cmap=obspy_sequential, vmin=minamp, vmax=maxamp_p)
+    ax11.set_title('original CWT amplitude')
+    ax12.set_title('degraded CWT amplitude')
+    ax12.set_ylabel("frequency [Hz]")
+    ax13.set_title('processed CWT amplitude')
+    ax13.set_xlim(t[0], t[-1])
+    ax13.set_ylim(freq[-1], freq[0])
+    ax13.set_xlabel("time after %s [s]" % tr.stats.starttime)
+    fig.colorbar(img_o, cax=ax111)
+    fig.colorbar(img_d, cax=ax121)
+    fig.colorbar(img_p, cax=ax131)
+    fig.autofmt_xdate()    
+    fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
+
+
 def all(t, tr, X, freq, IX, fig, event_list, figname="original"): 
     maxamp = abs(X).max()/2           # these two lines just adjust the color scale
     minamp = 0
