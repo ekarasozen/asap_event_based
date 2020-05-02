@@ -87,10 +87,12 @@ def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Ka
 #I'm not sure whether for loops and if statements are working properly. seems redundant and inefficient.  
     p = 2 
     m, n = amp_Xd.shape
-    SNR = np.zeros((m))
-    alpha = np.zeros((m))
+    #print(m)
+    SNR = np.zeros((1,n))
+    alpha = np.zeros((1,n))
     delta = np.zeros((m))
     amp_Xp = np.zeros((m,n))
+    amp_XpP = np.zeros((m,n))
     amp_XdP = amp_Xd ** p
     amp_Xna = np.mean(amp_Xn,axis=1)
     amp_XnaP = amp_Xna ** p
@@ -101,63 +103,36 @@ def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Ka
     beta=0.002 #in Kamath and Loizou
     FS = tro.stats.sampling_rate
     #delta :tweaking factor that can be individually set for each frequency band to customize the noise removal properties.
-    for i in range(0,m):
-        if freqs[i] <= 1: #khz #in Kamath and Loizous
-            delta = 1
-            idx = np.transpose(np.where(np.logical_and(freqs>0,freqs<1.0)))
-            #print(idx)
-            print(amp_XdP[1,:], freqs)
-            SNR[i] = np.sum(amp_XdP[idx,:]) / np.sum(amp_XnaP[idx])
-#            print(amp_XdP[idx,:])
-#            print(amp_XdP[i,:])
-            SNR[i] = 10*np.log10(SNR[i]) #convert snr to decibels
-            if SNR[i] < SNR_min: #this is very similar to over subtraction alpha constraints.....
-                alpha = alpha_max
-            elif SNR[i] >= SNR_min and SNR[i] <= SNR_max:
-                alpha = alpha_max + ((SNR[i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
-            elif SNR[i] > SNR_max:
-                alpha = alpha_min
-            amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (alpha)*(delta)*(amp_Xna[i] ** p) #or amp_XnaP, once the code is fixed, change the naming
-            amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed 
-            for j in range(0,n):
-                if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): 
-                    amp_Xp[i,:] = amp_Xp[i,:]
-                else:
-                   amp_Xp[i,:] = (beta)*(amp_Xd[i,:] ** p)
-        elif freqs[i] > 1 and freqs[i] <= ((FS/2) - 2):
-            delta = 2.5
-            idx = np.transpose(np.where(np.logical_and(freqs>1,freqs<(FS/2) - 2)))
-            SNR[i] = np.sum(amp_XdP[idx,:]) / np.sum(amp_XnaP[idx])
-            SNR[i] = 10*np.log10(SNR[i]) 
-            if SNR[i] < SNR_min: 
-                alpha = alpha_max
-            elif SNR[i] >= SNR_min and SNR[i] <= SNR_max:
-                alpha = alpha_max + ((SNR[i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
-            elif SNR[i] > SNR_max:
-                alpha = alpha_min
-            amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (alpha)*(delta)*(amp_Xna[i] ** p)
-            amp_Xp = amp_Xp ** (1/p)             
-            for j in range(0,n):
-                if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): 
-                    amp_Xp[i,:] = amp_Xp[i,:]
-                else:
-                   amp_Xp[i,:] = (beta)*(amp_Xd[i,:] ** p)
-        elif freqs[i] > ((FS/2) - 2):
-            delta = 1.5
-            idx = np.transpose(np.where(np.logical_and(freqs>((FS/2) - 2),freqs<10)))
-            SNR[i] = np.sum(amp_XdP[idx,:]) / np.sum(amp_XnaP[idx])
-            SNR[i] = 10*np.log10(SNR[i]) 
-            if SNR[i] < SNR_min: 
-                alpha = alpha_max
-            elif SNR[i] >= SNR_min and SNR[i] <= SNR_max:
-                alpha = alpha_max + ((SNR[i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
-            elif SNR[i] > SNR_max:
-                alpha = alpha_min
-            amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (alpha)*(delta)*(amp_Xna[i] ** p)
-            amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed 
-            for j in range(0,n):
-                if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): 
-                    amp_Xp[i,:] = amp_Xp[i,:]
-                else:
-                   amp_Xp[i,:] = (beta)*(amp_Xd[i,:] ** p)
+    for i in range(0,n):
+        for j in range(0,m):
+            if freqs[j] <= 10 and freqs[j]>9: #khz #in Kamath and Loizous
+            #if freqs[j] <= 1:
+                idx = np.transpose(np.where(np.logical_and(freqs>9,freqs<=10)))
+                delta = 1
+                #print(freqs[j], j, i, amp_Xd[j,i]) #khz #in Kamath and Loizous
+                #print(amp_Xd[idx,i])
+                #print(amp_Xna[idx])
+                #print(np.sum(amp_XdP[idx,i]))
+                #print(np.sum(amp_XnaP[idx]))
+                SNR[:,i] = np.sum(amp_XdP[idx,i]) / np.sum(amp_XnaP[idx])
+                SNR[:,i] = 10*np.log10(SNR[:,i]) 
+                #print(SNR)
+                print(SNR[:,i])
+                if SNR[:,i] < SNR_min: 
+                    alpha[:,i] = alpha_max
+                elif SNR[:,i] >= SNR_min and SNR[:,i] <= SNR_max:
+                    alpha[:,i] = alpha_max + ((SNR[:,i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
+                elif SNR[:,i] > SNR_max:
+                    alpha[:,i]= alpha_min
+                print(alpha[:,i])
+                amp_Xp[idx,i] = (amp_Xd[idx,i] ** p) - (alpha[:,i])*(delta)*(amp_Xna[idx] ** p) # NEED TO TEST AFTER THIS
+                amp_XpP[idx,i] = amp_Xp[idx,i] ** (1/p)  
+                print(amp_XpP[idx,i])  
+                nois = amp_XpP[idx,i].size
+                for k in range(0,nois):
+                    if amp_XpP[k,i] > (beta)*(amp_Xna[k] ** p): 
+                        amp_XpP[k,i] = amp_XpP[k,i]
+                    else:
+                       amp_XpP[k,i] = (beta)*(amp_Xd[k,i] ** p)
+        #print(np.sum(amp_Xd[j,i]))
     return amp_Xp
