@@ -43,8 +43,8 @@ def over_subtraction(amp_Xd, amp_Xn, p):
         elif SNR[:,i] >= 20:
             alpha[:,i] = alpha0-3 
             #amp_Xp[i,:] = (amp_Xd[i,:] ** p) - ((alpha[i])*(amp_Xna[i] ** p)) #Hassani 2011
-        amp_Xp[:,i] = (amp_Xd[:,i] ** p) - (amp_Xna ** p) # Fukane 2011
-#           if amp_Xp[i,j] > (beta)*(amp_Xna[i] ** p): #Hassani 2011
+        amp_Xp[:,i] = (amp_Xd[:,i] ** p) - (alpha)*(amp_Xna ** p) # Berouti
+#        amp_Xp[:,i] = (amp_Xd[:,i] ** p) - (amp_Xna ** p) # Fukane 2011
         for j in range(0,m):
             if amp_Xp[j,i] > (beta+(alpha[0,i]))*(amp_Xna[j] ** p): # Fukane 2011
                 amp_Xp[j,i] = amp_Xp[j,i]
@@ -84,10 +84,9 @@ def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
 
 
 def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Karmakar 2013
-#I'm not sure whether for loops and if statements are working properly. seems redundant and inefficient.  
+#find a better way to do the powers
     p = 2 
     m, n = amp_Xd.shape
-    #print(m)
     SNR = np.zeros((1,n))
     alpha = np.zeros((1,n))
     delta = np.zeros((m))
@@ -96,43 +95,85 @@ def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Ka
     amp_XdP = amp_Xd ** p
     amp_Xna = np.mean(amp_Xn,axis=1)
     amp_XnaP = amp_Xna ** p
-    SNR_min = -5 #db
-    SNR_max = 20 #db
-    alpha_min = 1
-    alpha_max = 5
     beta=0.002 #in Kamath and Loizou
     FS = tro.stats.sampling_rate
     #delta :tweaking factor that can be individually set for each frequency band to customize the noise removal properties.
     for i in range(0,n):
         for j in range(0,m):
-            if freqs[j] <= 10 and freqs[j]>9: #khz #in Kamath and Loizous
-            #if freqs[j] <= 1:
-                idx = np.transpose(np.where(np.logical_and(freqs>9,freqs<=10)))
-                delta = 1
-                #print(freqs[j], j, i, amp_Xd[j,i]) #khz #in Kamath and Loizous
-                #print(amp_Xd[idx,i])
-                #print(amp_Xna[idx])
-                #print(np.sum(amp_XdP[idx,i]))
-                #print(np.sum(amp_XnaP[idx]))
+             #if freqs[j] > 9 and freqs[j] <= 10:
+             #   idx = np.transpose(np.where(np.logical_and(freqs>9,freqs<=10)))
+             if freqs[j] <= 1:
+                idx = np.transpose(np.where(np.logical_and(freqs>0,freqs<=1)))
+                delta = 1/1000
+                SNR[:,i] = np.sum(amp_XdP[idx,i]) / np.sum(amp_XnaP[idx])
+                SNR[:,i] = 10*np.log10(SNR[:,i])
+                #print("SNR", SNR[:,i]) 
+                if SNR[:,i] < -5: 
+                    alpha[:,i] = 5 # or 4.75
+                elif SNR[:,i] >= -5 and SNR[:,i] <= 20:
+#                    alpha[:,i] = alpha_max + ((SNR[:,i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min))) #took this somewhere else. 
+                    alpha[:,i] = 4 - ((3/20)*SNR[:,i]) #in Kamath and Loizous
+                elif SNR[:,i] > 20:
+                    alpha[:,i]= 1
+                amp_Xp[idx,i] = (amp_Xd[idx,i] ** p) - (alpha[:,i])*(delta)*(amp_Xna[idx] ** p) # NEED TO TEST AFTER THIS
+                noi = amp_Xp[idx,i].size #number of index
+                for idx in range(0,noi):
+                    #if amp_XpP[k,i] > (beta)*(amp_Xd[k,i] ** p): #this is different in Kamath and Loizous but same with Loizous's book  
+                    if amp_Xp[idx,i] > 0: #from Kamath and Loizous
+                        amp_Xp[idx,i] = amp_Xp[idx,i]
+                    else:
+                        amp_Xp[idx,i] = (beta)*(amp_Xd[idx,i] ** p)
+                amp_Xp[idx,i] = amp_Xp[idx,i] + (0.05*(amp_Xd[idx,i] ** p)) #a small amount of noisy spectrum is introduced back
+                amp_Xp[idx,i] = amp_Xp[idx,i] ** (1/p)
+             elif freqs[j] > 1 and freqs[j]<=((FS/2)-2): #khz #in Kamath and Loizous
+                idx = np.transpose(np.where(np.logical_and(freqs>1,freqs<=((FS/2)-2))))
+                delta = 2.5
                 SNR[:,i] = np.sum(amp_XdP[idx,i]) / np.sum(amp_XnaP[idx])
                 SNR[:,i] = 10*np.log10(SNR[:,i]) 
-                #print(SNR)
-                print(SNR[:,i])
-                if SNR[:,i] < SNR_min: 
-                    alpha[:,i] = alpha_max
-                elif SNR[:,i] >= SNR_min and SNR[:,i] <= SNR_max:
-                    alpha[:,i] = alpha_max + ((SNR[:,i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min)))
-                elif SNR[:,i] > SNR_max:
-                    alpha[:,i]= alpha_min
-                print(alpha[:,i])
+                if SNR[:,i] < -5: 
+                    alpha[:,i] = 5 # or 4.75
+                elif SNR[:,i] >= -5 and SNR[:,i] <= 20:
+#                    alpha[:,i] = alpha_max + ((SNR[:,i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min))) #took this somewhere else. 
+                    alpha[:,i] = 4 - ((3/20)*SNR[:,i]) #in Kamath and Loizous
+                elif SNR[:,i] > 20:
+                    alpha[:,i]= 1
                 amp_Xp[idx,i] = (amp_Xd[idx,i] ** p) - (alpha[:,i])*(delta)*(amp_Xna[idx] ** p) # NEED TO TEST AFTER THIS
-                amp_XpP[idx,i] = amp_Xp[idx,i] ** (1/p)  
-                print(amp_XpP[idx,i])  
-                nois = amp_XpP[idx,i].size
-                for k in range(0,nois):
-                    if amp_XpP[k,i] > (beta)*(amp_Xna[k] ** p): 
-                        amp_XpP[k,i] = amp_XpP[k,i]
+                print(amp_Xp[idx,i], delta)
+                noi = amp_Xp[idx,i].size #number of index
+                for idx in range(0,noi):
+                    if amp_Xp[idx,i] > 0: #from Kamath and Loizous
+                        amp_Xp[idx,i] = amp_Xp[idx,i]
                     else:
-                       amp_XpP[k,i] = (beta)*(amp_Xd[k,i] ** p)
+                        amp_Xp[idx,i] = (beta)*(amp_Xd[idx,i] ** p)
+                amp_Xp[idx,i] = amp_Xp[idx,i] + (0.05*(amp_Xd[idx,i] ** p)) #a small amount of noisy spectrum is introduced back
+                amp_Xp[idx,i] = amp_Xp[idx,i] ** (1/p)  
+             elif freqs[j] > ((FS/2)-2): #khz #in Kamath and Loizous
+                idx = np.transpose(np.where(np.logical_and(freqs>((FS/2)-2),freqs<=20)))
+                delta = 1.5/1000
+                SNR[:,i] = np.sum(amp_XdP[idx,i]) / np.sum(amp_XnaP[idx])
+                SNR[:,i] = 10*np.log10(SNR[:,i]) 
+                if SNR[:,i] < -5: 
+                    alpha[:,i] = 5 # or 4.75
+                elif SNR[:,i] >= -5 and SNR[:,i] <= 20:
+#                    alpha[:,i] = alpha_max + ((SNR[:,i] - SNR_min)*((alpha_min - alpha_max)/(SNR_max - SNR_min))) #took this somewhere else. 
+                    alpha[:,i] = 4 - ((3/20)*SNR[:,i]) #in Kamath and Loizous
+                elif SNR[:,i] > 20:
+                    alpha[:,i]= 1
+                amp_Xp[idx,i] = (amp_Xd[idx,i] ** p) - (alpha[:,i])*(delta)*(amp_Xna[idx] ** p) # NEED TO TEST AFTER THIS
+                noi = amp_Xp[idx,i].size #number of index
+                for idx in range(0,noi):
+                    if amp_Xp[idx,i] > 0: #from Kamath and Loizous
+                        amp_Xp[idx,i] = amp_Xp[idx,i]
+                    else:
+                        amp_Xp[idx,i] = (beta)*(amp_Xd[idx,i] ** p)
+                amp_Xp[idx,i] = amp_Xp[idx,i] + (0.05*(amp_Xd[idx,i] ** p)) #a small amount of noisy spectrum is introduced back
+                amp_Xp[idx,i] = amp_Xp[idx,i] ** (1/p)  
         #print(np.sum(amp_Xd[j,i]))
+    #amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed
+    np.savetxt('SNR.out', SNR, delimiter=',', newline="\n")  
+    np.savetxt('alpha.out', alpha, delimiter=',', newline="\n")   
+    np.savetxt('amp_Xp.out', amp_Xp, delimiter=',', newline="\n")  
+    np.savetxt('amp_Xd.out', amp_Xd, delimiter=',', newline="\n")   
+    np.savetxt('amp_Xna.out', amp_Xna, delimiter=',', newline="\n")  
+    np.savetxt('freqs.out', freqs, delimiter=',', newline="\n")  
     return amp_Xp
