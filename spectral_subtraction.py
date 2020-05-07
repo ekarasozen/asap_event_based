@@ -30,6 +30,26 @@ def constant_subtraction(amp_Xd, amp_Xn, p, alpha0, beta):
     return amp_Xp, SNR, alpha   
     
     
+def simple_subtraction(amp_Xd, amp_Xn, p, alpha0, beta): 
+    m, n = amp_Xd.shape 
+    SNR = np.zeros((1,n))
+    alpha = np.zeros((1,n))
+    amp_Xp = np.zeros((m,n))
+    amp_XpP = np.zeros((m,n))
+    amp_Xda = np.mean(amp_Xd,axis=1)
+    amp_XdP = amp_Xd ** p
+    amp_Xna = np.mean(amp_Xn,axis=1)
+    amp_XnaP = amp_Xna ** p
+    for i in range(0,n):
+        SNR[:,i] = np.sum(amp_XdP[:,i]) / np.sum(amp_XnaP)
+        SNR[:,i] = 10*np.log10(SNR[:,i])
+        alpha[:,i] = alpha0       #hold alpha constant
+        amp_XpP[:,i] = amp_XdP[:,i] - alpha[:,i]*(amp_XnaP)  
+        belowthreshold = amp_XpP[:,i] < beta*amp_XdP[:,i]
+        amp_XpP[belowthreshold,i] = beta*amp_XdP[belowthreshold,i]
+        amp_Xp[:,i] = amp_XpP[:,i] ** (1/p)  
+    return amp_Xp, SNR, alpha 
+
 
 def over_subtraction(amp_Xd, amp_Xn, p): 
     #alpha over subtraction factor, value greater than or equal to 1
