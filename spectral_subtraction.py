@@ -9,7 +9,7 @@ from obspy import Stream
 # alpha is set as a constant equal to alpha0
 
 
-def simple_subtraction(amp_Xd, amp_Xn, p, alpha0, beta): 
+def constant_subtraction(amp_Xd, amp_Xn, p, alpha0, beta): 
     m, n = amp_Xd.shape 
     SNR = np.zeros((1,n))
     alpha = np.zeros((1,n))

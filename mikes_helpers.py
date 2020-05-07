@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 '''
 This module once contained:
-    spectral_subtraction.simple_subtraction
+    spectral_subtraction.simple_subtraction, later named constant_subtraction
     myplot.subtraction_performance
     measure.waveform_metrics
 '''
