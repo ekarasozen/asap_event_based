@@ -1,3 +1,7 @@
+'''
+A module for functions that help assess the performance of spectral subtraction
+'''
+
 import numpy as np
 from obspy.signal.cross_correlation import correlate
 from obspy.signal.cross_correlation import xcorr_max
@@ -18,9 +22,6 @@ def waveform_metrics(tro,trd,trp,picktime):
         snro_short      SNR of original trace, 5s windows before/after picktime
         snrd_short      SNR of degraded trace
         snrp_short      SNR of processed trace
-        summarystring1  ad hoc text string of metrics that can be used elsewhere
-        summarystring2  ad hoc text string of metrics
-        summarystring3  ad hoc text string of metrics
 
     Note that SNR is defined here as the ratio of the standard deviation
     of the waveform in two different windows. This is different than how SNR 
@@ -75,11 +76,7 @@ def waveform_metrics(tro,trd,trp,picktime):
     snrd_short = trd_post.std() / trd_pre.std() 
     snrp_short = trp_post.std() / trp_pre.std()
 
-    # create outputs
-    summarystring1 = " correlation (o,p): long=" + str(round(cclong_max,2)) + "(" + str(cclong_shift*tro.stats.delta) + "s)  short="  + str(round(ccshort_max,2)) + "(" + str(ccshort_shift*tro.stats.delta) + "s)"
-    summarystring2 = " snr (d->p): long=" + str(round(snrd_long,1)) + "->" + str(round(snrp_long,1)) + "    short="  + str(round(snrd_short,1)) + "->" + str(round(snrp_short,1))
-    summarystring3 ='$\Delta$SNR ' + str(round(100*snrp_long/snrd_long,0)) + '%        30s-correlation ' + str(round(cclong_max,2)) + '(' + str(cclong_shift*tro.stats.delta) + 's)'
-
+    # create output
     metrics = {
         "maxcorr_long":   round(cclong_max,2),
         "lag_long":       cclong_shift*tro.stats.delta,
@@ -90,10 +87,7 @@ def waveform_metrics(tro,trd,trp,picktime):
         "snrp_long":      round(snrp_long,1),
         "snro_short":     round(snro_short,1),
         "snrd_short":     round(snrd_short,1),
-        "snrp_short":     round(snrp_short,1),
-        "summarystring1": summarystring1,
-        "summarystring2": summarystring2,
-        "summarystring3": summarystring3
+        "snrp_short":     round(snrp_short,1)
     }
     
     return metrics

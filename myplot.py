@@ -147,8 +147,7 @@ def scales_freq(freqs_d,scales_d, fig, event_list, figname="frequency_scale"):
 
 def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,alpha0,beta,filename):
     '''
-    Creates a single uber-plot summarizing the performance of spectral subtraction
-    
+    Creates a single uber-plot summarizing the performance of spectral subtraction.
     The many input variables for this plotting method should be pretty self-evident. This 
     method needs to be called *after* calculate_metrics.
         freqs_d:  the vector of frequencies output by the CWT process
@@ -158,9 +157,21 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
                   by the measure.waveform_metrics function
     '''
     
-    alpha_beta_text = ' alpha0: ' + str(round(metrics["alpha0"],1)) + '    beta: ' + str(round(metrics["beta"],2))    
-    windowstart = round((metrics["picktime"] - trd.stats.starttime) - 40)
-    windowend   = round((metrics["picktime"] - trd.stats.starttime) + 40)
+    alpha_beta_text = ' alpha0: ' + str(round(alpha0)) + '    beta: ' + str(round(beta)) 
+    insetstring1 = (" xc (o,p):     long=" + str(round(metrics["maxcorr_long"],2)) + "(" + 
+                     str(round(metrics["lag_long"]*tro.stats.delta,2)) + "s)  short=" + 
+                     str(round(metrics["maxcorr_short"],2)) + "(" + 
+                     str(round(metrics["lag_short"]*tro.stats.delta,2)) + "s)")
+    insetstring2 = (" snr (d->p): long=" + str(round(metrics["snrd_long"],1)) + "->" + 
+                     str(round(metrics["snrp_long"],1)) + "    short="  + 
+                     str(round(metrics["snrd_short"],1)) + "->" + 
+                     str(round(metrics["snrp_short"],1)) )
+    titlestring = ( '$\Delta$SNR ' + 
+                     str(round(100*metrics["snrp_long"]/metrics["snrd_long"],0)) + '%        30s-correlation ' + 
+                     str(round(metrics["maxcorr_long"],2)) + '(' + 
+                     str(metrics["lag_long"]*tro.stats.delta) + 's)' )       
+    windowstart = round((picktime - trd.stats.starttime) - 40)
+    windowend   = round((picktime - trd.stats.starttime) + 40)
     
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4,1,figsize=(7.5,10))
     maxamp = abs(amp_Xd).max()/2           # these two lines just adjust the color scale
@@ -172,8 +183,8 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
     ax1.set_title('degraded CWT amplitude')
     ax1.set_xlim(windowstart, windowend)
 
+    im2 = ax2.plot(t[1,:], tr_alpha.data, 'r--', linewidth=1,label='alpha')
     im2 = ax2.plot(t[1,:], tr_SNR.data/10, 'r-', linewidth=1,label='SNR')
-    im2 = ax2.plot(t[1,:], tr_alpha.data, 'k-', linewidth=1,label='alpha')
     ax2.set_ylabel('0.1*SNR(db) & alpha')
     ax2.set_yticks([-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7])
     ax2.grid()
@@ -196,12 +207,12 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
     ax4.set_ylabel('counts')
     ax4.legend(loc='upper left')
     ax4.set_xlabel('time (s)')
-    ax4.set_title(metrics["summarystring3"])
+    ax4.set_title(titlestring)
     ax4.set_xlim(windowstart, windowend)
     ylimits = ax4.get_ylim()
     yrange = ylimits[1]-ylimits[0]
-    ax4.text(windowstart, ylimits[0]+.10*yrange,metrics["summarystring2"], style='italic', fontsize=8)
-    ax4.text(windowstart, ylimits[0]+.02*yrange,metrics["summarystring1"], style='italic', fontsize=8)
+    ax4.text(windowstart, ylimits[0]+.10*yrange,insetstring2, style='italic', fontsize=8)
+    ax4.text(windowstart, ylimits[0]+.02*yrange,insetstring1, style='italic', fontsize=8)
     
     plt.savefig(filename,dpi=300)
 
