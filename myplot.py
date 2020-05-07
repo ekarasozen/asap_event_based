@@ -1,7 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from obspy import Stream
 from obspy.imaging.cm import obspy_sequential
+
+
+    
     
 def wfs(t, tro, trd, trp, fig, event_list, figname="wfs"): 
     ax11 = fig.add_axes([0.1, 0.75, 0.7, 0.2])
@@ -138,3 +142,68 @@ def scales_freq(freqs_d,scales_d, fig, event_list, figname="frequency_scale"):
 #    ax.set_xlim([0.1, 10])
 #    ax.legend()
 #    plt.savefig('TMP_ffts.png')
+
+
+
+def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,alpha0,beta,filename):
+    '''
+    Creates a single uber-plot summarizing the performance of spectral subtraction
+    
+    The many input variables for this plotting method should be pretty self-evident. This 
+    method needs to be called *after* calculate_metrics.
+        freqs_d:  the vector of frequencies output by the CWT process
+        tr_SNR:   trace object containing the vector of SNR values
+        tr_alpha: trace object containing the vector of alpha values
+        metrics:  is an awkward dictionary of values and strings produced 
+                  by the measure.waveform_metrics function
+    '''
+    
+    alpha_beta_text = ' alpha0: ' + str(round(metrics["alpha0"],1)) + '    beta: ' + str(round(metrics["beta"],2))    
+    windowstart = round((metrics["picktime"] - trd.stats.starttime) - 40)
+    windowend   = round((metrics["picktime"] - trd.stats.starttime) + 40)
+    
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4,1,figsize=(7.5,10))
+    maxamp = abs(amp_Xd).max()/2           # these two lines just adjust the color scale
+    minamp = 0
+    t, f = np.meshgrid(trd.times(), freqs_d)
+    im1 = ax1.pcolormesh(t, f, np.abs(amp_Xd), cmap=cm.hot, vmin=minamp, vmax=maxamp)
+    ax1.set_ylabel('frequency (Hz)')
+    ax1.axes.xaxis.set_visible(False)
+    ax1.set_title('degraded CWT amplitude')
+    ax1.set_xlim(windowstart, windowend)
+
+    im2 = ax2.plot(t[1,:], tr_SNR.data/10, 'r-', linewidth=1,label='SNR')
+    im2 = ax2.plot(t[1,:], tr_alpha.data, 'k-', linewidth=1,label='alpha')
+    ax2.set_ylabel('0.1*SNR(db) & alpha')
+    ax2.set_yticks([-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7])
+    ax2.grid()
+    ax2.set_ylim(0.1* tr_SNR.data.min(), 1.05*tr_alpha.data.max())
+    ax2.legend(loc='upper left')
+    ax2.text(windowstart, -1,alpha_beta_text, style='italic', fontsize=8)
+    ax2.axes.xaxis.set_visible(False)
+    ax2.set_title('subtraction parameters')
+    ax2.set_xlim(windowstart, windowend)
+
+    im3 = ax3.pcolormesh(t, f, np.abs(amp_Xp), cmap=cm.hot, vmin=minamp, vmax=maxamp)
+    ax3.set_ylabel('frequency (Hz)')
+    ax3.axes.xaxis.set_visible(False)
+    ax3.set_title('processed CWT amplitude')
+    ax3.set_xlim(windowstart, windowend)
+
+    im4 = ax4.plot(t[1,:], tro.data, 'r-', linewidth=.75,label='original')
+    im4 = ax4.plot(t[1,:], trd.data, 'r:', linewidth=.75,label='degraded')
+    im4 = ax4.plot(t[1,:], trp.data, 'k-', linewidth=.5,label='processed')
+    ax4.set_ylabel('counts')
+    ax4.legend(loc='upper left')
+    ax4.set_xlabel('time (s)')
+    ax4.set_title(metrics["summarystring3"])
+    ax4.set_xlim(windowstart, windowend)
+    ylimits = ax4.get_ylim()
+    yrange = ylimits[1]-ylimits[0]
+    ax4.text(windowstart, ylimits[0]+.10*yrange,metrics["summarystring2"], style='italic', fontsize=8)
+    ax4.text(windowstart, ylimits[0]+.02*yrange,metrics["summarystring1"], style='italic', fontsize=8)
+    
+    plt.savefig(filename,dpi=300)
+
+    return 
+
