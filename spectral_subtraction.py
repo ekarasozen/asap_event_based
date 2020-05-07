@@ -23,9 +23,9 @@ def simple_subtraction(amp_Xd, amp_Xn, p, alpha0, beta):
         SNR[:,i] = np.sum(amp_XdP[:,i]) / np.sum(amp_XnaP)
         SNR[:,i] = 10*np.log10(SNR[:,i])
         alpha[:,i] = alpha0       #hold alpha constant
-        amp_XpP[:,i] = amp_XdP[:,i] - alpha[:,i]*(amp_XnaP)  
-        belowthreshold = amp_XpP[:,i] < beta*amp_XdP[:,i]
-        amp_XpP[belowthreshold,i] = beta*amp_XdP[belowthreshold,i]
+        amp_XpP[:,i] = amp_XdP[:,i] - (alpha[:,i] * amp_XnaP)
+        belowthreshold = amp_XpP[:,i] < beta*amp_XnaP
+        amp_XpP[belowthreshold,i] = beta*amp_XnaP[belowthreshold]
         amp_Xp[:,i] = amp_XpP[:,i] ** (1/p)  
     return amp_Xp, SNR, alpha   
     
