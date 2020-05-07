@@ -1,23 +1,35 @@
 import numpy as np
 from obspy import Stream
-#Xn: signal with noise
-#N: noise estimate - known for now (D in Fukane and Sahare)
+   
+   
     
-def simple_subtraction(amp_Xd, amp_Xn, p): 
-    #if p = 1; amplitude/magnitude subtraction
-    #if p = 2; power subtraction
-    #amp_Xd = np.abs(Xd)
-    minamp = 0                # eqn 10 in Hassani 2011
+##########################################################
+# SIMPLE OVER-SUBTRACTION WITH FIXED ALPHA
+# SNR is not used, but is included here for consistency
+# alpha is set as a constant equal to alpha0
+
+
+def simple_subtraction(amp_Xd, amp_Xn, p, alpha0, beta): 
     m, n = amp_Xd.shape 
+    SNR = np.zeros((1,n))
+    alpha = np.zeros((1,n))
     amp_Xp = np.zeros((m,n))
+    amp_XpP = np.zeros((m,n))
+    amp_Xda = np.mean(amp_Xd,axis=1)
+    amp_XdP = amp_Xd ** p
     amp_Xna = np.mean(amp_Xn,axis=1)
-    for i in range(0,m):
-        amp_Xp[i,:] = (amp_Xd[i,:] ** p) - (amp_Xna[i] ** p)
-    result = np.where(amp_Xp<minamp**p)  # find low or negative values
-    amp_Xp[result] = 0         # set minimum value, eqn 10 Hassani 2011
-    amp_Xp = amp_Xp ** (1/p)             # square root has to come AFTER the negatives are removed
-    #amp_Xp = (np.abs(amp_Xp)) ** (1/p)             # eqn 11 in Hassani 2011
-    return amp_Xp 
+    amp_XnaP = amp_Xna ** p
+    for i in range(0,n):
+        SNR[:,i] = np.sum(amp_XdP[:,i]) / np.sum(amp_XnaP)
+        SNR[:,i] = 10*np.log10(SNR[:,i])
+        alpha[:,i] = alpha0       #hold alpha constant
+        amp_XpP[:,i] = amp_XdP[:,i] - alpha[:,i]*(amp_XnaP)  
+        belowthreshold = amp_XpP[:,i] < beta*amp_XdP[:,i]
+        amp_XpP[belowthreshold,i] = beta*amp_XdP[belowthreshold,i]
+        amp_Xp[:,i] = amp_XpP[:,i] ** (1/p)  
+    return amp_Xp, SNR, alpha   
+    
+    
 
 def over_subtraction(amp_Xd, amp_Xn, p): 
     #alpha over subtraction factor, value greater than or equal to 1
