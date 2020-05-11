@@ -95,8 +95,44 @@ def all_log(t, tr, X, freq, IX, fig, event_list, figname="original"):
     fig.autofmt_xdate()    
     fig.savefig(event_list + '_'+ figname + '.pdf', bbox_inches='tight')
     #fig.savefig('xx.pdf', bbox_inches='tight')
+
+def osp_beta(amp_p, amp_p1, amp_p2, freqs_d, beta, beta1, beta2, alpha, fig, event_list, figname="osp_beta"): 
+    fig, ([ax, ax1, ax2]) = plt.subplots(3,1)
+    mean_amp_p = np.mean(amp_p,axis=1)
+    mean_amp_p1 = np.mean(amp_p1,axis=1)
+    mean_amp_p2 = np.mean(amp_p2,axis=1)
+    ax.plot(freqs_d,mean_amp_p, 'k-', lw=1,label='processed, beta= ' + str(beta) + ', alpha= ' + str(alpha[0,0]))
+    ax.legend()
+    ax1.plot(freqs_d,mean_amp_p1, 'k-', lw=1,label='processed, beta= ' + str(beta1) + ', alpha= ' + str(alpha[0,0]))
+    ax1.legend()
+    ax2.plot(freqs_d,mean_amp_p2, 'k-', lw=1,label='processed, beta= ' + str(beta2) + ', alpha= ' + str(alpha[0,0]))
+    ax2.legend()
+    ax.set_ylim(0, max(mean_amp_p2))
+    ax1.set_ylim(0, max(mean_amp_p2))
+    ax2.set_ylim(0, max(mean_amp_p2))
+    ax1.set_ylabel("mean amplitude spectra")
+    ax2.set_xlabel('frequency (Hz)')
+    fig.savefig(event_list + '_'+ figname + '.pdf', bbox_inches='tight')
+
+def osp_alpha(amp_p, amp_p1, amp_p2, freqs_d, beta, alpha, alpha1, alpha2, fig, event_list, figname="osp_alpha"): 
+    fig, ([ax, ax1, ax2]) = plt.subplots(3,1)
+    mean_amp_p = np.mean(amp_p,axis=1)
+    mean_amp_p1 = np.mean(amp_p1,axis=1)
+    mean_amp_p2 = np.mean(amp_p2,axis=1)
+    ax.plot(freqs_d,amp_p[:,10], 'k-', lw=1,label='processed, beta= ' + str(beta) + ', alpha= ' + str(alpha[0,0]))
+    ax.legend()
+    ax1.plot(freqs_d,amp_p1[:,10], 'k-', lw=1,label='processed, beta= ' + str(beta) + ', alpha= ' + str(alpha1[0,0]))
+    ax1.legend()
+    ax2.plot(freqs_d,amp_p2[:,10], 'k-', lw=1,label='processed, beta= ' + str(beta) + ', alpha= ' + str(alpha2[0,0]))
+    ax2.legend()
+    ax.set_ylim(0, max(mean_amp_p2))
+    ax1.set_ylim(0, max(mean_amp_p2))
+    ax2.set_ylim(0, max(mean_amp_p2))
+    ax1.set_ylabel("mean amplitude spectra")
+    ax2.set_xlabel('frequency (Hz)')
+    fig.savefig(event_list + '_'+ figname + '.pdf', bbox_inches='tight')
     
-    
+ 
 def spectra(amp_o, amp_d, amp_n, amp_p, freqs_d, fig, event_list, figname="spectra_comparison"): 
     # PLOT SAMPLE COLUMNS FROM THE DEGRADED AND PROCESSED CWT
     mean_amp_o = np.mean(amp_o,axis=1)

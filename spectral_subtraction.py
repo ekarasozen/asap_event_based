@@ -48,7 +48,7 @@ def simple_subtraction(amp_Xd, amp_Xn, p, alpha0, beta):
         belowthreshold = amp_XpP[:,i] < beta*amp_XdP[:,i]
         amp_XpP[belowthreshold,i] = beta*amp_XdP[belowthreshold,i]
         amp_Xp[:,i] = amp_XpP[:,i] ** (1/p)  
-    return amp_Xp, SNR, alpha 
+    return amp_Xp, SNR, alpha, beta 
 
 
 def over_subtraction(amp_Xd, amp_Xn, p): 
