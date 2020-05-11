@@ -139,7 +139,7 @@ def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Ka
                     alpha[:,i]= 1
                 amp_Xp[idx,i] = (amp_Xd[idx,i] ** p) - (alpha[:,i])*(delta)*(amp_Xna[idx] ** p) # NEED TO TEST AFTER THIS
                 print(amp_Xp[idx,i], delta)
-                noi = amp_Xp[idx,i].size #number of index
+                noi = amp_Xz[idx,i].size #number of index
                 for idx in range(0,noi):
                     if amp_Xp[idx,i] > 0: #from Kamath and Loizous
                         amp_Xp[idx,i] = amp_Xp[idx,i]
