@@ -50,8 +50,8 @@ for e, lab in enumerate(event_id):
         #amp_Xp = ss.over_subtraction(amp_Xd,amp_Xn)
         phase_Xd = np.angle(Xd) 
         Xp = amp_Xp*(np.exp(1.j*phase_Xd))
-        IXp = mlwt.icwt(Xp, trd)
-        test1, test2 = hilbert.hilbert_diff(trd, IXp)
+        trp.data = mlwt.icwt(Xp, trd)
+        test1, test2 = hilbert.hilbert_diff(trd, trp)
     elif cwt_type == "pycwt":
         t = np.arange(tro.stats.npts) / tro.stats.sampling_rate
         dt = tro.stats.delta
@@ -74,7 +74,8 @@ for e, lab in enumerate(event_id):
         #amp_Xp = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freq_d)
         phase_Xd = np.angle(Xd)
         Xp = amp_Xp*(np.exp(1.j*phase_Xd))
-        IXp = wavelet.icwt(Xp, scales_d, dt, dj=0.05, wavelet='morlet')
+        trp.data = wavelet.icwt(Xp, scales_d, dt, dj=0.05, wavelet='morlet')
+        trp.data = np.real(trp.data)
         test1, test2 = hilbert.hilbert_diff(trd, trp)
     #np.savetxt(event_list[e] + '_SNR.out', SNR, delimiter=',', newline="\n")  
     #np.savetxt(event_list[e] + '_alpha.out', alpha, delimiter=',', newline="\n")   
@@ -84,7 +85,7 @@ for e, lab in enumerate(event_id):
     #np.savetxt(event_list[e] + '_Xn.out', Xn, delimiter=',', newline="\n")  
     amp_Xo = abs(Xo)
     fig1 = plt.figure()
-    fig1 = myplot.wfs(t, tro, trd, IXp, fig1, event_list[e], figname="wfs") 
+    fig1 = myplot.wfs(t, tro, trd, trp, fig1, event_list[e], figname="wfs") 
     fig2 = plt.figure()
     fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, fig2, event_list[e], figname="scals") 
     #fig1 = myplot.all(t, tro, Xo, freq, IXo, fig1, event_list[e], figname="original")
