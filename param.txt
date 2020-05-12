@@ -18,8 +18,8 @@ noise_freqmax = 4
 ibegin = 5
 iend = 15
 ########################cwt parameters########################
-cwt_type = "mlwt"
-#cwt_type = "pycwt"
+#cwt_type = "mlwt"
+cwt_type = "pycwt"
 dj = 0.05 #scale spacing
 omega0 = 6
 s0 = 0.096801331 # smallest scale, required for pycwt (maybe not? check this), mlpy automatically calculates this

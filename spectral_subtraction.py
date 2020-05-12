@@ -83,7 +83,7 @@ def over_subtraction(amp_Xd, amp_Xn, p):
             else:
                 amp_Xp[j,i] = (beta)*(amp_Xna[j] ** p)
         amp_Xp[:,i] = amp_Xp[:,i] ** (1/p)  
-    return amp_Xp, SNR, alpha   
+    return amp_Xp, SNR, alpha, beta   
 
 def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
     m, n = amp_Xd.shape 
@@ -112,7 +112,7 @@ def nonlin_subtraction(amp_Xd, amp_Xn): #mainly from Lockwood
             else:
                 amp_Xp[j,i] = (beta)*(amp_Xds[j,i])
     np.savetxt('amp_Xna.out', amp_Xna, delimiter=',', newline="\n")   # X is an array
-    return amp_Xp, phi, alpha, rho   
+    return amp_Xp, alpha, rho, phi, beta, gamma   
 
 
 def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Karmakar 2013
@@ -208,4 +208,4 @@ def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Ka
     np.savetxt('amp_Xd.out', amp_Xd, delimiter=',', newline="\n")   
     np.savetxt('amp_Xna.out', amp_Xna, delimiter=',', newline="\n")  
     np.savetxt('freqs.out', freqs, delimiter=',', newline="\n")  
-    return amp_Xp
+    return amp_Xp, SNR, alpha, beta, delta
