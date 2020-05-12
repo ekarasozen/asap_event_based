@@ -52,18 +52,18 @@ def event(ev_id, network_list, station_code, pick, channel, start_time, end_time
             for j in arrivals:
                 if j.pick_id.id==i.resource_id and j.phase==pick: 
                     time_array = np.append(time_array, [i.time])
-                    t=i.time
+                    picktime=i.time
     if time_array.size == 0:
        print("There are no available picks from the quakeml file, pick time will be calculated by the Taup")
-       t = evot + taup(inventory,evlat,evlon,evdep,model_l=TauPyModel(model="northak"),phase_list=["P", "Pn", "Pg", "p"])
+       picktime = evot + taup(inventory,evlat,evlon,evdep,model_l=TauPyModel(model="northak"),phase_list=["P", "Pn", "Pg", "p"])
     try:
-        st = client_wm.get_waveforms(network_list[0], station_code+"*", "*", channel, (t - start_time), (t + end_time), attach_response=True)
+        st = client_wm.get_waveforms(network_list[0], station_code+"*", "*", channel, (picktime - start_time), (picktime + end_time), attach_response=True)
         if len(st) > 0:
             print('Waveform data found!')
     except Exception:
             print('No waveform data found!')
 #            continue
-    return st
+    return st, picktime
     
 def prep(st,filter_type,freqmin,freqmax):
     st.detrend("linear")
