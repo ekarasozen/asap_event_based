@@ -181,7 +181,7 @@ def scales_freq(freqs_d,scales_d, fig, event_list, figname="frequency_scale"):
 
 
 
-def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,alpha0,beta,filename):
+def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,alpha0,beta,fig,event_list,figname="subtraction_parameters"):
     '''
     Creates a single uber-plot summarizing the performance of spectral subtraction.
     The many input variables for this plotting method should be pretty self-evident. This 
@@ -250,7 +250,7 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
     ax4.text(windowstart, ylimits[0]+.10*yrange,insetstring2, style='italic', fontsize=8)
     ax4.text(windowstart, ylimits[0]+.02*yrange,insetstring1, style='italic', fontsize=8)
     
-    plt.savefig(filename,dpi=300)
+    fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
 
     return 
 
