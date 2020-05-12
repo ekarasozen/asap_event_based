@@ -11,6 +11,7 @@ import numpy as np
 from scipy import signal
 from obspy import Stream
 from obspy.imaging.cm import obspy_sequential
+import hilbert 
 
 filename = input("Parameters file: ")
 exec(open(filename).read())
@@ -42,11 +43,15 @@ for e, lab in enumerate(event_id):
         t_n, freq_n = mlwt.param(trn,scales_n)
         Xn = mlwt.cwt(trn,scales_n)
         amp_Xn = abs(Xn) 
+        amp_Xp, SNR, alpha, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 1, 1)
+        amp_Xp1, SNR1, alpha1, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 2, 1)
+        amp_Xp2, SNR2, alpha2, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 3, 1)
 #        amp_Xp = ss.simple_subtraction(amp_Xd,amp_Xn,2)
-        amp_Xp = ss.over_subtraction(amp_Xd,amp_Xn)
+        #amp_Xp = ss.over_subtraction(amp_Xd,amp_Xn)
         phase_Xd = np.angle(Xd) 
         Xp = amp_Xp*(np.exp(1.j*phase_Xd))
         IXp = mlwt.icwt(Xp, trd)
+        test1, test2 = hilbert.hilbert_diff(trd, IXp)
     elif cwt_type == "pycwt":
         t = np.arange(tro.stats.npts) / tro.stats.sampling_rate
         dt = tro.stats.delta
@@ -70,6 +75,7 @@ for e, lab in enumerate(event_id):
         phase_Xd = np.angle(Xd)
         Xp = amp_Xp*(np.exp(1.j*phase_Xd))
         IXp = wavelet.icwt(Xp, scales_d, dt, dj=0.05, wavelet='morlet')
+        test1, test2 = hilbert.hilbert_diff(trd, trp)
     #np.savetxt(event_list[e] + '_SNR.out', SNR, delimiter=',', newline="\n")  
     #np.savetxt(event_list[e] + '_alpha.out', alpha, delimiter=',', newline="\n")   
     #np.savetxt(event_list[e] + '_phi.out', phi, delimiter=',', newline="\n")  
@@ -78,7 +84,7 @@ for e, lab in enumerate(event_id):
     #np.savetxt(event_list[e] + '_Xn.out', Xn, delimiter=',', newline="\n")  
     amp_Xo = abs(Xo)
     fig1 = plt.figure()
-    fig1 = myplot.wfs(t, tro, trd, trp, fig1, event_list[e], figname="wfs") 
+    fig1 = myplot.wfs(t, tro, trd, IXp, fig1, event_list[e], figname="wfs") 
     fig2 = plt.figure()
     fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, fig2, event_list[e], figname="scals") 
     #fig1 = myplot.all(t, tro, Xo, freq, IXo, fig1, event_list[e], figname="original")

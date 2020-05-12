@@ -1,22 +1,17 @@
 import sys
 sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap_w_obspy_git/")
-#import param
 import numpy as np
 import mlpy.wavelet as wave
 import math
 from obspy.imaging.cm import obspy_sequential
 
-#filename = input("Parameters file: ")
-#exec(open(filename).read())
+filename = input("Parameters file: ")
+exec(open(filename).read())
 
 # For now, wavelet type, omega0 and dj are set to default
 # type = Morlet, omega0=6, d=0.05
 # Based on Torrence & Compo '97 and obspy example
 #still not sure about renaming st to tr. 
-
-#dj = param.dj
-#omega0 = param.omega0
-#wf = param.wf
 
 def scales(st):
     L = len(st.data)
