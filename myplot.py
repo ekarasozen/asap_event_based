@@ -193,7 +193,7 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
                   by the measure.waveform_metrics function
     '''
     
-    alpha_beta_text = ' alpha0: ' + str(round(alpha0)) + '    beta: ' + str(round(beta)) 
+    alpha_beta_text = ' alpha0: ' + str(alpha0) + '    beta: ' + str(round(beta)) 
     insetstring1 = (" xc (o,p):     long=" + str(round(metrics["maxcorr_long"],2)) + "(" + 
                      str(round(metrics["lag_long"]*tro.stats.delta,2)) + "s)  short=" + 
                      str(round(metrics["maxcorr_short"],2)) + "(" + 
