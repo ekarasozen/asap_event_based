@@ -3,7 +3,7 @@ sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap/"
 from getdata import *
 from addnoise import whitenoise
 import spectral_subtraction as ss
-import mlwt ###mlpy
+#import mlwt ###mlpy
 import pycwt as wavelet  ###pycwt
 import myplot
 import matplotlib.pyplot as plt
@@ -12,13 +12,14 @@ from scipy import signal
 from obspy import Stream
 from obspy.imaging.cm import obspy_sequential
 import hilbert 
+import measure
 
 filename = input("Parameters file: ")
 exec(open(filename).read())
 
 event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
 for e, lab in enumerate(event_id):
-    st = event(ev_id=event_id[e], network_list=network_list, station_code=station_code, pick=pick_type, channel=channel, start_time=start_time, end_time=end_time)
+    st, picktime = event(ev_id=event_id[e], network_list=network_list, station_code=station_code, pick=pick_type, channel=channel, start_time=start_time, end_time=end_time)
     st = prep(st,filter_type=filter_type, freqmin=filter_freqmin, freqmax=filter_freqmax)
     tro = st[0].copy() #[o]riginal signal
     trd = st[0].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
@@ -35,7 +36,7 @@ for e, lab in enumerate(event_id):
         Xo = mlwt.cwt(tro,scales)
         IXo = mlwt.icwt(Xo, tro)
         scales_d = mlwt.scales(trd)
-        t_d, freq_d = mlwt.param(trd,scales_d)
+        t_d, freqs_d = mlwt.param(trd,scales_d)
         Xd = mlwt.cwt(trd,scales_d)
         amp_Xd = abs(Xd)
         IXd = mlwt.icwt(Xd, trd)
@@ -58,22 +59,32 @@ for e, lab in enumerate(event_id):
         Xo, scales, freq, coi, fft, fftfreqs = wavelet.cwt(tro.data, dt, dj, s0, J, mother)    
         IXo = wavelet.icwt(Xo, scales, dt, dj=0.05, wavelet='morlet') 
         t_d = np.arange(trd.stats.npts) / trd.stats.sampling_rate 
-        Xd, scales_d, freq_d, coi_d, fft_d, fftfreqs_d = wavelet.cwt(trd.data, dt, dj, s0, J, mother)    
+        Xd, scales_d, freqs_d, coi_d, fft_d, fftfreqs_d = wavelet.cwt(trd.data, dt, dj, s0, J, mother)    
         amp_Xd = abs(Xd)
         IXd = wavelet.icwt(Xd, scales_d, dt, dj=0.05, wavelet='morlet')
         Xn, scales_n, freq_n, coi_n, fft_n, fftfreqs_n = wavelet.cwt(trn.data, dt, dj, s0, J, mother)
         amp_Xn = abs(Xn)
+        amp_Xna = np.mean(amp_Xn,axis=1)
         amp_Xp, SNR, alpha, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 1, 1)
         amp_Xp1, SNR1, alpha1, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 2, 1)
         amp_Xp2, SNR2, alpha2, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 3, 1)
-        #amp_Xp = ss.simple_subtraction(amp_Xd,amp_Xn,2)
         #amp_Xp, SNR, alpha, beta = ss.over_subtraction(amp_Xd,amp_Xn,2)
         #amp_Xp, alpha, rho, phi, beta, gamma = ss.nonlin_subtraction(amp_Xd,amp_Xn)
-        #amp_Xp, SNR, alpha, beta, delta = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freq_d)
+        #amp_Xp, SNR, alpha, beta, delta = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freqs_d)
         phase_Xd = np.angle(Xd)
         Xp = amp_Xp*(np.exp(1.j*phase_Xd))
         trp.data = wavelet.icwt(Xp, scales_d, dt, dj=0.05, wavelet='morlet')
-        trp.data = np.real(trp.data)
+        print('----> maximum imaginary value in "processed signal" is: ', np.max(np.imag(trp.data)))
+        if np.max(np.imag(trp.data)) == 0:
+            trp.data = np.real(trp.data)
+        else:
+            print('maximum imaginary value in "processed signal" is not zero, therefore not outputted')
+            continue #this condition is not tested yet
+        tr_SNR = trd.copy()
+        tr_alpha = trd.copy()
+        tr_SNR.data = SNR.flatten()
+        tr_alpha.data = alpha.flatten()
+        metrics = measure.waveform_metrics(tro,trd,trp,picktime)
         test1, test2 = hilbert.hilbert_diff(trd, trp)
     #np.savetxt(event_list[e] + '_SNR.out', SNR, delimiter=',', newline="\n")  
     #np.savetxt(event_list[e] + '_alpha.out', alpha, delimiter=',', newline="\n")   
@@ -88,10 +99,14 @@ for e, lab in enumerate(event_id):
     fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, fig2, event_list[e], figname="scals") 
     #fig1 = myplot.all(t, tro, Xo, freq, IXo, fig1, event_list[e], figname="original")
     fig4 = plt.figure()
-    fig4 = myplot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freq_d, fig4, event_list[e], figname="spectra_comparison")
+    fig4 = myplot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, fig4, event_list[e], figname="spectra_comparison")
     fig5 = plt.figure()
-    fig5 = myplot.scales_freq(freq_d, scales_d, fig5, event_list[e], figname="frequency_scale") 
+    fig5 = myplot.scales_freq(freqs_d, scales_d, fig5, event_list[e], figname="frequency_scale") 
 #    fig6 = plt.figure()
-#    fig6 = myplot.osp_beta(amp_Xp, amp_Xp1, amp_Xp2, freq_d, beta, beta1, beta2, alpha, fig6, event_list[e], figname="osp_beta") 
+#    fig6 = myplot.osp_beta(amp_Xp, amp_Xp1, amp_Xp2, freqs_d, beta, beta1, beta2, alpha, fig6, event_list[e], figname="osp_beta") 
     fig6 = plt.figure()
-    fig6 = myplot.osp_alpha(amp_Xp, amp_Xp1, amp_Xp2, freq_d, beta, alpha, alpha1, alpha2, fig6, event_list[e], figname="osp_alpha") 
+    fig6 = myplot.osp_alpha(amp_Xp, amp_Xp1, amp_Xp2, freqs_d, beta, alpha, alpha1, alpha2, fig6, event_list[e], figname="osp_alpha") 
+    fig7 = plt.figure()
+    fig7 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,alpha,beta,fig7, event_list[e], figname="subtraction_performance")
+    fig8 = plt.figure()
+    fig8 = myplot.sub_param(amp_Xd, amp_Xna, freqs_d, fig8, event_list[e], figname="compare_role_of_alpha_beta")
