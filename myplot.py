@@ -96,6 +96,177 @@ def all_log(t, tr, X, freq, IX, fig, event_list, figname="original"):
     fig.savefig(event_list + '_'+ figname + '.pdf', bbox_inches='tight')
     #fig.savefig('xx.pdf', bbox_inches='tight')
 
+
+#def sub_param(amp_Xd, amp_Xna, freqs_d, fig1, fig2, fig3, fig4, fig5, event_list, figname1="compare_role_of_alpha_beta", figname2="compare_different_betas", figname3="compare_different_betas2", fignam4="compare_11_consecutive_timeframes", figname5="compare_11_consecutive_seconds"):
+def sub_param(amp_Xd, amp_Xna, freqs_d, fig, event_list, figname="compare_role_of_alpha_beta"):
+    m, n = amp_Xd.shape 
+    p = 2
+    amp_XdP = amp_Xd**p                     # appended P is shorthand for **p
+    amp_XnaP = amp_Xna**p
+    
+    # EXPLORE SPECTRAL SUBTRACTION PARAMETERS
+    #alpha0=4 #vary between 3-6 (Beruiti et al'79), normally taken as 4 (Kamath & Loizou'02)
+    #beta=0.2 #should be between 0-1.
+    amp_XpP = np.zeros((m,n))
+    amp_XpP1 = np.zeros((m,n))
+    amp_XpP2 = np.zeros((m,n))
+    amp_XpP3 = np.zeros((m,n))
+    amp_XpPnobeta1 = np.zeros((m,n))
+    amp_XpPnobeta2 = np.zeros((m,n))
+    amp_XpPnobeta3 = np.zeros((m,n))
+    
+    #######################################################################################################################################
+    # PLOT ROLE OF ALPHA AND BETA
+    #######################################################################################################################################    
+    # SELECT A SINGLE TIME FRAME TO TEST  
+    #j = 7000   #   snr=0.6  alpha=3.9        alpha0-3/20*snr[7000]
+    #j = 7500   #   snr=5.2  alpha=3.2        alpha0-3/20*snr[7500]
+    j = 1490   #   snr=9.1  alpha=2.6        alpha0-3/20*snr[7800]     
+    #j = 7800   #   snr=9.1  alpha=2.6        alpha0-3/20*snr[7800]  
+    beta = .3
+    alpha = 2.3
+    amp_XpP2[:,j] = amp_XdP[:,j] - alpha*amp_XnaP  
+    amp_XpPnobeta2[:,j] = amp_XpP2[:,j] 
+    foundlows = np.where(amp_XpP2[:,j] < beta*amp_XnaP)
+    amp_XpP2[foundlows,j] = beta*amp_XnaP[foundlows]
+    #COMPARE 
+    # 900C3F C70039 FF5733 FFC305
+    fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(5,1,figsize=(7.5,10))
+    ax1.semilogx(freqs_d,amp_XdP[:,j],       'k-',lw=.75,label='Xd')
+    ax1.semilogx(freqs_d,amp_XnaP,           'k--',lw=.75,label='Xna')
+    ax1.semilogx(freqs_d,amp_XpPnobeta2[:,j],':',lw=.75,label='alpha=2.3, no beta',color='#C70039')
+    ax1.semilogx(freqs_d,amp_XpP2[:,j],      '-',lw=.75,label='alpha=2.3, beta=0.3',color='#C70039')
+    ax1.semilogx(freqs_d,beta*amp_XnaP,      'k:',lw=.75,label='beta*Xna')
+    ax1.legend()
+    ax1.set(xlim=[.5, 10])
+    ax1.set_title('timeframe 1490')
+
+    #######################################################################################################################################
+    # MAKE A PLOT COMPARING DIFFERENT ALPHAS
+    #######################################################################################################################################    
+    # SELECT A SINGLE TIME FRAME TO TEST  
+    #j = 7000   #   snr=0.6  alpha=3.9        alpha0-3/20*snr[7000]
+    #j = 7500   #   snr=5.2  alpha=3.2        alpha0-3/20*snr[7500]
+    j = 1490   #   snr=9.1  alpha=2.6        alpha0-3/20*snr[7800]     
+    #j = 7800   #   snr=9.1  alpha=2.6        alpha0-3/20*snr[7800]     
+    alpha = 1
+    amp_XpP1[:,j] = amp_XdP[:,j] - (alpha*amp_XnaP)  
+    amp_XpPnobeta1[:,j] = amp_XpP1[:,j] 
+    foundlows = np.where(amp_XpP1[:,j] < beta*amp_XnaP)
+    amp_XpP1[foundlows,j] = beta*amp_XnaP[foundlows]
+    alpha = 2
+    amp_XpP2[:,j] = amp_XdP[:,j] - (alpha*amp_XnaP)  
+    amp_XpPnobeta2[:,j] = amp_XpP2[:,j] 
+    foundlows = np.where(amp_XpP2[:,j] < beta*amp_XnaP)
+    amp_XpP2[foundlows,j] = beta*amp_XnaP[foundlows]
+    alpha = 3
+    amp_XpP3[:,j] = amp_XdP[:,j] - (alpha*amp_XnaP)  
+    amp_XpPnobeta3[:,j] = amp_XpP3[:,j] 
+    foundlows = np.where(amp_XpP3[:,j] < beta*amp_XnaP)
+    amp_XpP3[foundlows,j] = beta*amp_XnaP[foundlows]
+    #COMPARE 
+    # 900C3F C70039 FF5733 FFC305
+    ax2.semilogx(freqs_d,amp_XdP[:,j],       'k-',lw=.75,label='Xd')
+    ax2.semilogx(freqs_d,amp_XnaP,           'k--',lw=.75,label='Xna')
+    ax2.semilogx(freqs_d,amp_XpPnobeta1[:,j],':',lw=.75,label='alpha=1, no beta',color='#900C3F')
+    ax2.semilogx(freqs_d,amp_XpP1[:,j],      '-',lw=.75,label='alpha=1, beta=0.2',color='#900C3F')
+    ax2.semilogx(freqs_d,amp_XpPnobeta2[:,j],':',lw=.75,label='alpha=2, no beta',color='#C70039')
+    ax2.semilogx(freqs_d,amp_XpP2[:,j],      '-',lw=.75,label='alpha=2, beta=0.2',color='#C70039')
+    ax2.semilogx(freqs_d,amp_XpPnobeta3[:,j],':',lw=.75,label='alpha=3, no beta',color='#FF5733')
+    ax2.semilogx(freqs_d,amp_XpP3[:,j],      '-',lw=.75,label='alpha=3, beta=0.2',color='#FF5733')
+    ax2.semilogx(freqs_d,beta*amp_XnaP,      'k:',lw=.75,label='beta*Xna')
+    ax2.legend()
+    ax2.set(xlim=[.5, 10])
+    ax2.set_title('timeframe 1490')
+#    fig2.savefig(event_list + '_'+ figname2 + '.png', bbox_inches='tight')
+ 
+    #######################################################################################################################################
+    # MAKE A PLOT COMPARING DIFFERENT BETAS
+    #######################################################################################################################################
+    # SELECT A SINGLE TIME FRAME TO TEST  
+    j = 1490   #   snr=9.1  alpha=2.6        alpha0-3/20*snr[7800]     
+    alpha = 3
+    beta = 0.3
+    amp_XpP1[:,j] = amp_XdP[:,j] - (alpha*amp_XnaP)  
+    amp_XpPnobeta1[:,j] = amp_XpP1[:,j] 
+    foundlows = np.where(amp_XpP1[:,j] < beta*amp_XnaP)
+    amp_XpP1[foundlows,j] = beta*amp_XnaP[foundlows]
+    alpha = 3
+    beta = 0.6
+    amp_XpP2[:,j] = amp_XdP[:,j] - (alpha*amp_XnaP)  
+    amp_XpPnobeta2[:,j] = amp_XpP2[:,j] 
+    foundlows = np.where(amp_XpP2[:,j] < beta*amp_XnaP)
+    amp_XpP2[foundlows,j] = beta*amp_XnaP[foundlows]
+    alpha = 3
+    beta = 0.9
+    amp_XpP3[:,j] = amp_XdP[:,j] - (alpha*amp_XnaP)  
+    amp_XpPnobeta3[:,j] = amp_XpP3[:,j] 
+    foundlows = np.where(amp_XpP3[:,j] < beta*amp_XnaP)
+    amp_XpP3[foundlows,j] = beta*amp_XnaP[foundlows]
+    #COMPARE 
+    # 900C3F C70039 FF5733 FFC305
+    ax3.semilogx(freqs_d,amp_XdP[:,j],       'k-',lw=.75,label='Xd')
+    ax3.semilogx(freqs_d,amp_XnaP,           'k--',lw=.75,label='Xna')
+    ax3.semilogx(freqs_d,amp_XpP1[:,j],      '-',lw=.75,label='alpha=3, beta=0.3',color='#900C3F')
+    ax3.semilogx(freqs_d,amp_XpP2[:,j],      '-',lw=.75,label='alpha=3, beta=0.6',color='#C70039')
+    ax3.semilogx(freqs_d,amp_XpP3[:,j],      '-',lw=.75,label='alpha=3, beta=0.9',color='#FF5733')
+    ax3.semilogx(freqs_d,beta*amp_XnaP,      'k:',lw=.75,label='beta*Xna')
+    ax3.legend()
+    ax3.set(xlim=[.5, 10])
+    ax3.set_title('timeframe 1490')
+    #fig3.savefig(event_list + '_'+ figname3 + '.png', bbox_inches='tight')
+ 
+    #############################################
+    # COMPARE TIMEFRAME VARIABILITY
+    #############################################
+    #PALLETTE 
+    #000000
+    #2C0C23
+    #571845
+    #741242
+    #900C3F    
+    #AC063C
+    #C70039    
+    #E32C36
+    #FF5733  
+    #FF8D1C 
+    #FFC305
+    ax4.semilogx(freqs_d, amp_XdP[:,1485], '-', lw=.75, color='#000000')
+    ax4.semilogx(freqs_d, amp_XdP[:,1486], '-', lw=.75, color='#2C0C23')
+    ax4.semilogx(freqs_d, amp_XdP[:,1487], '-', lw=.75, color='#571845')
+    ax4.semilogx(freqs_d, amp_XdP[:,1488], '-', lw=.75, color='#741242')
+    ax4.semilogx(freqs_d, amp_XdP[:,1489], '-', lw=.75, color='#900C3F')
+    ax4.semilogx(freqs_d, amp_XdP[:,1490], '-', lw=.75, color='#AC063C')
+    ax4.semilogx(freqs_d, amp_XdP[:,1491], '-', lw=.75, color='#C70039')
+    ax4.semilogx(freqs_d, amp_XdP[:,1492], '-', lw=.75, color='#E32C36')
+    ax4.semilogx(freqs_d, amp_XdP[:,1493], '-', lw=.75, color='#FF5733')
+    ax4.semilogx(freqs_d, amp_XdP[:,1494], '-', lw=.75, color='#FF8D1C')
+    ax4.semilogx(freqs_d, amp_XdP[:,1495], '-', lw=.75, color='#FFC305')
+    ax4.set(xlim=[.5, 10])
+    ax4.set_title('11 consecutive timeframes (0.5 s) [1485-1495]')
+    #fig4.savefig(event_list + '_'+ figname4 + '.png', bbox_inches='tight')
+    
+    #######################################################################################################################################
+    # COMPARE VARIABILITY EACH SECOND
+    #######################################################################################################################################
+        
+    ax5.semilogx(freqs_d, amp_XdP[:,1390], '-', lw=.75, color='#000000')
+    ax5.semilogx(freqs_d, amp_XdP[:,1410], '-', lw=.75, color='#2C0C23')
+    ax5.semilogx(freqs_d, amp_XdP[:,1430], '-', lw=.75, color='#571845')
+    ax5.semilogx(freqs_d, amp_XdP[:,1450], '-', lw=.75, color='#741242')
+    ax5.semilogx(freqs_d, amp_XdP[:,1470], '-', lw=.75, color='#900C3F')
+    ax5.semilogx(freqs_d, amp_XdP[:,1490], '-', lw=.75, color='#AC063C')
+    ax5.semilogx(freqs_d, amp_XdP[:,1510], '-', lw=.75, color='#C70039')
+    ax5.semilogx(freqs_d, amp_XdP[:,1530], '-', lw=.75, color='#E32C36')
+    ax5.semilogx(freqs_d, amp_XdP[:,1550], '-', lw=.75, color='#FF5733')
+    ax5.semilogx(freqs_d, amp_XdP[:,1570], '-', lw=.75, color='#FF8D1C')
+    ax5.semilogx(freqs_d, amp_XdP[:,1590], '-', lw=.75, color='#FFC305')
+    ax5.set(xlim=[.5, 10])
+    ax5.set_title('11 seconds [frames 1390:20:1590]')
+    #fig5.savefig(event_list + '_'+ figname5 + '.png', bbox_inches='tight')
+    fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
+
+
 def osp_beta(amp_p, amp_p1, amp_p2, freqs_d, beta, beta1, beta2, alpha, fig, event_list, figname="osp_beta"): 
     fig, ([ax, ax1, ax2]) = plt.subplots(3,1)
     mean_amp_p = np.mean(amp_p,axis=1)
