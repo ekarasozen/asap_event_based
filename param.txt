@@ -17,10 +17,6 @@ noise_freqmax = 4
 ##################noise estimation parameters##################
 ibegin = 5
 iend = 15
-########################cwt parameters########################
+########################cwt type########################
 #cwt_type = "mlwt"
 cwt_type = "pycwt"
-dj = 0.05 #scale spacing
-omega0 = 6
-s0 = 0.096801331 # smallest scale, required for pycwt (maybe not? check this), mlpy automatically calculates this
-wf = 'morlet' #type of wavelet for mlpy, is there a way to do this for pycwt too? check

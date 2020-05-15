@@ -31,6 +31,9 @@ for e, lab in enumerate(event_id):
     trn.detrend("demean")
     trp = trd.copy() # [p]rocessed version of degraded signal to remove the noise, seems like there is no need for this
     if cwt_type == "mlwt":
+        dj = 0.05 #scale spacing
+        omega0 = 6
+        wf = 'morlet' #type of wavelet for mlpy, is there a way to do this for pycwt too? check
         scales = mlwt.scales(tro)
         t, freq = mlwt.param(tro,scales)
         Xo = mlwt.cwt(tro,scales)
@@ -44,14 +47,23 @@ for e, lab in enumerate(event_id):
         t_n, freq_n = mlwt.param(trn,scales_n)
         Xn = mlwt.cwt(trn,scales_n)
         amp_Xn = abs(Xn) 
+        amp_Xna = np.mean(amp_Xn,axis=1)
         amp_Xp, SNR, alpha, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 1, 1)
         amp_Xp1, SNR1, alpha1, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 2, 1)
         amp_Xp2, SNR2, alpha2, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 3, 1)
         phase_Xd = np.angle(Xd) 
         Xp = amp_Xp*(np.exp(1.j*phase_Xd))
         trp.data = mlwt.icwt(Xp, trd)
+        tr_SNR = trd.copy()
+        tr_alpha = trd.copy()
+        tr_SNR.data = SNR.flatten()
+        tr_alpha.data = alpha.flatten()
+        metrics = measure.waveform_metrics(tro,trd,trp,picktime)
         test1, test2 = hilbert.hilbert_diff(trd, trp)
     elif cwt_type == "pycwt":
+        dj = 0.05 #scale spacing
+        s0 = 0.096801331 # smallest scale, required for pycwt (maybe not? check this), mlpy automatically calculates this
+        omega0 = 6
         t = np.arange(tro.stats.npts) / tro.stats.sampling_rate
         dt = tro.stats.delta
         J = (np.log2(len(tro) * dt / s0)) / dj  # number of scales-1 

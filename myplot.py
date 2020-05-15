@@ -364,8 +364,7 @@ def alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, 
     st_all = Stream(traces=[tro, trd]) 
     alpha0list = [1, 2, 4, 6, 10]
     dt = tro.stats.delta
-    mother = wavelet.Morlet(omega0)              # See https://github.com/regeirk/pycwt/blob/master/pycwt/wavelet.py 
-
+    mother = wavelet.Morlet(omega0)              # required for pycwt
     for i in range(len(alpha0list)):
         # DO SUBTRACTION
         beta = 0.0
@@ -373,9 +372,8 @@ def alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, 
         amp_Xp, SNR, alpha = ss.constant_subtraction(amp_Xd,amp_Xn,2,alpha0,beta)
         Xp = amp_Xp * np.exp(1.j*phase_Xd)
         trp = trd.copy()
-        #trp.data = wavelet.icwt(Xp, scales_d, dt, dj, mother)
-        trp.data = mlwt.icwt(Xp, trd) #for mlpy, haven't tested this yet. 
-        #trp.data = np.real(trp.data) #not sure if we need this here
+        trp.data = wavelet.icwt(Xp, scales_d, dt, dj, mother)
+        #trp.data = mlwt.icwt(Xp, trd) #for mlpy, haven't tested this yet. 
         # PLOT WAVEFORMS
         trp.stats.location = 'alpha'+str(alpha0)
         st_all += trp

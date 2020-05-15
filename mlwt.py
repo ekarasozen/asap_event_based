@@ -5,14 +5,16 @@ import mlpy.wavelet as wave
 import math
 from obspy.imaging.cm import obspy_sequential
 
-filename = input("Parameters file: ")
-exec(open(filename).read())
+#filename = input("Parameters file: ")
+#exec(open(filename).read())
 
 # For now, wavelet type, omega0 and dj are set to default
 # type = Morlet, omega0=6, d=0.05
 # Based on Torrence & Compo '97 and obspy example
 #still not sure about renaming st to tr. 
-
+dj = 0.05 #scale spacing
+omega0 = 6
+wf = 'morlet' #type of wavelet for mlpy,
 def scales(st):
     L = len(st.data)
     dt = st.stats.delta
