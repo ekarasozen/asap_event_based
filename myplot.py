@@ -58,9 +58,10 @@ def scals(t, tr, Xo, Xd, Xp, freq, fig, event_list, figname="scals"):
 
 
 
-def sub_param_one_tf(amp_Xd, amp_Xna, freqs_d, fig, event_list, timeframe="100", figname="one_timeframe_alpha_beta"):
+def sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, fig, event_list, timeframe="100", figname="one_timeframe_alpha_beta"):
     m, n = amp_Xd.shape 
     p = 2
+    amp_Xna = np.mean(amp_Xn,axis=1)
     amp_XdP = amp_Xd**p                     # appended P is shorthand for **p
     amp_XnaP = amp_Xna**p
     
@@ -193,7 +194,7 @@ def sub_param_one_tf(amp_Xd, amp_Xna, freqs_d, fig, event_list, timeframe="100",
     ax3.set_xlabel('frequency (Hz)')
     fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
 
-def processed_signal_tf(amp_Xd, amp_Xna, freqs_d, fig, event_list, x1=1485, now1=11, step1=1, x3=1390, now2=11, step2=20, figname="cons_timeframe_processed_signal"):
+def processed_signal_tf(amp_Xd, amp_Xn, freqs_d, fig, event_list, x1=1485, now1=11, step1=1, x3=1390, now2=11, step2=20, figname="cons_timeframe_processed_signal"):
     #x1 start of interval for first fig.
     #now1 number of windows  for the first fig.
     #step1 step size for the first fig.
@@ -203,6 +204,7 @@ def processed_signal_tf(amp_Xd, amp_Xna, freqs_d, fig, event_list, x1=1485, now1
 
     m, n = amp_Xd.shape 
     p = 2
+    amp_Xna = np.mean(amp_Xn,axis=1)
     amp_XdP = amp_Xd**p                     # appended P is shorthand for **p
     amp_XnaP = amp_Xna**p
     
@@ -355,9 +357,7 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
     yrange = ylimits[1]-ylimits[0]
     ax4.text(windowstart, ylimits[0]+.10*yrange,insetstring2, style='italic', fontsize=8)
     ax4.text(windowstart, ylimits[0]+.02*yrange,insetstring1, style='italic', fontsize=8)
-    
     fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
-
     return 
     
 def alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, fig, event_list, figname="alpha_comparison_wfs"):
@@ -373,13 +373,45 @@ def alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, 
         Xp = amp_Xp * np.exp(1.j*phase_Xd)
         trp = trd.copy()
         trp.data = wavelet.icwt(Xp, scales_d, dt, dj, mother)
-        #trp.data = mlwt.icwt(Xp, trd) #for mlpy, haven't tested this yet. 
+        #trp.data = mlwt.icwt(Xp, trd) 
         # PLOT WAVEFORMS
         trp.stats.location = 'alpha'+str(alpha0)
         st_all += trp
     st_all.plot(automerge=False,equal_scale=True,linewidth=1,fig=fig)
     plt.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
     #fig.autofmt_xdate()    
+
+def alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, freqs_d, omega0, dj, fig, event_list, figname="alpha_comparison_scals"):
+    alpha0list = [1, 2, 4, 6, 10]
+    nop= len(alpha0list)+2 #number of subplots
+    dt = tro.stats.delta
+    mother = wavelet.Morlet(omega0)              # required for pycwt  
+    fig1 = plt.figure(figsize=(7.5,10))
+    ax1 = fig1.add_subplot((nop),1,1)
+    maxamp = abs(amp_Xd).max()/2           # these two lines just adjust the color scale
+    minamp = 0
+    t, f = np.meshgrid(trd.times(), freqs_d)
+    im1 = ax1.pcolormesh(t, f, np.abs(amp_Xo), cmap=cm.hot, vmin=minamp, vmax=maxamp)
+    ax1.text(1.5, 8.5, 'original CWT amplitude', fontsize=8, bbox=dict(facecolor='white'))
+    ax1.axes.xaxis.set_visible(False)
+    ax2 = fig1.add_subplot((nop),1,2)
+    im2 = ax2.pcolormesh(t, f, np.abs(amp_Xd), cmap=cm.hot, vmin=minamp, vmax=maxamp)
+    ax2.text(1.5, 8.5, 'degraded CWT amplitude', fontsize=8, bbox=dict(facecolor='white'))
+    ax2.axes.xaxis.set_visible(False)
+    ax2.set_ylabel('frequency (Hz)')
+    for i in range(len(alpha0list)):
+        ax3 = fig1.add_subplot(nop, 1, (i+3))
+        # DO SUBTRACTION
+        beta = 0.0
+        alpha0 = alpha0list[i]
+        amp_Xp, SNR, alpha = ss.constant_subtraction(amp_Xd,amp_Xn,2,alpha0,beta)
+        im = ax3.pcolormesh(t, f, np.abs(amp_Xp), cmap=cm.hot, vmin=minamp, vmax=maxamp)
+        #ax1.set_ylabel('frequency (Hz)')
+        text = 'alpha'+str(alpha0)
+        ax3.text(1.5, 8.5, text, fontsize=8, bbox=dict(facecolor='white'))
+        ax3.axes.xaxis.set_visible(False)
+    ax3.axes.xaxis.set_visible(True)
+    fig1.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
 
 
 def all(t, tr, X, freq, IX, fig, event_list, figname="original"): 
