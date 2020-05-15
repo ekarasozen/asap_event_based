@@ -5,6 +5,7 @@ A module for functions that help assess the performance of spectral subtraction
 import numpy as np
 from obspy.signal.cross_correlation import correlate
 from obspy.signal.cross_correlation import xcorr_max
+from scipy.signal import hilbert, chirp
 
 
 
@@ -76,6 +77,8 @@ def waveform_metrics(tro,trd,trp,picktime):
     snrd_short = trd_post.std() / trd_pre.std() 
     snrp_short = trp_post.std() / trp_pre.std()
 
+
+
     # create output
     metrics = {
         "maxcorr_long":   round(cclong_max,2),
@@ -91,4 +94,16 @@ def waveform_metrics(tro,trd,trp,picktime):
     }
     
     return metrics
+    
+def hilb_metrics(trd,trp):
+    #This can ben added to metrics if needed. 
+    # Hilbert transform difference
+    trd_h = hilbert(trd)
+    trp_h = hilbert(trp)
+    hilb_div = np.angle((trd_h / trp_h), deg=True) 
+    max_hilb = np.max(np.abs(hilb_div))
+    mean_hilb = np.mean(hilb_div)
+    #hilbert_sub = np.unwrap(np.angle(trd_h) - np.angle(trp_h)) #this is same with  np.angle(trd_h / trp_h)
+
+    return hilb_div, max_hilb, mean_hilb
     

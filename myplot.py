@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import matplotlib.offsetbox as offsetbox
 from obspy import Stream
 from obspy.imaging.cm import obspy_sequential
 import sys
@@ -359,6 +360,18 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
     ax4.text(windowstart, ylimits[0]+.02*yrange,insetstring1, style='italic', fontsize=8)
     fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
     return 
+
+def hilb_plot(t,hilb_div,max_hilb,mean_hilb,fig,event_list,figname="hilbert_metrics"):
+    fig, ax1 = plt.subplots(1,1,figsize=(5,5))
+    ax1.scatter(t, hilb_div, s=15, facecolors='none', edgecolors='r', linewidth=0.5)
+    text = 'max = ' + str(round(max_hilb,2)) + '\n' + 'mean = ' + str(round(mean_hilb,2))    
+    ob = offsetbox.AnchoredText(text, loc=1, prop=dict(color='black', size=8)) #ax.text location kept changing
+    ob.patch.set(boxstyle='round', color='gray', alpha=0.5)
+    ax1.add_artist(ob)
+    ax1.set_xlabel('Time (seconds)')
+    ax1.set_ylabel('Phase lag (degrees)')
+    fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
+
     
 def alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, fig, event_list, figname="alpha_comparison_wfs"):
     st_all = Stream(traces=[tro, trd]) 

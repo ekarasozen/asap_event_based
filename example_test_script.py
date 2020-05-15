@@ -3,7 +3,7 @@ sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap/"
 from getdata import *
 from addnoise import whitenoise
 import spectral_subtraction as ss
-#import mlwt ###mlpy
+import mlwt ###mlpy
 import pycwt as wavelet  ###pycwt
 import myplot
 import matplotlib.pyplot as plt
@@ -11,7 +11,6 @@ import numpy as np
 from scipy import signal
 from obspy import Stream
 from obspy.imaging.cm import obspy_sequential
-import hilbert 
 import measure
 
 filename = input("Parameters file: ")
@@ -58,7 +57,7 @@ for e, lab in enumerate(event_id):
         tr_SNR.data = SNR.flatten()
         tr_alpha.data = alpha.flatten()
         metrics = measure.waveform_metrics(tro,trd,trp,picktime)
-        test1, test2 = hilbert.hilbert_diff(trd, trp)
+        hilb_div, max_hilb, mean_hilb = measure.hilb_metrics(trd,trp)
     elif cwt_type == "pycwt":
         dj = 0.05 #scale spacing
         s0 = 0.096801331 # smallest scale, required for pycwt (maybe not? check this), mlpy automatically calculates this
@@ -93,7 +92,7 @@ for e, lab in enumerate(event_id):
         tr_SNR.data = SNR.flatten()
         tr_alpha.data = alpha.flatten()
         metrics = measure.waveform_metrics(tro,trd,trp,picktime)
-        test1, test2 = hilbert.hilbert_diff(trd, trp)
+        hilb_div, max_hilb, mean_hilb = measure.hilb_metrics(trd,trp)
     #np.savetxt(event_list[e] + '_SNR.out', SNR, delimiter=',', newline="\n")  
     #np.savetxt(event_list[e] + '_alpha.out', alpha, delimiter=',', newline="\n")   
     #np.savetxt(event_list[e] + '_phi.out', phi, delimiter=',', newline="\n")  
@@ -105,7 +104,6 @@ for e, lab in enumerate(event_id):
     fig1 = myplot.wfs(t, tro, trd, trp, fig1, event_list[e], figname="wfs") 
     fig2 = plt.figure()
     fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, fig2, event_list[e], figname="scals") 
-    #fig1 = myplot.all(t, tro, Xo, freq, IXo, fig1, event_list[e], figname="original")
     fig4 = plt.figure()
     fig4 = myplot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, fig4, event_list[e], figname="spectra_comparison")
     fig5 = plt.figure()
@@ -120,3 +118,5 @@ for e, lab in enumerate(event_id):
     fig9 = myplot.alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, fig9, event_list[e], figname="alpha_comparison_wfs")
     fig10 = plt.figure()
     fig10 = myplot.alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, freqs_d, omega0, dj, fig10, event_list[e], figname="alpha_comparison_scals")
+    fig11 = plt.figure()
+    fig11 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,fig11,event_list[e],figname="hilbert_metrics")
