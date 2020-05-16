@@ -29,7 +29,7 @@ for e, lab in enumerate(event_id):
     trn.detrend("linear")
     trn.detrend("demean")
     trp = trd.copy() # [p]rocessed version of degraded signal to remove the noise, seems like there is no need for this
-    if cwt_type == "mlwt":
+    if t_type == "mlwt":
         dj = 0.05 #scale spacing
         omega0 = 6
         wf = 'morlet' #type of wavelet for mlpy, is there a way to do this for pycwt too? check
@@ -58,7 +58,7 @@ for e, lab in enumerate(event_id):
         tr_alpha.data = alpha.flatten()
         metrics = measure.waveform_metrics(tro,trd,trp,picktime)
         hilb_div, max_hilb, mean_hilb = measure.hilb_metrics(trd,trp)
-    elif cwt_type == "pycwt":
+    elif t_type == "pycwt":
         dj = 0.05 #scale spacing
         s0 = 0.096801331 # smallest scale, required for pycwt (maybe not? check this), mlpy automatically calculates this
         omega0 = 6
@@ -93,6 +93,33 @@ for e, lab in enumerate(event_id):
         tr_alpha.data = alpha.flatten()
         metrics = measure.waveform_metrics(tro,trd,trp,picktime)
         hilb_div, max_hilb, mean_hilb = measure.hilb_metrics(trd,trp)
+    elif t_type == "stft":
+        #t = np.arange(tro.stats.npts) / tro.stats.sampling_rate
+        fs = 1/trd.stats.delta
+        nperseg = 64
+        fo, to, Xo = signal.stft(tro.data, fs, nperseg=nperseg)
+        fd, td, Xd = signal.stft(trd.data, fs, nperseg=nperseg)
+        fn, tn, Xn = signal.stft(trn.data, fs, nperseg=nperseg)
+        amp_Xd = np.abs(Xd)
+        amp_Xn = np.abs(Xn)
+        amp_Xp, SNR, alpha, beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 4, 0.3)
+        phase_Xd = np.angle(Xd)
+        Xp = amp_Xp * np.exp(1.j*phase_Xd)
+        t_tmp, trp.data = signal.istft(Xp, fs)
+        print('----> maximum imaginary value in "processed signal" is: ', np.max(np.imag(trp.data)))
+        if np.max(np.imag(trp.data)) == 0:
+            trp.data = np.real(trp.data)
+        else:
+            print('maximum imaginary value in "processed signal" is not zero, therefore not outputted')
+            continue #this condition is not tested yet
+        tr_SNR = trd.copy()
+        tr_alpha = trd.copy()
+        tr_SNR.data = SNR.flatten()
+        tr_alpha.data = alpha.flatten()
+        metrics = measure.waveform_metrics(tro,trd,trp,picktime)
+        hilb_div, max_hilb, mean_hilb = measure.hilb_metrics(trd,trp)
+    np.savetxt(event_list[e] + '_amp_Xp.out', amp_Xp, delimiter=',', newline="\n")  
+    np.savetxt(event_list[e] + '_td.out', td, delimiter=',', newline="\n")  
     #np.savetxt(event_list[e] + '_SNR.out', SNR, delimiter=',', newline="\n")  
     #np.savetxt(event_list[e] + '_alpha.out', alpha, delimiter=',', newline="\n")   
     #np.savetxt(event_list[e] + '_phi.out', phi, delimiter=',', newline="\n")  
@@ -100,23 +127,24 @@ for e, lab in enumerate(event_id):
     #np.savetxt(event_list[e] + '_rho.out', rho, delimiter=',', newline="\n")  
     #np.savetxt(event_list[e] + '_Xn.out', Xn, delimiter=',', newline="\n")  
     amp_Xo = abs(Xo)
-    fig1 = plt.figure()
-    fig1 = myplot.wfs(t, tro, trd, trp, fig1, event_list[e], figname="wfs") 
+    #fig1 = plt.figure()
+    #fig1 = myplot.wfs(t, tro, trd, trp, fig1, event_list[e], figname="wfs") 
     fig2 = plt.figure()
-    fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, fig2, event_list[e], figname="scals") 
-    fig4 = plt.figure()
-    fig4 = myplot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, fig4, event_list[e], figname="spectra_comparison")
-    fig5 = plt.figure()
-    fig5 = myplot.scales_freq(freqs_d, scales_d, fig5, event_list[e], figname="frequency_scale") 
-    fig6 = plt.figure()
-    fig6 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,alpha,beta,fig6, event_list[e], figname="subtraction_performance")
-    fig7 = plt.figure()
-    fig7 = myplot.sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, fig7, event_list[e], timeframe=1490, figname="one_timeframe_alpha_beta")
-    fig8 = plt.figure()
-    fig8 = myplot.processed_signal_tf(amp_Xd, amp_Xn, freqs_d, fig8, event_list[e], x1=1485, now1=11, step1=1, x3=1390, now2=11, step2=20, figname="cons_timeframe_processed_signal")   
-    fig9 = plt.figure()
-    fig9 = myplot.alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, fig9, event_list[e], figname="alpha_comparison_wfs")
-    fig10 = plt.figure()
-    fig10 = myplot.alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, freqs_d, omega0, dj, fig10, event_list[e], figname="alpha_comparison_scals")
-    fig11 = plt.figure()
-    fig11 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,fig11,event_list[e],figname="hilbert_metrics")
+    fig2 = myplot.stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, fig2, event_list[e], figname="stft")
+    #fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, fig2, event_list[e], figname="scals") 
+    #fig4 = plt.figure()
+    #fig4 = myplot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, fig4, event_list[e], figname="spectra_comparison")
+    #fig5 = plt.figure()
+    #fig5 = myplot.scales_freq(freqs_d, scales_d, fig5, event_list[e], figname="frequency_scale") 
+    #fig6 = plt.figure()
+    #fig6 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,alpha,beta,fig6, event_list[e], figname="subtraction_performance")
+    #fig7 = plt.figure()
+    #fig7 = myplot.sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, fig7, event_list[e], timeframe=1490, figname="one_timeframe_alpha_beta")
+    #fig8 = plt.figure()
+    #fig8 = myplot.processed_signal_tf(amp_Xd, amp_Xn, freqs_d, fig8, event_list[e], x1=1485, now1=11, step1=1, x3=1390, now2=11, step2=20, figname="cons_timeframe_processed_signal")   
+    #fig9 = plt.figure()
+    #fig9 = myplot.alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, fig9, event_list[e], figname="alpha_comparison_wfs")
+    #fig10 = plt.figure()
+    #fig10 = myplot.alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, freqs_d, omega0, dj, fig10, event_list[e], figname="alpha_comparison_scals")
+    #fig11 = plt.figure()
+    #fig11 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,fig11,event_list[e],figname="hilbert_metrics")

@@ -17,6 +17,7 @@ noise_freqmax = 4
 ##################noise estimation parameters##################
 ibegin = 5
 iend = 15
-########################cwt type########################
-#cwt_type = "mlwt"
-cwt_type = "pycwt"
+########################transformation type########################
+#t_type = "mlwt"
+#t_type = "pycwt"
+t_type = "stft"

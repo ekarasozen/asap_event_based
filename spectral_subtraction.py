@@ -54,6 +54,8 @@ def simple_subtraction(amp_Xd, amp_Xn, p, alpha0, beta):
 def over_subtraction(amp_Xd, amp_Xn, p): 
     #alpha over subtraction factor, value greater than or equal to 1
     #beta spectral floor parameter value between 0 to 1
+    print(amp_Xd.shape)
+    print(amp_Xn.shape)
     m, n = amp_Xd.shape 
     SNR = np.zeros((1,n))
     alpha = np.zeros((1,n))
@@ -61,6 +63,7 @@ def over_subtraction(amp_Xd, amp_Xn, p):
     amp_Xda = np.mean(amp_Xd,axis=1)
     amp_XdP = amp_Xd ** p
     amp_Xna = np.mean(amp_Xn,axis=1)
+    print(amp_Xna.shape)
     amp_XnaP = amp_Xna ** p
     alpha0=4 #vary between 3-6 (Beruiti et al'79), normally taken as 4 (Kamath & Loizou'02)
     beta=0.2 #should be between 0-1.

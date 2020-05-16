@@ -425,7 +425,26 @@ def alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, fr
         ax3.axes.xaxis.set_visible(False)
     ax3.axes.xaxis.set_visible(True)
     fig1.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
-
+    
+def stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, fig, event_list, figname="stft"):
+    fig, (ax1, ax2, ax3) = plt.subplots(3,1)
+    maxamp = abs(amp_Xd).max()/2           # these two lines just adjust the color scale
+    minamp = 0
+    t, f = np.meshgrid(td, fd)
+    im1 = ax1.pcolormesh(t, f, np.abs(amp_Xd), cmap=cm.hot, vmin=minamp, vmax=maxamp)
+    im2 = ax2.pcolormesh(t, f, np.abs(amp_Xp), cmap=cm.hot, vmin=minamp, vmax=maxamp)
+    im3 = ax3.plot(tro.times(), tro.data, 'r-', linewidth=.75,label='original')
+    im3 = ax3.plot(trd.times(), trd.data, 'r:', linewidth=.75,label='degraded')
+    im3 = ax3.plot(t_tmp, trp.data, 'k-', linewidth=.5,label='processed')
+    ax3.legend()
+    ax1.set_ylabel('frequency (Hz)')
+    ax2.set_ylabel('frequency (Hz)')
+    ax3.set_ylabel('counts')
+    ax3.set_xlabel('time (s)')
+    ax1.set_title('degraded STFT amplitude')
+    ax2.set_title('processed STFT amplitude')
+    ax3.set_title(' STFT amplitude')
+    fig.savefig(event_list + '_'+ figname + '.png', bbox_inches='tight')
 
 def all(t, tr, X, freq, IX, fig, event_list, figname="original"): 
     maxamp = abs(X).max()/2           # these two lines just adjust the color scale
