@@ -106,7 +106,7 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
         im2 = ax2.plot(t[1,:], tr_SNR.data/10, 'r-', linewidth=1,label='SNR')
         ax2.set_ylabel('0.1*SNR(db) & alpha')
         ax2.text(windowstart, -1,alpha_beta_text, style='italic', fontsize=8)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         im2 = ax2.plot(t[1,:], tr_alpha.data, 'r--', linewidth=1,label='alpha')
         im2 = ax2.plot(t[1,:], tr_SNR.data/10, 'r-', linewidth=1,label='SNR')
         ax2.set_ylabel('0.1*SNR(db) & alpha')
@@ -625,7 +625,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 4.0
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -663,7 +663,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 1
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -682,7 +682,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 2
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -701,7 +701,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 3
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -720,7 +720,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 4
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -739,7 +739,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 5
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -758,7 +758,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 6
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -777,7 +777,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 7
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -796,7 +796,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 8
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -815,7 +815,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 9
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)
@@ -861,7 +861,7 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     alpha0 = 4
     if ss_type == "over":
         SNR[:,j] = np.sum(amp_XdP[:,j]) / np.sum(amp_XnaP)
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         amp_Xds[:,j] = (muy)*amp_Xd[:,(j-1)]+(1-muy)*amp_Xd[:,j] 
         amp_XdsP[:,j] = amp_Xds[:,j] ** p
         SNR[:,j] = np.sum(amp_XdsP[:,j]) / np.sum(amp_XnaP)

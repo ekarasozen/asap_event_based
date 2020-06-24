@@ -79,7 +79,7 @@ for e, lab in enumerate(event_id):
             amp_Xp, SNR, alpha0, alpha,beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 2, 1)
         elif ss_type == "over":
             amp_Xp, SNR, alpha0, alpha, beta = ss.over_subtraction(amp_Xd,amp_Xn,2,8,0.2)
-        elif ss_type == "simple_over":
+        elif ss_type == "smooth_over":
             amp_Xp, SNR, alpha0, alpha, beta = ss.smooth_over_subtraction(amp_Xd,amp_Xn,2,5,0.2)
         elif ss_type == "freq_over": 
             amp_Xp, SNR, alpha0, alpha, beta = ss.freq_over_subtraction(amp_Xd,amp_Xn,2,5,0.2)
@@ -152,11 +152,11 @@ for e, lab in enumerate(event_id):
         fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, event_list[e], phi="0", figname="subtraction_performance")
         fig4 = myplot.oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig4, event_list[e], timeframe=1490, figname="one_timeframe_oversub")#for oversub
         fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,event_list[e],figname="hilbert_metrics")
-    elif ss_type == "simple_over":
+    elif ss_type == "smooth_over":
         fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, event_list[e], phi="0", figname="subtraction_performance")
         fig4 = myplot.oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig4, event_list[e], timeframe=1490, figname="one_timeframe_oversub")#for oversub
         fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,event_list[e],figname="hilbert_metrics")
-    elif ss_type == "frequency_over": 
+    elif ss_type == "freqency_over": 
         fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, event_list[e], phi="0", figname="subtraction_performance")
        # fig4 = myplot.oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig4, event_list[e], timeframe=1490, figname="one_timeframe_oversub")#for oversub
         fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,event_list[e],figname="hilbert_metrics")

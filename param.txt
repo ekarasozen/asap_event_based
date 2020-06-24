@@ -24,7 +24,7 @@ t_type = "pycwt"
 ########################spectral subtraction type########################
 #ss_type = "simple"
 #ss_type = "over"
-#ss_type = "simple_over"
+#ss_type = "smooth_over"
 #ss_type = "frequency_over"
 ss_type = "non_lin"
 #ss_type = "simple_non_lin"
