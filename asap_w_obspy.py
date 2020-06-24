@@ -26,10 +26,10 @@ from obspy.taup import TauPyModel
 from obspy.taup import plot_travel_times
 import sys
 sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap_w_obspy_git/")
-from addnoise import addnoise
+#from addnoise import addnoise
 
 #CHOOSE FROM LOCAL V MODELS FOR TAUP CALCULATION
-#model_t = TauPyModel(model="ak135")
+#model_l = TauPyModel(model="ak135")
 model_l = TauPyModel(model="northak")
 #model_l = TauPyModel(model="scak")
 #model_l = TauPyModel(model="kaktovik")
@@ -39,7 +39,11 @@ model_l = TauPyModel(model="northak")
 
 #event_list = ['ak014azdbz0f'] #kaktovik mag6 mainshock
 #event_list = ['ak018aap2cqu', 'ak014azdbz0f'] #test events
-event_list = ['ak018aap2cqu', 'ak014azdbz0f'] #test events
+#event_list = ['ak018aap2cqu', 'ak014azdbz0f'] #test events
+#event_list = ['us2000aert'] #for GI webpage
+
+event_list = ['ak02062lvzgw', 'ak02062n3694', 'ak02062oaghc', 'ak02062ourm3'] #local events from alex
+#event_list = ['us70009ee1', 'us70009ej2', 'us70009ej8', 'us70009el5', 'us70009jqf', 'us70009jqi', 'us70009jqm'] # regional/teleseismic events from alex
 #run_name = input("Run Name (for output file names):") #YOU CAN CHANGE THIS TO FOLDER NAME MAYBE. 
 path = input("Enter the path of your file: ")
 event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
@@ -51,7 +55,7 @@ freqmax = 3 # waveform & array processing filtering
 ts_full = 20 #for full waveform P - ts_full (in seconds)
 te_full = 80 #for full waveform P + te_full (in seconds)
 ts_win = 1 # for trimmed waveform P pick window +/- (in seconds)
-te_win = 9 # for trimmed waveform P pick window +/- (in seconds)
+te_win = 3 # for trimmed waveform P pick window +/- (in seconds)
 win_len = te_win+ts_win #should be x2 of t_win in seconds
 
 file1 = open(path + array_code + "_obspy_processing.out","w")
@@ -244,7 +248,7 @@ for e, lab in enumerate(event_id):
     #PLOT WAVEFORMS
     nos = len(st)
     for s in range(nos):
-        st[s].data = addnoise(st[s],2,20,0.1,0.4)
+        #st[s].data = addnoise(st[s],2,20,0.1,0.4)
         #nl=2*st[s].std() #noise level from std of each trace 
         #noe=st[s].stats.npts #number of elements in trace
         #st[s].data = st[s].data + np.random.normal(0,nl,noe) #ADDS RANDOM NOISE
@@ -306,7 +310,7 @@ for e, lab in enumerate(event_id):
        # restrict output
        semb_thres=-1e9, vel_thres=-1e9, timestamp='mlabday',
        stime=stime, etime=etime, 
-       method=1 #the method to use 0 == bf, 1 == capon
+       method=0 #the method to use 0 == bf, 1 == capon
     )
     out = array_processing(st, **kwargs)
     cl_rlp = out[:, 1] #calculated relative power
