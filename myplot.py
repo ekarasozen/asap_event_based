@@ -119,7 +119,8 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
         im2 = ax2.plot(t[1,:], alpha_mean, 'r--', linewidth=1,label='alpha_mean')
         im2 = ax2.plot(t[1,:], 0.1*SNR_mean, 'r-', linewidth=1,label='SNR_mean')
         ax2.set_ylabel('0.1*SNR(db) & alpha (mean)')
-        ax2.text(windowstart, -1,alpha_beta_text, style='italic', fontsize=8)
+        ylimits = ax2.get_ylim()
+        ax2.text(windowstart, ylimits[0],alpha_beta_text, style='italic', fontsize=8)
     elif ss_type == "non_lin":
         #phi_mean = np.mean((10*np.log10(phi ** 2)),axis=0)
         SNR_mean = np.mean(SNR,axis=0)
@@ -567,14 +568,14 @@ def simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fi
     amp_Xp4[foundlows,i] = beta*amp_Xds[foundlows,i]
 
 
-    ax2.plot(freqs_d,phi0[:,i],       ':',lw=.75,label='phi=alpha/rho')
+    ax2.plot(freqs_d,phi0[:,i],       ':',lw=.75,label='phi=alpha/rho',color='red')
     ax2.plot(freqs_d,amp_Xds[:,i],       'k-',lw=.75,label='Xds')
     ax2.plot(freqs_d,0.5*amp_Xds[:,i],       'k:',lw=1.75,label='Xds* beta = 0.5')
-    ax2.plot(freqs_d,amp_Xp0[:,i],       '-',lw=.75,label='beta = 0.1',color='#900C3F')
-    ax2.plot(freqs_d,amp_Xp1[:,i],       '-',lw=.75,label='beta = 0.3',color='#C70039')
-    ax2.plot(freqs_d,amp_Xp2[:,i],       '-',lw=.75,label='beta = 0.5',color='#FF5733')
-    ax2.plot(freqs_d,amp_Xp3[:,i],       '-',lw=.75,label='beta = 0.7',color='#AC063C')
-    ax2.plot(freqs_d,amp_Xp4[:,i],       '-',lw=.75,label='beta = 1.0',color='#FFC305')
+    ax2.plot(freqs_d,0.5*amp_Xna,       'k--',lw=1.75,label='Xna* beta = 0.5')
+    ax2.plot(freqs_d,amp_Xp0[:,i],       '-',lw=.75,label='beta = 0.1',color='darkblue')
+    ax2.plot(freqs_d,amp_Xp1[:,i],       '-',lw=.75,label='beta = 0.3',color='blue')
+    ax2.plot(freqs_d,amp_Xp2[:,i],       '-',lw=.75,label='beta = 0.5',color='cyan')
+    ax2.plot(freqs_d,amp_Xp3[:,i],       '-',lw=.75,label='beta = 0.7',color='lightblue')
     ax2.legend()
 
     fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
@@ -846,9 +847,9 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     ax2.plot(freqs_d,amp_XpP6[:,j],      '-',lw=.75,label='alpha0=6',color='aqua')
     ax2.plot(freqs_d,amp_XpP7[:,j],      '-',lw=.75,label='alpha0=7',color='lightblue')
     ax2.plot(freqs_d,amp_XpP8[:,j],      '-',lw=.75,label='alpha0=8',color='turquoise')
-    ax2.plot(freqs_d,amp_XpP9[:,j],      '-',lw=.75,label='alpha0=9',color='azure')
+    ax2.plot(freqs_d,amp_XpP9[:,j],      '-',lw=.75,label='alpha0=9',color='red')
     ax2.plot(freqs_d,amp_XpPnobeta9[:,j],':',lw=1.75,label='alpha0=9, no beta',color='red')
-    ax2.plot(freqs_d,beta*amp_XnaP,      'k:',lw=1.75,label='beta=' + str(beta) + '*Xna')
+    ax2.plot(freqs_d,beta*amp_XnaP,      'k:',lw=1.75,label='(beta=' + str(beta) + ')*Xna')
     ax2.legend()
     ax2.set(xlim=[.5, 10])
     #ax2.set_title('timeframe' + str(j))
@@ -878,27 +879,27 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     amp_XpPnobeta1[:,j] = amp_XpP1[:,j] 
     foundlows = np.where(amp_XpP1[:,j] < beta*amp_XnaP)
     amp_XpP1[foundlows,j] = beta*amp_XnaP[foundlows]
-    beta = 0.6
-    amp_XpP2[:,j] = amp_XdP[:,j] - (alpha[:,j]*amp_XnaP)  
-    amp_XpPnobeta2[:,j] = amp_XpP2[:,j] 
-    foundlows = np.where(amp_XpP2[:,j] < beta*amp_XnaP)
-    amp_XpP2[foundlows,j] = beta*amp_XnaP[foundlows]
     beta = 0.9
     amp_XpP3[:,j] = amp_XdP[:,j] - (alpha[:,j]*amp_XnaP)  
     amp_XpPnobeta3[:,j] = amp_XpP3[:,j] 
     foundlows = np.where(amp_XpP3[:,j] < beta*amp_XnaP)
     amp_XpP3[foundlows,j] = beta*amp_XnaP[foundlows]
-    beta = 2.0
-    amp_XpP4[:,j] = amp_XdP[:,j] - (alpha[:,j]*amp_XnaP)  
-    amp_XpPnobeta4[:,j] = amp_XpP4[:,j] 
-    foundlows = np.where(amp_XpP4[:,j] < beta*amp_XnaP)
-    amp_XpP4[foundlows,j] = beta*amp_XnaP[foundlows]
-    alpha0 = 4
-    beta = 3.0
-    amp_XpP5[:,j] = amp_XdP[:,j] - (alpha[:,j]*amp_XnaP)  
-    amp_XpPnobeta5[:,j] = amp_XpP5[:,j] 
-    foundlows = np.where(amp_XpP5[:,j] < beta*amp_XnaP)
-    amp_XpP5[foundlows,j] = beta*amp_XnaP[foundlows]
+    beta = 0.6
+    amp_XpP2[:,j] = amp_XdP[:,j] - (alpha[:,j]*amp_XnaP)  
+    amp_XpPnobeta2[:,j] = amp_XpP2[:,j] 
+    foundlows = np.where(amp_XpP2[:,j] < beta*amp_XnaP)
+    amp_XpP2[foundlows,j] = beta*amp_XnaP[foundlows]
+  #  beta = 2.0
+  #  amp_XpP4[:,j] = amp_XdP[:,j] - (alpha[:,j]*amp_XnaP)  
+  #  amp_XpPnobeta4[:,j] = amp_XpP4[:,j] 
+  #  foundlows = np.where(amp_XpP4[:,j] < beta*amp_XnaP)
+  #  amp_XpP4[foundlows,j] = beta*amp_XnaP[foundlows]
+  #  alpha0 = 4
+  #  beta = 3.0
+  #  amp_XpP5[:,j] = amp_XdP[:,j] - (alpha[:,j]*amp_XnaP)  
+  #  amp_XpPnobeta5[:,j] = amp_XpP5[:,j] 
+  #  foundlows = np.where(amp_XpP5[:,j] < beta*amp_XnaP)
+  #  amp_XpP5[foundlows,j] = beta*amp_XnaP[foundlows]
     #COMPARE 
     # 900C3F C70039 FF5733 FFC305
     ax3.plot(freqs_d,amp_XdP[:,j],       'k-',lw=.75,label='Xd, or Xds if smooth')
@@ -906,9 +907,9 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     ax3.plot(freqs_d,amp_XpP1[:,j],      '-',lw=.75,label='alpha0=4, beta=0.3',color='#900C3F')
     ax3.plot(freqs_d,amp_XpP2[:,j],      '-',lw=.75,label='alpha0=4, beta=0.6',color='#C70039')
     ax3.plot(freqs_d,amp_XpP3[:,j],      '-',lw=.75,label='alpha0=4, beta=0.9',color='#FF5733')
-    ax3.plot(freqs_d,amp_XpP4[:,j],      '-',lw=.75,label='alpha0=4, beta=2.0',color='#AC063C')
-    ax3.plot(freqs_d,amp_XpP5[:,j],      '-',lw=.75,label='alpha0=4, beta=3.0',color='#FFC305')
-    ax3.plot(freqs_d,beta*amp_XnaP,      'k:',lw=.75,label='beta*Xna')
+#    ax3.plot(freqs_d,amp_XpP4[:,j],      '-',lw=.75,label='alpha0=4, beta=2.0',color='#AC063C')
+#    ax3.plot(freqs_d,amp_XpP5[:,j],      '-',lw=.75,label='alpha0=4, beta=3.0',color='#FFC305')
+    ax3.plot(freqs_d,beta*amp_XnaP,      'k:',lw=.75,label='(beta=0.6)*Xna')
     ax3.legend()
     ax3.set(xlim=[.5, 10])
     ax3.set_xlabel('frequency (Hz)')
