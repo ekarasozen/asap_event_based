@@ -129,7 +129,7 @@ def freq_over_subtraction(amp_Xd, amp_Xn, p, alpha0, beta):
     for i in range(0,n):
         for j in range(0,m):
             #SNR[j,i] = amp_XdP[j,i] / amp_XnaP[j]
-            SNR[j,i] = np.sum(amp_XdP[j,i]) / np.sum(amp_XnaP[j])
+            SNR[j,i] = amp_XdP[j,i] / amp_XnaP[j]
             SNR[j,i] = 10*np.log10(SNR[j,i]) #convert snr to decibels
             if SNR[j,i] < -5:
                 alpha[j,i] = alpha0+(3/4)
