@@ -15,8 +15,8 @@ noise_amplitude = 50
 noise_freqmin = 1
 noise_freqmax = 4
 ##################noise estimation parameters##################
-ibegin = 5
-iend = 15
+ibegin = 7.5
+iend = 10
 ########################transformation type########################
 #t_type = "mlwt"
 t_type = "pycwt"
@@ -26,5 +26,5 @@ t_type = "pycwt"
 #ss_type = "over"
 #ss_type = "smooth_over"
 #ss_type = "frequency_over"
-ss_type = "non_lin"
-#ss_type = "simple_non_lin"
+#ss_type = "non_lin"
+ss_type = "simple_non_lin"

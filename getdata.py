@@ -8,6 +8,8 @@ client_wm = Client("IRIS")
 from obspy.clients.iris import Client  #this is needed for gc_distaz calculation
 from obspy.taup import TauPyModel
 from obspy.taup import plot_travel_times
+from obspy.core.util import AttribDict
+from obspy import Stream, Trace
 #TA option is not added. 
 
 def taup(inventory,evlat,evlon,evdep,model_l,phase_list):
@@ -30,6 +32,58 @@ def taup(inventory,evlat,evlon,evdep,model_l,phase_list):
 #       continue this casse is not tested yet.
     return t
     
+
+def keskin_event(event_name,inventory, start_time, end_time):
+    time_array = np.empty((0, 100))
+    inventory = read_inventory(inventory, format= 'STATIONXML')
+    cat = read_events(event_name, format= 'QUAKEML')
+    evot = cat[22].origins[0].time
+    evlat = cat[22].origins[0].latitude
+    evlon= cat[22].origins[0].longitude
+    evdep= (cat[22].origins[0].depth) / 1000 #convert to km
+    picks = cat[22].picks
+    arrivals = cat[22].origins[0].arrivals
+    for i in picks:
+       i_station_code = i.waveform_id.station_code
+       i_network_code = i.waveform_id.network_code
+    if time_array.size == 0:
+       print("There are no available picks from the quakeml file, pick time will be calculated by the Taup")
+       picktime = evot + taup(inventory,evlat,evlon,evdep,model_l=TauPyModel(model="ak135"),phase_list=["P", "Pn", "Pg", "p"])
+    st1 = read("../keskin_data/BR101.SHZ.2018") 
+    st2 = read("../keskin_data/BR102.SHZ.2018") 
+    st3 = read("../keskin_data/BR103.SHZ.2018") 
+    st4 = read("../keskin_data/BR104.SHZ.2018") 
+    st5 = read("../keskin_data/BR105.SHZ.2018") 
+    st6 = read("../keskin_data/BR106.SHZ.2018") 
+    st = Stream(traces=[st1[0],st2[0],st3[0],st4[0],st5[0], st6[0]])
+    st[0].stats.coordinates = AttribDict({
+        'latitude': 39.72539,
+        'elevation': 1437.2,
+        'longitude': 33.63911})    
+    st[1].stats.coordinates = AttribDict({
+        'latitude': 39.73550,
+        'elevation': 1525.9,
+        'longitude': 33.64861})    
+    st[2].stats.coordinates = AttribDict({
+        'latitude': 39.71961,
+        'elevation': 1488.5,
+        'longitude': 33.65700})    
+    st[3].stats.coordinates = AttribDict({
+        'latitude': 39.70739,
+        'elevation': 1346.9,
+        'longitude': 33.64139})    
+    st[4].stats.coordinates = AttribDict({
+        'latitude': 39.71800,
+        'elevation': 1431.4,
+        'longitude': 33.61731})    
+    st[5].stats.coordinates = AttribDict({
+        'latitude': 39.73381,
+        'elevation': 1372.8,
+        'longitude': 33.61800}) 
+    st.trim((picktime - start_time), (picktime + end_time))
+    return st, picktime
+
+
 
 def event(ev_id, network_list, station_code, pick, channel, start_time, end_time):
     time_array = np.empty((0, 100))

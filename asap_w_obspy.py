@@ -37,12 +37,12 @@ model_l = TauPyModel(model="northak")
 #ALL 191 FINAL SELECTION BENCHMARK DATASET AS OF FEB 12 2020
 #event_list = ['ak0147odw83x', 'ak01479cs1ql', 'ak01460tnurs', 'ak0145qxe8b6', 'ak0145qx2tq1', 'ak0145nmf4mh', 'ak0145nlz3oh', 'ak0145nlrjqg', 'ak0145nlaph8', 'ak0145nl41pp', 'ak0145nkrjaf', 'ak016gg2nkth', 'ak0153hov4fk', 'ak0145aam3cq']
 
-#event_list = ['ak014azdbz0f'] #kaktovik mag6 mainshock
+event_list = ['ak014azdbz0f'] #kaktovik mag6 mainshock
 #event_list = ['ak018aap2cqu', 'ak014azdbz0f'] #test events
 #event_list = ['ak018aap2cqu', 'ak014azdbz0f'] #test events
 #event_list = ['us2000aert'] #for GI webpage
 
-event_list = ['ak02062lvzgw', 'ak02062n3694', 'ak02062oaghc', 'ak02062ourm3'] #local events from alex
+#event_list = ['ak02062lvzgw', 'ak02062n3694', 'ak02062oaghc', 'ak02062ourm3'] #local events from alex
 #event_list = ['us70009ee1', 'us70009ej2', 'us70009ej8', 'us70009el5', 'us70009jqf', 'us70009jqi', 'us70009jqm'] # regional/teleseismic events from alex
 #run_name = input("Run Name (for output file names):") #YOU CAN CHANGE THIS TO FOLDER NAME MAYBE. 
 path = input("Enter the path of your file: ")

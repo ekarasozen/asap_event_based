@@ -17,16 +17,20 @@ import measure
 filename = input("Parameters file: ")
 exec(open(filename).read())
 
-event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
-for e, lab in enumerate(event_id):
-    st, picktime = event(ev_id=event_id[e], network_list=network_list, station_code=station_code, pick=pick_type, channel=channel, start_time=start_time, end_time=end_time)
+#event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in str(e+1)]
+noe = 1
+for e in range(noe):
+#for e, lab in enumerate(event_id):
+    st, picktime = keskin_event(event_name='events-2020-08-05T22_54_43.xml', inventory='Keskin_sp.xml',start_time=start_time, end_time=end_time)
+    #st, picktime = event(ev_id=event_id[e], network_list=network_list, station_code=station_code, pick=pick_type, channel=channel, start_time=start_time, end_time=end_time)
     st = prep(st,filter_type=filter_type, freqmin=filter_freqmin, freqmax=filter_freqmax)
-    tro = st[0].copy() #[o]riginal signal
-    trd = st[0].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
-    trd.data = whitenoise(trd,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax)
+    tro = st[5].copy() #[o]riginal signal
+    print(st[5])
+    trd = st[5].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
+#    trd.data = whitenoise(trd,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax)
     trn = trd.copy() #[n]oise sample with no signal (typically used to determine what to remove)
     t0 = trn.stats.starttime
-    trn.trim(t0+ibegin, t0+iend) #put this to parameters
+    trn.trim(t0+ibegin, t0+iend) 
     trn.detrend("linear")
     trn.detrend("demean")
     trp = trd.copy() # [p]rocessed version of degraded signal to remove the noise, seems like there is no need for this
@@ -78,15 +82,15 @@ for e, lab in enumerate(event_id):
         if ss_type == "simple":
             amp_Xp, SNR, alpha0, alpha,beta = ss.simple_subtraction(amp_Xd,amp_Xn, 2, 2, 1)
         elif ss_type == "over":
-            amp_Xp, SNR, alpha0, alpha, beta = ss.over_subtraction(amp_Xd,amp_Xn,2,8,0.2)
+            amp_Xp, SNR, alpha0, alpha, beta = ss.over_subtraction(amp_Xd,amp_Xn,2,6,0.2)
         elif ss_type == "smooth_over":
             amp_Xp, SNR, alpha0, alpha, beta = ss.smooth_over_subtraction(amp_Xd,amp_Xn,2,5,0.2)
-        elif ss_type == "freq_over": 
+        elif ss_type == "frequency_over": 
             amp_Xp, SNR, alpha0, alpha, beta = ss.freq_over_subtraction(amp_Xd,amp_Xn,2,5,0.2)
         elif ss_type == "non_lin":
             amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 = ss.nonlin_subtraction(amp_Xd,amp_Xn, 0.1, 0.5)
         elif ss_type == "simple_non_lin":
-            amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 1.0, 0.0)
+            amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.0, 0.0)
         #amp_Xp, SNR, alpha, beta, delta = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freqs_d)
         phase_Xd = np.angle(Xd)
         Xp = amp_Xp*(np.exp(1.j*phase_Xd))
@@ -128,9 +132,9 @@ for e, lab in enumerate(event_id):
         tr_alpha.data = alpha.flatten()
         metrics = measure.waveform_metrics(tro,trd,trp,picktime)
         hilb_div, max_hilb, mean_hilb = measure.hilb_metrics(trd,trp)
-    #np.savetxt(event_list[e] + '_amp_Xp.out', amp_Xp, delimiter=',', newline="\n")  
+    #np.savetxt(str(e+1) + '_amp_Xp.out', amp_Xp, delimiter=',', newline="\n")  
     amp_Xo = abs(Xo)
-    outpath = event_list[e] + '/' + ss_type + '/'
+    outpath = 'deneme/' + ss_type + '/'
     if not os.path.exists(outpath):
        os.makedirs(outpath)
     fig1 = plt.figure()
@@ -140,36 +144,36 @@ for e, lab in enumerate(event_id):
     fig5 = plt.figure()
     fig6 = plt.figure()
     fig7 = plt.figure()
-    fig1 = myplot.wfs(t, tro, trd, trp, outpath, fig1, event_list[e], figname="wfs") 
-    fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, outpath, fig2, event_list[e], figname="scals") 
-    #fig2 = myplot.stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, fig2, event_list[e], figname="stft") #COMMENT OUT FOR STFT *********
+    fig1 = myplot.wfs(t, tro, trd, trp, outpath, fig1, str(e+1), figname="wfs") 
+    fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, outpath, fig2, str(e+1), figname="scals") 
+    #fig2 = myplot.stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, fig2, str(e+1)[e], figname="stft") #COMMENT OUT FOR STFT *********
     if ss_type == "simple":
-        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, event_list[e], phi="0", figname="subtraction_performance")
-        fig4 = myplot.sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig4, event_list[e], timeframe=1490, figname="one_timeframe_alpha_beta")
-        fig5 = myplot.processed_signal_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig5, event_list[e], x1=1485, now1=11, step1=1, x3=1390, now2=11, step2=20, figname="cons_timeframe_processed_signal")   
-        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,event_list[e],figname="hilbert_metrics")
+        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, str(e+1), phi="0", figname="subtraction_performance")
+        fig4 = myplot.sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig4, str(e+1), timeframe=1490, figname="one_timeframe_alpha_beta")
+        fig5 = myplot.processed_signal_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig5, str(e+1), x1=1485, now1=11, step1=1, x3=1390, now2=11, step2=20, figname="cons_timeframe_processed_signal")   
+        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,str(e+1),figname="hilbert_metrics")
     elif ss_type == "over":
-        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, event_list[e], phi="0", figname="subtraction_performance")
-        fig4 = myplot.oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig4, event_list[e], timeframe=1490, figname="one_timeframe_oversub")#for oversub
-        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,event_list[e],figname="hilbert_metrics")
+        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, str(e+1), phi="0", figname="subtraction_performance")
+        fig4 = myplot.oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig4, str(e+1), timeframe=1490, figname="one_timeframe_oversub")#for oversub
+        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,str(e+1),figname="hilbert_metrics")
     elif ss_type == "smooth_over":
-        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, event_list[e], phi="0", figname="subtraction_performance")
-        fig4 = myplot.oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig4, event_list[e], timeframe=1490, figname="one_timeframe_oversub")#for oversub
-        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,event_list[e],figname="hilbert_metrics")
-    elif ss_type == "freqency_over": 
-        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, event_list[e], phi="0", figname="subtraction_performance")
-       # fig4 = myplot.oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig4, event_list[e], timeframe=1490, figname="one_timeframe_oversub")#for oversub
-        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,event_list[e],figname="hilbert_metrics")
+        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, str(e+1), phi="0", figname="subtraction_performance")
+        fig4 = myplot.oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig4, str(e+1), timeframe=1490, figname="one_timeframe_oversub")#for oversub
+        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,str(e+1),figname="hilbert_metrics")
+    elif ss_type == "frequency_over": 
+        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, str(e+1), phi="0", figname="subtraction_performance")
+       # fig4 = myplot.oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig4, str(e+1), timeframe=1490, figname="one_timeframe_oversub")#for oversub
+        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig6,str(e+1),figname="hilbert_metrics")
     elif ss_type == "non_lin":
-        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,gamma,beta,ss_type, outpath,fig3, event_list[e], phi, figname="subtraction_performance") #instead of alpha0, gamma is used here. 
-        fig4 = myplot.nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig4, event_list[e], timeframe=1490, figname="one_timeframe_nonlin") #NON LIN SS
-        fig5 = myplot.nonlin_signal_smooth(amp_Xd, amp_Xn, freqs_d, outpath, fig5, event_list[e], timeframe=1490, figname="signal_smooth_nonlin") #NON LIN SS
-        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb, outpath,fig6,event_list[e],figname="hilbert_metrics")
+        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,gamma,beta,ss_type, outpath,fig3, str(e+1), phi, figname="subtraction_performance") #instead of alpha0, gamma is used here. 
+        fig4 = myplot.nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig4, str(e+1), timeframe=1490, figname="one_timeframe_nonlin") #NON LIN SS
+        fig5 = myplot.nonlin_signal_smooth(amp_Xd, amp_Xn, freqs_d, outpath, fig5, str(e+1), timeframe=1490, figname="signal_smooth_nonlin") #NON LIN SS
+        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb, outpath,fig6,str(e+1),figname="hilbert_metrics")
     elif ss_type == "simple_non_lin":
-        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath,fig3, event_list[e], phi, figname="subtraction_performance")
-        fig4 = myplot.simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig4, event_list[e], timeframe=1490, figname="one_timeframe_simple_nonlin")
-        #fig5 = myplot.nonlin_signal_smooth(amp_Xd, amp_Xn, freqs_d, outpath, fig5, event_list[e], timeframe=1490, figname="signal_smooth_nonlin") # NOT UTILIZED FOR SIMPLE NON LIN YET
-        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb, outpath,fig6,event_list[e],figname="hilbert_metrics")
-    #fig9 = myplot.alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, outpath, fig9, event_list[e], figname="alpha_comparison_wfs")
-    #fig10 = myplot.alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, freqs_d, omega0, dj, outpath, fig10, event_list[e], figname="alpha_comparison_scals")
-    fig7 = myplot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, outpath, fig7, event_list[e], figname="spectra_comparison")
+        fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath,fig3, str(e+1), phi, figname="subtraction_performance")
+        fig4 = myplot.simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig4, str(e+1), timeframe=1490, figname="one_timeframe_simple_nonlin")
+        #fig5 = myplot.nonlin_signal_smooth(amp_Xd, amp_Xn, freqs_d, outpath, fig5, str(e+1)[e], timeframe=1490, figname="signal_smooth_nonlin") # NOT UTILIZED FOR SIMPLE NON LIN YET
+        fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb, outpath,fig6,str(e+1),figname="hilbert_metrics")
+    #fig9 = myplot.alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, outpath, fig9, str(e+1)[e], figname="alpha_comparison_wfs")
+    #fig10 = myplot.alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, freqs_d, omega0, dj, outpath, fig10, str(e+1)[e], figname="alpha_comparison_scals")
+    fig7 = myplot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, outpath, fig7, str(e+1), figname="spectra_comparison")
