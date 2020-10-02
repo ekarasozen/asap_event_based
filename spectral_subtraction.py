@@ -177,30 +177,41 @@ def nonlin_subtraction(amp_Xd, amp_Xn, beta, gamma): #mainly from Lockwood
 
 def simple_nonlin_subtraction(amp_Xd, amp_Xn, beta, gamma): 
     #alpha0 is useless here, just to make other plotting options easier. its not used in this technique. 
-    #gamma is not used also
-    alpha0 = 0
+    #gamma = 0.3
+    alpha0 = gamma #for the subtraction performance plotting code only. we don't use alpha 0
     m, n = amp_Xd.shape 
-    alpha = np.zeros((1,n))
+    #alpha = np.zeros((1,n))
     rho = np.zeros((m,n))
     SNR = np.zeros((m,n))
     phi = np.zeros((m,n))
     amp_Xp = np.zeros((m,n))
-    amp_Xds = np.zeros((m,n))
-    amp_Xda = np.mean(amp_Xd,axis=1)
-    amp_Xna = np.mean(amp_Xn,axis=1)
-    alpha = np.max(amp_Xn,axis=1) 
-    muy = 0.3 #should be between 0.1-0.5
-    for i in range(0,n):
-        for j in range(0,m):
-            amp_Xds[j,i] = (muy)*amp_Xd[j,(i-1)]+(1-muy)*amp_Xd[j,i] 
-            rho[j,i] = amp_Xds[j,i]/amp_Xna[j]
-            SNR[j,i] = 10*np.log10((rho[j,i]) ** 2)
-            phi[j,i] = alpha[j] / (rho[j,i]) #original
-#           phi[j,i] = alpha[j] / (1 + (rho[j,i])) #test
-            if amp_Xds[j,i] > phi[j,i] + ((beta)*(amp_Xna[j])):
-                amp_Xp[j,i] = (amp_Xds[j,i]) - phi[j,i]
-            else:
-                amp_Xp[j,i] = (beta)*(amp_Xds[j,i])
+    ones_array=np.ones((1,n))  
+    #amp_Xna = np.median(amp_Xn,axis=1)
+    #alpha = np.median(amp_Xn,axis=1) 
+    amp_Xna = np.array([np.median(amp_Xn,axis=1)]).transpose()  # create m x 1 matrix
+    amp_Xna = np.dot(amp_Xna,ones_array)                      # expand to m x n matrix
+    alpha = np.array([np.median(amp_Xn,axis=1)]).transpose()
+    alpha = np.dot(alpha,ones_array)   
+    #for i in range(0,n):
+    #   for j in range(0,m):
+    #       rho[j,i] = amp_Xd[j,i]/amp_Xna[j]
+    #       SNR[j,i] = 10*np.log10((rho[j,i]) ** 2)
+#   #       phi[j,i] = alpha[j] / (rho[j,i]) #original
+#   #       phi[j,i] = 1 / (rho[j,i]) #test2
+    #       phi[j,i] = 2 * alpha[j] / (1 + (gamma*rho[j,i])) 
+    #       if amp_Xd[j,i] > phi[j,i] + ((beta)*(amp_Xna[j])):
+    #      # if amp_Xd[164:188,i] > phi[164:188,i]:
+    #           amp_Xp[j,i] = (amp_Xd[j,i]) - phi[j,i]
+    #       else:
+    #           amp_Xp[j,i] = (beta)*(amp_Xd[j,i])
+    rho = amp_Xd / amp_Xna
+    SNR = 10*np.log10((rho) ** 2)
+    phi = 2*alpha / (1+gamma*rho)
+    abovethreshold = amp_Xd >= phi
+    belowthreshold = amp_Xd < phi
+    amp_Xp[abovethreshold] = amp_Xd[abovethreshold] - phi[abovethreshold]
+    amp_Xp[belowthreshold] = (beta)*(amp_Xd[belowthreshold])
+
     return amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 
 
 
