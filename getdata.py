@@ -33,16 +33,17 @@ def taup(inventory,evlat,evlon,evdep,model_l,phase_list):
     return t
     
 
-def keskin_event(event_name,inventory, start_time, end_time):
+def keskin_event(db_name,ev_id,inventory, start_time, end_time):
     time_array = np.empty((0, 100))
     inventory = read_inventory(inventory, format= 'STATIONXML')
-    cat = read_events(event_name, format= 'QUAKEML')
-    evot = cat[22].origins[0].time
-    evlat = cat[22].origins[0].latitude
-    evlon= cat[22].origins[0].longitude
-    evdep= (cat[22].origins[0].depth) / 1000 #convert to km
-    picks = cat[22].picks
-    arrivals = cat[22].origins[0].arrivals
+    cat = read_events(db_name, format= 'QUAKEML')
+    evot = cat[ev_id].origins[0].time
+    print(evot)
+    evlat = cat[ev_id].origins[0].latitude
+    evlon= cat[ev_id].origins[0].longitude
+    evdep= (cat[ev_id].origins[0].depth) / 1000 #convert to km
+    picks = cat[ev_id].picks
+    arrivals = cat[ev_id].origins[0].arrivals
     for i in picks:
        i_station_code = i.waveform_id.station_code
        i_network_code = i.waveform_id.network_code
@@ -57,29 +58,29 @@ def keskin_event(event_name,inventory, start_time, end_time):
     st6 = read("../keskin_data/BR106.SHZ.2018") 
     st = Stream(traces=[st1[0],st2[0],st3[0],st4[0],st5[0], st6[0]])
     st[0].stats.coordinates = AttribDict({
-        'latitude': 39.72539,
-        'elevation': 1437.2,
-        'longitude': 33.63911})    
+        'latitude': 39.725346,
+        'elevation': 1463.7,
+        'longitude': 33.639096})    
     st[1].stats.coordinates = AttribDict({
-        'latitude': 39.73550,
-        'elevation': 1525.9,
-        'longitude': 33.64861})    
+        'latitude': 39.735643,
+        'elevation': 1552.4,
+        'longitude': 33.648541})    
     st[2].stats.coordinates = AttribDict({
-        'latitude': 39.71961,
-        'elevation': 1488.5,
-        'longitude': 33.65700})    
+        'latitude': 39.719633,
+        'elevation': 1515.0,
+        'longitude': 33.657081})    
     st[3].stats.coordinates = AttribDict({
-        'latitude': 39.70739,
-        'elevation': 1346.9,
-        'longitude': 33.64139})    
+        'latitude': 39.707446,
+        'elevation': 1374.9,
+        'longitude': 33.641485})    
     st[4].stats.coordinates = AttribDict({
-        'latitude': 39.71800,
-        'elevation': 1431.4,
-        'longitude': 33.61731})    
+        'latitude': 39.718039,
+        'elevation': 1458.5,
+        'longitude': 33.617315})    
     st[5].stats.coordinates = AttribDict({
-        'latitude': 39.73381,
-        'elevation': 1372.8,
-        'longitude': 33.61800}) 
+        'latitude': 39.733703,
+        'elevation': 1400.2,
+        'longitude': 33.617991})    
     st.trim((picktime - start_time), (picktime + end_time))
     return st, picktime
 

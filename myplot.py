@@ -12,7 +12,7 @@ import pycwt as wavelet  ###pycwt
 import mlwt ###mlpy
 
 #plot all waveforms    
-def wfs(t, tro, trd, trp, outpath, fig, event_list, figname="wfs"): 
+def wfs(t, tro, trd, trp, outpath, fig, event_list, station_list, figname="wfs"): 
     ax11 = fig.add_axes([0.1, 0.75, 0.7, 0.2])
     ax12 = fig.add_axes([0.1, 0.55, 0.7, 0.2], sharex=ax11)
     ax13 = fig.add_axes([0.1, 0.35, 0.7, 0.2], sharex=ax11)
@@ -28,10 +28,10 @@ def wfs(t, tro, trd, trp, outpath, fig, event_list, figname="wfs"):
     ax13.legend()
     ax14.legend(loc='upper left', fontsize='medium')
     fig.autofmt_xdate()    
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
 #plot all scaleograms
-def scals(t, tr, Xo, Xd, Xp, freq, outpath, fig, event_list, figname="scals"): 
+def scals(t, tr, Xo, Xd, Xp, freq, outpath, fig, event_list, station_list, figname="scals"): 
     maxamp_o = abs(Xo).max()/2           # these two lines just adjust the color scale
     maxamp_d = abs(Xd).max()/2           # these two lines just adjust the color scale
     maxamp_p = abs(Xp).max()/2           # these two lines just adjust the color scale
@@ -57,9 +57,9 @@ def scals(t, tr, Xo, Xd, Xp, freq, outpath, fig, event_list, figname="scals"):
     fig.colorbar(img_d, cax=ax121)
     fig.colorbar(img_p, cax=ax131)
     fig.autofmt_xdate()    
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
-def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type,outpath,fig,event_list,phi="0",figname="subtraction_parameters"):
+def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type,outpath,fig,event_list,station_list,phi="0",figname="subtraction_parameters"):
     '''
     Creates a single uber-plot summarizing the performance of spectral subtraction.
     The many input variables for this plotting method should be pretty self-evident. This 
@@ -72,6 +72,7 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
     '''
     
     alpha_beta_text = ' alpha0: ' + str(alpha0) + '    beta: ' + str(beta) 
+    #alpha0 is gamma for simple non lin. had to do this to make sure this plotting code works for other subtraction techniques
     gamma_beta_text = ' gamma: ' + str(alpha0) + '    beta: ' + str(beta)  #need to input gamma instead of alpha0 when calling this function for non_lin ss. 
     insetstring1 = (" xc (o,p):     long=" + str(round(metrics["maxcorr_long"],2)) + "(" + 
                      str(round(metrics["lag_long"]*tro.stats.delta,2)) + "s)  short=" + 
@@ -135,11 +136,11 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
        # phi_mean = np.mean(phi,axis=0)
         SNR_mean = np.mean(SNR,axis=0)
       #  im2 = ax2.plot(t[1,:], phi_mean, 'r--', linewidth=1,label='phi_mean')
-        im2 = ax2.plot(t[1,:], SNR_mean ** (1/2), 'r-', linewidth=1,label='rho_mean')
+        im2 = ax2.plot(t[1,:], SNR_mean, 'r-', linewidth=1,label='rho_mean')
         #im2 = ax2.plot(t[1,:], SNR[1], 'r-', linewidth=1,label='SNR')
-        ax2.set_ylabel('SNR_mean^(1/2)(db) = rho')
-        ylimits = ax2.get_ylim()
-        ax2.text(windowstart, ylimits[0],gamma_beta_text, style='italic', fontsize=8)
+        ax2.set_ylabel('SNR_mean(db) = rho')
+        #ylimits = ax2.get_ylim()
+        #ax2.text(windowstart, ylimits[0],gamma_beta_text, style='italic', fontsize=8)
     #ax2.set_yticks([-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7])
     ax2.grid()
     #ax2.set_ylim(0.1* tr_SNR.data.min(), 1.05*tr_alpha.data.max())
@@ -166,10 +167,10 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
     yrange = ylimits[1]-ylimits[0]
     ax4.text(windowstart, ylimits[0]+.10*yrange,insetstring2, style='italic', fontsize=8)
     ax4.text(windowstart, ylimits[0]+.02*yrange,insetstring1, style='italic', fontsize=8)
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '_' + ss_type + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '_' + ss_type + '.png'))
     return 
 
-def hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig,event_list,figname="hilbert_metrics"):
+def hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig,event_list,station_list,figname="hilbert_metrics"):
     fig, ax1 = plt.subplots(1,1,figsize=(5,5))
     ax1.scatter(t, hilb_div, s=15, facecolors='none', edgecolors='r', linewidth=0.5)
     text = 'max = ' + str(round(max_hilb,2)) + '\n' + 'mean = ' + str(round(mean_hilb,2))    
@@ -178,11 +179,11 @@ def hilb_plot(t,hilb_div,max_hilb,mean_hilb,outpath,fig,event_list,figname="hilb
     ax1.add_artist(ob)
     ax1.set_xlabel('Time (seconds)')
     ax1.set_ylabel('Phase lag (degrees)')
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
      
 
-def stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, outpath, fig, event_list, figname="stft"):
+def stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, outpath, fig, event_list,station_list, figname="stft"):
     fig, (ax1, ax2, ax3) = plt.subplots(3,1)
     maxamp = abs(amp_Xd).max()/2           # these two lines just adjust the color scale
     minamp = 0
@@ -200,7 +201,7 @@ def stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, outpath, fig, event_list,
     ax1.set_title('degraded STFT amplitude')
     ax2.set_title('processed STFT amplitude')
     ax3.set_title(' STFT amplitude')
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath,event_list + '_'+ station_list + '_' + figname + '.png'))
 
 
     
@@ -212,7 +213,7 @@ def stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, outpath, fig, event_list,
 ##################################################################################
 ##################################################################################
 
-def nonlin_signal_smooth(amp_Xd, amp_Xn, freqs_d, outpath, fig, event_list, timeframe="100", figname="signal_smooth_nonlin"):
+def nonlin_signal_smooth(amp_Xd, amp_Xn, freqs_d, outpath, fig, event_list, station_list,timeframe="100", figname="signal_smooth_nonlin"):
     m, n = amp_Xd.shape 
     phi = np.zeros((m,n))
     phis = np.zeros((m,n))
@@ -327,9 +328,9 @@ def nonlin_signal_smooth(amp_Xd, amp_Xn, freqs_d, outpath, fig, event_list, time
     ax2.set_title('Smoothed Xd with varying \u03bcy for timeframe ' + str(i))
 
 
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
-def nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig, event_list, timeframe="100", figname="one_timeframe_nonlin"):
+def nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig, event_list, station_list, timeframe="100", figname="one_timeframe_nonlin"):
     m, n = amp_Xd.shape 
     muy = 0.3 #should be between 0.1-0.5
     #p = 2
@@ -480,11 +481,11 @@ def nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig, even
     #ax3.plot(freqs_d,beta*amp_Xds[:,i],      'g:',lw=1.75,label='beta=' + str(beta) + '*Xds')
     ax3.legend()
 
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
-def simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig, event_list, timeframe="100", figname="one_timeframe_nonlin"):
+def simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig, event_list, station_list, timeframe="100", figname="one_timeframe_nonlin"):
     m, n = amp_Xd.shape 
-    muy = 0.3 #should be between 0.1-0.5
+    #muy = 0.3 #should be between 0.1-0.5
     #p = 2
     phi = np.zeros((m,n))
     phi0 = np.zeros((m,n))
@@ -494,7 +495,10 @@ def simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fi
     phi4 = np.zeros((m,n))
     phi5 = np.zeros((m,n))
     rho = np.zeros((m,n))
-    amp_Xds = np.zeros((m,n))
+    rho0 = np.zeros((m,n))
+    rho1 = np.zeros((m,n))
+    rho2 = np.zeros((m,n))
+    #amp_Xds = np.zeros((m,n))
     amp_Xp = np.zeros((m,n))
     amp_Xp0 = np.zeros((m,n))
     amp_Xp1 = np.zeros((m,n))
@@ -503,6 +507,7 @@ def simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fi
     amp_Xp4 = np.zeros((m,n))
     amp_Xp5nobeta5 = np.zeros((m,n))
     alpha = np.zeros((n))
+    alpha_mean = np.zeros((n))
     amp_Xna = np.mean(amp_Xn,axis=1)
 
     
@@ -514,73 +519,169 @@ def simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fi
     # SELECT A SINGLE TIME FRAME TO TEST  
     i = timeframe   #   snr=9.1  alpha=2.6        alpha0-3/20*snr[7800]     
     alpha = np.max(amp_Xn,axis=1) # I think this makes more sense
-    amp_Xds[:,i] = (muy)*amp_Xd[:,(i-1)]+(1-muy)*amp_Xd[:,i] 
-    rho[:,i] = amp_Xds[:,i]/amp_Xna
-
-    phi0[:,i] = alpha / rho[:,i]
-
-    phi1[:,i] = alpha / (1 + (rho[:,i]))
-
-    gamma = 0.1
-    phi2[:,i] = alpha / (1 + (gamma*rho[:,i]))
-
-    gamma = 0.3
-    phi3[:,i] = alpha / (1 + (gamma*rho[:,i]))
+    alpha_mean = np.mean(amp_Xn,axis=1) # I think this makes more sense
+    #amp_Xds[:,i] = (muy)*amp_Xd[:,(i-1)]+(1-muy)*amp_Xd[:,i] 
 
     gamma = 0.5
-    phi4[:,i] = alpha / (1 + (gamma*rho[:,i]))
+    i0 = 300
+    rho0[:,i0] = amp_Xd[:,i0]/amp_Xna
+    phi0[:,i0] = (2*alpha_mean) / (1+(gamma*rho0[:,i0]))
+#    phi0[:,i0] = alpha / rho0[:,i0]
+    i1 = 500
+    rho1[:,i1] = amp_Xd[:,i1]/amp_Xna
+#    phi1[:,i1] = alpha / rho1[:,i1]
+    phi1[:,i1] = (2*alpha_mean) / (1+(gamma*rho1[:,i1]))
+
 
     #COMPARE PHI CALCULATION 
     fig, (ax1, ax2) = plt.subplots(2,1,figsize=(7.5,10))
-    ax1.plot(freqs_d,phi0[:,i],       'r-',lw=.75,label='phi, alpha/rho')
-    ax1.plot(freqs_d,phi1[:,i],       'b-',lw=.75,label='phi, alpha/1+rho')
-    ax1.plot(freqs_d,phi2[:,i],       'r:',lw=.75,label='phi, alpha/1+(gamma(0.1)*rho)')
-    ax1.plot(freqs_d,phi3[:,i],       'b:',lw=.75,label='phi, alpha/1+(gamma(0.3)*rho)')
-    ax1.plot(freqs_d,phi4[:,i],       'g:',lw=.75,label='phi, alpha/1+(gamma(0.5)*rho)')
-    ax1.plot(freqs_d,alpha,       'g-',lw=.75,label='alpha')
+    ax1.plot(freqs_d,phi0[:,i0],       'r-',lw=.95,label='low SNR, timeframe ' + str(i0))
+#    ax1.plot(freqs_d,phi0[:,i0],       'r:',lw=.95,label='low SNR, timeframe ' + str(i0) + ', gamma ' + str(gamma0))
+    ax1.plot(freqs_d,phi1[:,i1],       'b-',lw=.95,label='high SNR, timeframe ' + str(i1))
+   # ax1.plot(freqs_d,phi4[:,i],       'g:',lw=.75,label='phi, alpha/1+(gamma(0.5)*rho)')
+    #ax1.plot(freqs_d,alpha,       'r-',lw=.75,label='alpha(Xn_max)')
+    #ax1.plot(freqs_d,alpha_mean,       'b-',lw=.75,label='alpha(Xn_mean)')
     ax1.legend()
-    ax1.set_title('timeframe ' + str(i))
+#    ax1.set_title('timeframe ' + str(i))
+    ax1.set_title('alpha = 2/(1+gamma*SNR)')
+ #   ax1.set(xlim=[0, 20])
+ #   ax1.set(ylim=[0.1, 1000])
+    ax1.set_xlabel('frequency')
+    ax1.set_ylabel('alpha*Xn_mean')
+
 
     
-    beta = 0.1
-    amp_Xp0[:,i] = (amp_Xds[:,i]) - phi0[:,i]
-    foundlows = np.where(amp_Xds[:,i] < (phi0[:,i] + (beta*amp_Xna)))
-    amp_Xp0[foundlows,i] = beta*amp_Xds[foundlows,i]
-
-    beta = 0.3
-    amp_Xp1[:,i] = (amp_Xds[:,i]) - phi0[:,i]
-    foundlows = np.where(amp_Xd[:,i] < (phi0[:,i] + (beta*amp_Xna)))
-    amp_Xp1[foundlows,i] = beta*amp_Xds[foundlows,i]
-
-    beta = 0.5
-    amp_Xp2[:,i] = (amp_Xds[:,i]) - phi0[:,i]
-    foundlows = np.where(amp_Xds[:,i] < (phi0[:,i] + (beta*amp_Xna)))
-    amp_Xp2[foundlows,i] = beta*amp_Xds[foundlows,i]
-
-    beta = 0.7
-    amp_Xp3[:,i] = (amp_Xds[:,i]) - phi0[:,i]
-    foundlows = np.where(amp_Xds[:,i] < (phi0[:,i] + (beta*amp_Xna)))
-    amp_Xp3[foundlows,i] = beta*amp_Xds[foundlows,i]
-
-    beta = 1.0
-    amp_Xp4[:,i] = (amp_Xds[:,i]) - phi0[:,i]
-    foundlows = np.where(amp_Xds[:,i] < (phi0[:,i] + (beta*amp_Xna)))
-    amp_Xp4[foundlows,i] = beta*amp_Xds[foundlows,i]
+    beta = 0
+    amp_Xp0[:,i0] = (amp_Xd[:,i0]) - phi0[:,i0]
+    foundlows = np.where(amp_Xd[:,i0] < (phi0[:,i0] + (beta*amp_Xna)))
+    amp_Xp0[foundlows,i0] = beta*amp_Xd[foundlows,i0]
 
 
-    ax2.plot(freqs_d,phi0[:,i],       ':',lw=.75,label='phi=alpha/rho',color='red')
-    ax2.plot(freqs_d,amp_Xds[:,i],       'k-',lw=.75,label='Xds')
-    ax2.plot(freqs_d,0.5*amp_Xds[:,i],       'k:',lw=1.75,label='Xds* beta = 0.5')
-    ax2.plot(freqs_d,0.5*amp_Xna,       'k--',lw=1.75,label='Xna* beta = 0.5')
-    ax2.plot(freqs_d,amp_Xp0[:,i],       '-',lw=.75,label='beta = 0.1',color='darkblue')
-    ax2.plot(freqs_d,amp_Xp1[:,i],       '-',lw=.75,label='beta = 0.3',color='blue')
-    ax2.plot(freqs_d,amp_Xp2[:,i],       '-',lw=.75,label='beta = 0.5',color='cyan')
-    ax2.plot(freqs_d,amp_Xp3[:,i],       '-',lw=.75,label='beta = 0.7',color='lightblue')
+    amp_Xp1[:,i1] = (amp_Xd[:,i1]) - phi1[:,i1]
+    foundlows = np.where(amp_Xd[:,i1] < (phi1[:,i1] + (beta*amp_Xna)))
+    amp_Xp1[foundlows,i1] = beta*amp_Xd[foundlows,i1]
+
+
+    ax2.plot(freqs_d,amp_Xd[:,i0],       'r:',lw=.95,label='Xd, low SNR ',color='red')
+    ax2.plot(freqs_d,amp_Xd[:,i1],       'b:',lw=.95,label='Xd, high SNR ',color='blue')
+    #ax2.plot(freqs_d,0.5*amp_Xd[:,i],       'k:',lw=1.75,label='Xd* beta = 0.5')
+    ax2.plot(freqs_d,amp_Xna,       'k--',lw=1.75,label='Xn')
+    ax2.plot(freqs_d,amp_Xp0[:,i0],       '-',lw=.95,label='Xp, low SNR, beta = 0',color='red')
+    ax2.plot(freqs_d,amp_Xp1[:,i1],       '-',lw=.95,label='Xp, high SNR, beta = 0',color='blue')
+#    ax2.plot(freqs_d,amp_Xp2[:,i],       '-',lw=.75,label='beta = 0.5',color='cyan')
+#    ax2.plot(freqs_d,amp_Xp3[:,i],       '-',lw=.75,label='beta = 0.7',color='lightblue')
     ax2.legend()
+    #ax2.set_title('phi = alpha(Xn_max)/rho')
 
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
-def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_list, timeframe="100", figname="one_timeframe_oversub"):
+def simple_nonlin_phi(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig, event_list, station_list, timeframe="100", figname="phi_simple_nonlin"):
+    m, n = amp_Xd.shape 
+    #muy = 0.3 #should be between 0.1-0.5
+    #p = 2
+    phi = np.zeros((m,n))
+    phi0 = np.zeros((m,n))
+    phi1 = np.zeros((m,n))
+    phi2 = np.zeros((m,n))
+    phi3 = np.zeros((m,n))
+    phi4 = np.zeros((m,n))
+    phi5 = np.zeros((m,n))
+    phi6 = np.zeros((m,n))
+    phi7 = np.zeros((m,n))
+    rho = np.zeros((m,n))
+    rho0 = np.zeros((m,n))
+    rho1 = np.zeros((m,n))
+    rho2 = np.zeros((m,n))
+    rho3 = np.zeros((m,n))
+    rho4 = np.zeros((m,n))
+    rho5 = np.zeros((m,n))
+    rho6 = np.zeros((m,n))
+    rho7 = np.zeros((m,n))
+    alpha = np.zeros((n))
+    alpha_mean = np.zeros((n))
+    amp_Xna = np.mean(amp_Xn,axis=1)
+
+    
+    # EXPLORE SIMPLE NON LINEAR SPECTRAL SUBTRACTION PARAMETERS
+    
+    #######################################################################################################################################
+    # PLOT ROLE OF PHI
+    #######################################################################################################################################    
+    # SELECT A SINGLE TIME FRAME TO TEST  
+    i = timeframe   #   snr=9.1  alpha=2.6        alpha0-3/20*snr[7800]  
+    alpha = np.max(amp_Xn,axis=1) # I think this makes more sense
+    alpha_mean = np.mean(amp_Xn,axis=1) 
+    #amp_Xds[:,i] = (muy)*amp_Xd[:,(i-1)]+(1-muy)*amp_Xd[:,i] 
+    gamma0 = 0.5
+
+    i0 = 300
+    rho0[:,i0] = amp_Xd[:,i0]/amp_Xna
+#    phi0[:,i0] = alpha  / rho0[:,i0]
+    phi0[:,i0] = (2 * alpha_mean) / (1 + (gamma0*rho0[:,i0]))
+ 
+    i1 = 500
+    rho1[:,i1] = amp_Xd[:,i1]/amp_Xna
+#    phi1[:,i1] = alpha / rho1[:,i1]
+    phi1[:,i1] = (2 * alpha_mean) / (1 + (gamma0*rho1[:,i1]))
+
+    gamma1 = 0.1
+
+    i0 = 300
+    rho2[:,i0] = amp_Xd[:,i0]/amp_Xna
+#   phi2[:,i0] = alpha / rho2[:,i0]
+    phi2[:,i0] = (2 * alpha_mean)  / (1 + (gamma1*rho2[:,i0]))
+
+    i1 = 500
+    rho3[:,i1] = amp_Xd[:,i1]/amp_Xna
+#    phi3[:,i1] = alpha / rho3[:,i1]
+    phi3[:,i1] = (2 * alpha_mean) / (1 + (gamma1*rho3[:,i1]))
+
+
+    #gamma = 0.1
+#
+    #phi2[:,i] = alpha / (1 + gamma*rho[:,i])
+#
+    #phi3[:,i] = alpha_mean / (1 + gamma*rho[:,i])
+#
+    #gamma = 0.5
+#
+    #phi4[:,i] = alpha / (1 + (gamma*rho[:,i]))
+#
+    #phi5[:,i] = alpha_mean / (1 + (gamma*rho[:,i]))
+#
+    #gamma = 1.0
+#
+    #phi6[:,i] = alpha / (1 + (gamma*rho[:,i]))
+#
+    #phi7[:,i] = alpha_mean / (1 + (gamma*rho[:,i]))
+#
+
+    #COMPARE PHI CALCULATION 
+    fig, (ax1) = plt.subplots(1,1,figsize=(7.5,10))
+    #ax1.plot(rho[:,i],phi0[:,i],       'r-',lw=.75,label='phi, = 1/rho')
+    #ax1.plot(rho[:,i],phi1[:,i],       'r:',lw=.75,label='phi = alpha_min/rho')
+    ax1.semilogy(rho0[20:66,i0],phi0[20:66,i0],       'r-',lw=.95,label='low SNR, timeframe ' + str(i0) + ', gamma ' + str(gamma0))
+    ax1.semilogy(rho1[20:66,i1],phi1[20:66,i1],       'b-',lw=.95,label='high SNR, timeframe ' + str(i1) + ', gamma ' + str(gamma0))
+    ax1.semilogy(rho2[20:66,i0],phi2[20:66,i0],       'r:',lw=.95,label='low SNR, timeframe ' + str(i0) + ', gamma ' + str(gamma1))
+    ax1.semilogy(rho3[20:66,i1],phi3[20:66,i1],       'b:',lw=.95,label='high SNR, timeframe ' + str(i1) + ', gamma ' + str(gamma1))
+     #ax1.plot(rho[:,i],phi3[:,i],       'b:',lw=.75,label='phi = alpha_mean & gamma = 0.1')
+    #ax1.semilogy(rho[20:66,i],phi5[20:66,i],       'g-',lw=.95,label='phi =  gamma = 0.5')
+    #ax1.plot(rho[:,i],phi5[:,i],       'g:',lw=.75,label='phi = alpha_mean & gamma = 0.5')
+    #ax1.semilogy(rho[20:66,i],phi7[20:66,i],       'y-',lw=.95,label='phi = gamma = 1.0')
+    #ax1.semilogx(rho[:,i],phi7[:,i],       'y:',lw=.95,label='phi = gamma = 0.5')
+    #ax1.plot(rho[:,i],alpha,       '-',lw=.75,label='alpha_max')
+    #ax1.plot(rho[:,i],alpha_mean,       ':',lw=.75,label='alpha_mean')
+    ax1.legend()
+#    ax1.set_title('timeframe ' + str(i) + '  phi = alpha(Xn_mean)/rho')
+    ax1.set_title('alpha = 2/(1+gamma*SNR)')
+    ax1.set(xlim=[0, 20])
+    ax1.set(ylim=[0.1, 1000])
+    ax1.set_xlabel('SNR')
+    ax1.set_ylabel('alpha*Xn_mean') 
+
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
+
+def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_list, station_list, timeframe="100", figname="one_timeframe_oversub"):
     m, n = amp_Xd.shape 
     p = 2
     muy = 0.3 # you might need to put this into function definition if you end up using smooth over sub a lot
@@ -913,9 +1014,9 @@ def oversub_param_one_tf(amp_Xd, amp_Xn, freqs_d, ss_type, outpath, fig, event_l
     ax3.legend()
     ax3.set(xlim=[.5, 10])
     ax3.set_xlabel('frequency (Hz)')
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 #
-def sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig, event_list, timeframe="100", figname="one_timeframe_alpha_beta"):
+def sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig, event_list, station_list, timeframe="100", figname="one_timeframe_alpha_beta"):
     m, n = amp_Xd.shape 
     p = 2
     amp_Xna = np.mean(amp_Xn,axis=1)
@@ -1049,9 +1150,9 @@ def sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig, event_list, timefram
     ax3.legend()
     ax3.set(xlim=[.5, 10])
     ax3.set_xlabel('frequency (Hz)')
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
-def processed_signal_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig, event_list, x1=1485, now1=11, step1=1, x3=1390, now2=11, step2=20, figname="cons_timeframe_processed_signal"):
+def processed_signal_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig, event_list, station_list, x1=1485, now1=11, step1=1, x3=1390, now2=11, step2=20, figname="cons_timeframe_processed_signal"):
     #x1 start of interval for first fig.
     #now1 number of windows  for the first fig.
     #step1 step size for the first fig.
@@ -1095,11 +1196,11 @@ def processed_signal_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig, event_list, x1=14
     ax2.set(xlim=[.5, 10])
     ax2.set_title(str(now2) + ' consecutive timeframes [' + str(x3) + ':' + str(step2) + ':' +  str(x4) + ']')
     ax2.set_xlabel('frequency (Hz)')
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
 #Compare the effects of different alpha values on waveforms
 
-def alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, outpath, fig, event_list, figname="alpha_comparison_wfs"):
+def alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, outpath, fig, event_list, station_list, figname="alpha_comparison_wfs"):
     st_all = Stream(traces=[tro, trd]) 
     alpha0list = [1, 2, 4, 6, 10]
     dt = tro.stats.delta
@@ -1117,11 +1218,11 @@ def alpha_comp_wfs(t, tro, trd, amp_Xd, amp_Xn, phase_Xd, scales_d, omega0, dj, 
         trp.stats.location = 'alpha'+str(alpha0)
         st_all += trp
     st_all.plot(automerge=False,equal_scale=True,linewidth=1,fig=fig)
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
     #fig.autofmt_xdate()    
 
 #Compare the effects of different alpha values on scaleograms
-def alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, freqs_d, omega0, dj, outpath, fig, event_list, figname="alpha_comparison_scals"):
+def alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, freqs_d, omega0, dj, outpath, fig, event_list, station_list, figname="alpha_comparison_scals"):
     alpha0list = [1, 2, 4, 6, 10]
     nop= len(alpha0list)+2 #number of subplots
     dt = tro.stats.delta
@@ -1151,7 +1252,7 @@ def alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, fr
         ax3.text(1.5, 8.5, text, fontsize=8, bbox=dict(facecolor='white'))
         ax3.axes.xaxis.set_visible(False)
     ax3.axes.xaxis.set_visible(True)
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
 ##################################################################################
 ##################################################################################
@@ -1161,7 +1262,7 @@ def alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, fr
 ##################################################################################
 ##################################################################################
 #very first plot to plot all scaleograms, not used anymore
-def all(t, tr, X, freq, IX, outpath, fig, event_list, figname="original"): 
+def all(t, tr, X, freq, IX, outpath, fig, event_list, station_list, figname="original"): 
     maxamp = abs(X).max()/2           # these two lines just adjust the color scale
     minamp = 0
     tX, f = np.meshgrid(tr.times(), freq)
@@ -1178,11 +1279,11 @@ def all(t, tr, X, freq, IX, outpath, fig, event_list, figname="original"):
     ax14.set_xlabel("Time after %s [s]" % tr.stats.starttime)
     fig.colorbar(img, cax=ax13)
     fig.autofmt_xdate()    
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.png'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
 #very first plot to plot all scaleograms, not used anymore, in log plot
 
-def all_log(t, tr, X, freq, IX, outpath, fig, event_list, figname="original"): 
+def all_log(t, tr, X, freq, IX, outpath, fig, event_list, station_list, figname="original"): 
     ax11 = fig.add_axes([0.1, 0.75, 0.7, 0.2])
     ax12 = fig.add_axes([0.1, 0.1, 0.7, 0.60], sharex=ax11)
     ax13 = fig.add_axes([0.83, 0.1, 0.03, 0.6])
@@ -1202,7 +1303,7 @@ def all_log(t, tr, X, freq, IX, outpath, fig, event_list, figname="original"):
     ax14.set_xlabel("Time after %s [s]" % tr.stats.starttime)
     fig.colorbar(img, cax=ax13)
     fig.autofmt_xdate()    
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.pdf'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.pdf'))
     #fig.savefig('xx.pdf', bbox_inches='tight')
 
 #def 
@@ -1218,7 +1319,7 @@ def all_log(t, tr, X, freq, IX, outpath, fig, event_list, figname="original"):
 
 
 #SPECTRA COMPARISON PLOT, COMPARES THE SPECTRA OF ORIGINAL, PROCESSED, NOISE AND DEGRADED SIGNALS
-def spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, outpath, fig, event_list, figname="spectra_comparison"): 
+def spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, outpath, fig, event_list, station_list, figname="spectra_comparison"): 
     # PLOT SAMPLE COLUMNS FROM THE DEGRADED AND PROCESSED CWT
     mean_amp_Xo = np.mean(amp_Xo,axis=1)
     mean_amp_Xn = np.mean(amp_Xn,axis=1)
@@ -1235,11 +1336,11 @@ def spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, outpath, fig, event_list, f
     ax.plot(freqs_d,mean_amp_Xp, 'g-', lw=2,label='processed')
     #ax.plot(freqs_d,mean_amp_r, 'b-', lw=2,label='residual')
     ax.plot(freqs_d,mean_amp_Xn, 'r-', lw=2,label='noise')
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.pdf'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.pdf'))
     #plt.savefig('TMP_spectra_comparison.png')
 
 #SCALES VS FREQUENCY FOR CWT
-def scales_freq(freqs_d,scales_d, outpath, fig, event_list, figname="frequency_scale"): 
+def scales_freq(freqs_d,scales_d, outpath, fig, event_list, station_list, figname="frequency_scale"): 
     # MAKE A PLOT OF SCALES VS FREQUENCY
     fig, ([ax1, ax2]) = plt.subplots(2,1)
     h1 = ax1.loglog(freqs_d,scales_d) 
@@ -1250,6 +1351,6 @@ def scales_freq(freqs_d,scales_d, outpath, fig, event_list, figname="frequency_s
     ax2.set_xlabel('frequency')
     ax2.set_ylabel('scale')
     plt.setp(h2, color='k', marker='o', markerfacecolor='r', markeredgecolor='k' )
-    fig.savefig(os.path.join(outpath, event_list + '_'+ figname + '.pdf'))
+    fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.pdf'))
     #plt.savefig('TMP_frequency_vs_scale.png')    
     
