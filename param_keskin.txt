@@ -1,0 +1,33 @@
+###################waveform parameters########################
+#event_list=['ak0184nb2fzw','ak014cou8d9l']
+noe = list(range(38)) #for Keskin
+event_list=['keskin_' + str(s+1) for s in noe] #for Keskin
+station_list=['BR101','BR102','BR103','BR104','BR105','BR106'] #for Keskin
+network_list = ['IM','XM']
+station_code = "BC"
+pick_type = "P"
+channel = "SHZ"
+start_time = 80
+end_time = 60
+filter_type = "bandpass"
+filter_freqmin = 1
+filter_freqmax = 3
+###################noise parameters added to purposefully degrade signals##################
+noise_type = 2 #refer to addnoise for different types of whitenoise that can be added
+noise_amplitude = 50
+noise_freqmin = 1
+noise_freqmax = 4
+##################noise estimation parameters##################
+ibegin = 10
+iend = 90
+########################transformation type########################
+#t_type = "mlwt"
+t_type = "pycwt"
+#t_type = "stft"
+########################spectral subtraction type########################
+#ss_type = "simple"
+#ss_type = "over"
+#ss_type = "smooth_over"
+#ss_type = "frequency_over"
+#ss_type = "non_lin"
+ss_type = "simple_non_lin"
