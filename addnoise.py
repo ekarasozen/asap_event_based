@@ -1,6 +1,6 @@
 import numpy as np
 def whitenoise(st,type,amplitude,min_freq=1,max_freq=3):
-    np.random.seed(42)
+    #np.random.seed(42)
     nl=amplitude*st.std()
     noe=st.stats.npts 
     nos=st.stats.sampling_rate 
