@@ -206,13 +206,15 @@ def simple_nonlin_subtraction(amp_Xd, amp_Xn, beta, gamma):
     #           amp_Xp[j,i] = (beta)*(amp_Xd[j,i])
     rho = amp_Xd / amp_Xna
     SNR = 10*np.log10((rho) ** 2)
-    phi = 2*alpha / (1+gamma*rho)
+    phi = (14*alpha) / (1+(gamma*(rho**4)))
     abovethreshold = amp_Xd >= phi
     belowthreshold = amp_Xd < phi
     amp_Xp[abovethreshold] = amp_Xd[abovethreshold] - phi[abovethreshold]
+#    amp_Xp[belowthreshold] = 0
     amp_Xp[belowthreshold] = (beta)*(amp_Xd[belowthreshold])
-
-    return amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 
+   #np.savetxt('rho.out', rho, delimiter=',', newline="\n")  
+#
+    return amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold 
 
 
 def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Karmakar 2013
