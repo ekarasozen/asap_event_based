@@ -9,7 +9,7 @@ import sys
 sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap/")
 import spectral_subtraction as ss
 import pycwt as wavelet  ###pycwt
-import mlwt ###mlpy
+#import mlwt ###mlpy
 
 #plot all waveforms    
 def wfs(t, tro, trd, trp, outpath, fig, event_list, station_list, figname="wfs"): 
