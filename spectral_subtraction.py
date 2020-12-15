@@ -190,8 +190,8 @@ def simple_nonlin_subtraction(amp_Xd, amp_Xn, beta, gamma):
     #alpha = np.median(amp_Xn,axis=1) 
     amp_Xna = np.array([np.median(amp_Xn,axis=1)]).transpose()  # create m x 1 matrix
     amp_Xna = np.dot(amp_Xna,ones_array)                      # expand to m x n matrix
-    alpha = np.array([np.median(amp_Xn,axis=1)]).transpose()
-    alpha = np.dot(alpha,ones_array)   
+    #alpha = np.array([np.median(amp_Xn,axis=1)]).transpose()
+    #alpha = np.dot(alpha,ones_array)   
     #for i in range(0,n):
     #   for j in range(0,m):
     #       rho[j,i] = amp_Xd[j,i]/amp_Xna[j]
@@ -206,12 +206,18 @@ def simple_nonlin_subtraction(amp_Xd, amp_Xn, beta, gamma):
     #           amp_Xp[j,i] = (beta)*(amp_Xd[j,i])
     rho = amp_Xd / amp_Xna
     SNR = 10*np.log10((rho) ** 2)
-    phi = (14*alpha) / (1+(gamma*(rho**4)))
-    abovethreshold = amp_Xd >= phi
-    belowthreshold = amp_Xd < phi
+    alpha = (18.49) / (1+(gamma*(rho**4)))
+    phi = alpha*amp_Xna
+    abovethreshold = amp_Xd > phi
+    belowthreshold = amp_Xd <= phi
     amp_Xp[abovethreshold] = amp_Xd[abovethreshold] - phi[abovethreshold]
-#    amp_Xp[belowthreshold] = 0
-    amp_Xp[belowthreshold] = (beta)*(amp_Xd[belowthreshold])
+    amp_Xp[belowthreshold] = 0
+    #print(rho.shape)
+    #rho_p = rho[:,1600:1800]
+    #print(np.mean(rho_p))
+    #rho_n = rho[:,0:1600]
+    #print(np.mean(rho_n))
+#    amp_Xp[belowthreshold] = (beta)*(amp_Xd[belowthreshold])
    #np.savetxt('rho.out', rho, delimiter=',', newline="\n")  
 #
     return amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold 

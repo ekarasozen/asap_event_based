@@ -25,10 +25,13 @@ for e, lab in enumerate(event_id):
     st = prep(st,filter_type=filter_type, freqmin=filter_freqmin, freqmax=filter_freqmax)
     nos = len(st)
     #print(st)
+    outpath = event_list[e] + '/' + ss_type + '/'
+    #std = read(outpath + station_code + "*degraded*") # to add same noise to same station in different runs
     for s in range(nos):
        tro = st[s].copy() #[o]riginal signal
        trd = st[s].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
        trd.data = whitenoise(trd,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax)
+       #trd = std[s].copy() # to add same noise to same station in different runs
        trn = trd.copy() #[n]oise sample with no signal (typically used to determine what to remove)
        t0 = trn.stats.starttime
        trn.trim(t0+ibegin, t0+iend) 
@@ -92,7 +95,7 @@ for e, lab in enumerate(event_id):
            elif ss_type == "non_lin":
                amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 = ss.nonlin_subtraction(amp_Xd,amp_Xn, 0.1, 0.1)
            elif ss_type == "simple_non_lin":
-               amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.05, 0.01)
+               amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.05, 0.7)
            #amp_Xp, SNR, alpha, beta, delta = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freqs_d)
            phase_Xd = np.angle(Xd)
            Xp = amp_Xp*(np.exp(1.j*phase_Xd))
@@ -140,7 +143,6 @@ for e, lab in enumerate(event_id):
        #np.savetxt(event_list[e] + '_phi.out', phi, delimiter=',', newline="\n")  
        #np.savetxt(event_list[e] + '_freqs_d.out', freqs_d, delimiter=',', newline="\n")  
        amp_Xo = abs(Xo)
-       outpath = event_list[e] + '/' + ss_type + '/'
 #       outpath = 'deneme/' + ss_type + '/'
        if not os.path.exists(outpath):
           os.makedirs(outpath)

@@ -19,7 +19,7 @@ noise_freqmin = 1
 noise_freqmax = 4
 ##################noise estimation parameters##################
 ibegin = 10
-iend = 90
+iend = 70
 ########################transformation type########################
 #t_type = "mlwt"
 t_type = "pycwt"

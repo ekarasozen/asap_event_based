@@ -30,14 +30,17 @@ sys.path.append("/Users/ezgikarasozen/Documents/Research/Array_processing/asap_w
 
 #CHOOSE FROM LOCAL V MODELS FOR TAUP CALCULATION
 #model_l = TauPyModel(model="ak135")
-model_l = TauPyModel(model="northak")
+#model_l = TauPyModel(model="northak")
+model_l = TauPyModel(model="simeonof")
 #model_l = TauPyModel(model="scak")
 #model_l = TauPyModel(model="kaktovik")
 
 #ALL 191 FINAL SELECTION BENCHMARK DATASET AS OF FEB 12 2020
 #event_list = ['ak0147odw83x', 'ak01479cs1ql', 'ak01460tnurs', 'ak0145qxe8b6', 'ak0145qx2tq1', 'ak0145nmf4mh', 'ak0145nlz3oh', 'ak0145nlrjqg', 'ak0145nlaph8', 'ak0145nl41pp', 'ak0145nkrjaf', 'ak016gg2nkth', 'ak0153hov4fk', 'ak0145aam3cq']
-
-event_list = ['ak014azdbz0f'] #kaktovik mag6 mainshock
+#event_list = ['ak0209dha24u'] #simeonof mag7 mainshock
+event_list = ['ak0209dha24u', 'ak0209dhfsda', 'ak0209dhjycc', 'ak0209di1v38', 'ak0209dijy3k', 'ak0209dilddq', 'ak0209dim3wu', 'ak0209djbiac', 'ak0209djp1hp', 'ak0209dk6w7x', 'ak0209dk6w9e', 'ak0209dkxd3e', 'ak0209dkz5j3', 'ak0209dl3908', 'ak0209dl43xh', 'ak0209dli6ts', 'ak0209dlkl0m', 'ak0209dlnynj', 'ak0209dmoum3', 'ak0209doknge', 'ak0209dp606r', 'ak0209dqddxc', 'ak0209f1do6a', 'ak0209f4edk6', 'ak0209f5kfbn', 'ak0209f6695e', 'ak0209f7d5xy', 'ak0209f9uo2n', 'ak0209fc6qc1', 'ak0209gvi4f4', 'ak0209gwlcne', 'ak0209gxvgdw', 'ak0209ijmej8', 'ak0209k4px7l', 'ak0209kchwr2', 'ak0209lunesk', 'ak0209lzxy5f', 'ak0209nfs770', 'ak0209ngauyy', 'ak0209ni9703', 'ak0209nibq9x', 'ak0209nl00hr', 'ak0209oz0cpc', 'ak0209p3tqf3', 'ak0209p66t3h', 'ak0209p6goh5', 'ak0209qn7xnk', 'ak0209qskvhc', 'ak0209qsr862', 'ak0209qtqm1d', 'ak0209qvi9kl', 'ak0209sm371k', 'ak0209sm602c', 'ak0209txpf7k', 'ak0209tyfl1c', 'ak0209u00egi', 'ak0209u16bpq', 'ak0209vt4369', 'ak0209z31me9', 'ak020a0ss1vi', 'ak020a0ssbp0', 'ak020a40z8rk', 'ak020a5p89cv', 'ak020a5qcvrv', 'ak020a5skbl7', 'ak020a767ge3', 'ak020a779tjt', 'ak020a794430', 'ak020a7copbi', 'ak020ac6wt2m', 'ak020akg6o5h', 'ak020ao09wft', 'ak020aplyc6l', 'ak020aqzyjl4', 'ak020arbe91i', 'ak020bl5c5qf', 'ak020btcr2ty', 'ak020bzrqmoq', 'ak020cbh0hqh', 'ak020cg92jnk', 'ak020cgbjw8x'] #simeonof mainshock and aftershocks
+#event_list = ['ak0209dha24u', 'ak0209dhfsda', 'ak0209dhjycc']
+#event_list = ['ak014azdbz0f'] #kaktovik mag6 mainshock
 #event_list = ['ak018aap2cqu', 'ak014azdbz0f'] #test events
 #event_list = ['ak018aap2cqu', 'ak014azdbz0f'] #test events
 #event_list = ['us2000aert'] #for GI webpage
@@ -61,6 +64,9 @@ win_len = te_win+ts_win #should be x2 of t_win in seconds
 file1 = open(path + array_code + "_obspy_processing.out","w")
 file1.write("EVENT_ID"+"\t"+" AN"+"\t"+"DATE"+"\t"+"   TIME"+"\t"+"    MAG"+"\t"+"LAT"+"\t"+"   LON"+"\t"+"     DP"+"\t"+" DIST"+"\t"+" TBAZ"+"\t"+"MBAZ"+"\t"+"EBAZ"+" "+"RPW"+"  "+"SLW"+"\t"+"PICK"+"  "+"NOS"+"\t"+"TYPE"+"\n")
 
+file2 = open("simeonof_aftershocks/simeonof5.19_locations.txt","r")
+#mloc_list=[(mloc) for line in file2 for mloc in line.split()]
+mloc_list = np.loadtxt(file2, usecols=(1,2,3,4,5,6,7,8,9,11))
 
 #plot waveforms wrt distance not alphabetically. 
 #maybe work with better bmap options, if you have time
@@ -87,10 +93,14 @@ for e, lab in enumerate(event_id):
     st_nam = np.empty((0, 100))
     cat = read_events(event_id[e])
     evmag = (cat[0].magnitudes[0].mag)
-    evot = (cat[0].origins[0].time)
-    evlat = cat[0].origins[0].latitude
-    evlon= cat[0].origins[0].longitude
-    evdep= (cat[0].origins[0].depth) / 1000 #convert to km
+    #evot = (cat[0].origins[0].time)
+    evot = UTCDateTime(int(mloc_list[e,0]), int(mloc_list[e,1]), int(mloc_list[e,2]), int(mloc_list[e,3]), int(mloc_list[e,4]), mloc_list[e,5])
+    #evlat = cat[0].origins[0].latitude
+    evlat = mloc_list[e,6]
+    #evlon= cat[0].origins[0].longitude
+    evlon = mloc_list[e,7]
+    #evdep= (cat[0].origins[0].depth) / 1000 #convert to km
+    evdep= (mloc_list[e,8])
     evtype= cat[0].event_type
     print(event_id[e])
     if cat[0].origins[0].evaluation_mode == "automatic":
@@ -317,6 +327,29 @@ for e, lab in enumerate(event_id):
     cl_abp = out[:, 2] #calculated absolute power
     cl_baz = out[:, 3] #calculated backazimuth
     cl_slw = out[:, 4] #calculated slowness
+#OBSPY ARRAY PROCESSING PLOT #1
+    #labels = ['rel_power', 'abs_power', 'baz', 'slowness']
+    ##xlocator = mdates.AutoDateLocator()
+    #fig2 = plt.figure()
+    #for i, lab in enumerate(labels):
+    #     ax11 = fig2.add_subplot(4, 4, (i + 1)*4)
+    #     ax11.scatter(out[:, 0], out[:, i + 1], c=out[:, 1], alpha=0.6,
+    #                edgecolors='none', cmap=obspy_sequential)
+    #     ax11.set_ylabel(lab)
+    #     ax11.set_xlim(out[0, 0], out[-1, 0])
+    #     #ax11.set_ylim(out[:, i + 1].min(), out[:, i + 1].max())
+    #     if i == 2:
+    #         ax11.set_ylim(-200, -50)
+    #     if i == 3:
+    #         ax11.set_ylim(0, 0.15)
+    #    #ax11.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) #no need for now.
+    #     ax11.yaxis.set_label_position("right")
+    #    # ax11.xaxis.set_major_locator(xlocator)
+    #     ax11.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+    #     ax11.axvline(date2num(t.datetime), lw=0.8, c='darkred', label='P pick')
+    #ax11.legend(loc='lower left', fontsize=6)
+    ##ax11.annotate(("{}"*1).format("Array Processing with Obspy"), xy=(0, 4.08), xycoords='axes fraction', fontsize=11)
+    #fig2.autofmt_xdate()
 #OBSPY ARRAY PROCESSING PLOT #2 POLAR PLOT
     cmap = obspy_sequential #colormaps
     # make output human readable, adjust backazimuth to values between 0 and 360
@@ -351,20 +384,6 @@ for e, lab in enumerate(event_id):
     [i.set_color('grey') for i in ax4.get_yticklabels()]
     ColorbarBase(cax4, cmap=cmap,
                 norm=Normalize(vmin=hist.min(), vmax=hist.max()))
-#OBSPY ARRAY PROCESSING PLOT #1
-#    labels = ['rel_power', 'abs_power', 'baz', 'slowness']
-#     xlocator = mdates.AutoDateLocator()
-#     for i, lab in enumerate(labels):
-#         ax4 = fig1.add_subplot(4, 4, (i + 1)*4)
-#         ax4.scatter(out[:, 0], out[:, i + 1], c=out[:, 1], alpha=0.6,
-#                    edgecolors='none', cmap=obspy_sequential)
-#         ax4.set_ylabel(lab)
-#         ax4.set_ylim(out[:, i + 1].min(), out[:, i + 1].max())
-# #        ax4.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) #no need for now.
-#         ax4.yaxis.set_label_position("right")
-#         ax4.xaxis.set_major_locator(xlocator)
-#         ax4.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-#     ax4.annotate(("{}"*1).format("Array Processing with Obspy"), xy=(0, 4.08), xycoords='axes fraction', fontsize=11)
     err_baz = gc_baz - cl_baz
     if err_baz > 180:
        err_baz = err_baz - 360
@@ -374,6 +393,7 @@ for e, lab in enumerate(event_id):
        err_baz = err_baz
     #print(gc_baz,float(cl_baz),err_baz)
     fig1.subplots_adjust(left=0.15, top=0.95, right=0.95, bottom=0.2, hspace=0)
+    #fig2.subplots_adjust(left=0.15, top=0.95, right=2.95, bottom=0.2, hspace=0)
     file1.write("{0:12} {1:2} {2:} {3:} {4:3.1f} {5:6.3f} {6:7.3f} {7:3.0f} {8:6.3f} {9:6.2f} {10:6.2f} {11:7.2f} {12:4.2f} {13:5.3f} {14:4} {15:2}     {16:10}".format(event_list[e],array_code,event_date,event_time,evmag,evlat,evlon,evdep,float(gc_dist),float(gc_baz),float(cl_baz),float(err_baz),float(cl_rlp),float(cl_slw),stn_pick,nos,evtype))
     file1.write("\n")
     #TEXT TO APPEND
@@ -385,6 +405,7 @@ for e, lab in enumerate(event_id):
     ax1.annotate(("{0:18}{1:5.3f}{2:1}").format("Apparent slowness: ",np.mean(cl_slw)," s/km"), xy=(0, (-0.6)), xycoords='axes fraction', fontsize=11)
     ax1.annotate(("{0:18}{1:4.2f}").format("Relative power: ",np.mean(cl_rlp)), xy=(0, (-0.7)), xycoords='axes fraction', fontsize=11)
     fig1.suptitle(("{}"*4).format("Event Name: ", event_list[e][2:], ", Array: ", array_name), y=1.04,fontweight='bold')
-    fig1.savefig(path + event_list[e] + "_" + array_code + '.pdf', bbox_inches='tight')
+    fig1.savefig(path + event_list[e] + "_" + array_code + '.png', bbox_inches='tight')
+    #fig2.savefig(path + event_list[e] + "_" + array_code + '_obspy.png', bbox_inches='tight')
 #    fig1.savefig(run_name + "_" + event_list[e] + "_" + array_code + '_base.pdf', bbox_inches='tight')
 file1.close()
