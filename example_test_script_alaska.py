@@ -26,12 +26,12 @@ for e, lab in enumerate(event_id):
     nos = len(st)
     #print(st)
     outpath = event_list[e] + '/' + ss_type + '/'
-    #std = read(outpath + station_code + "*degraded*") # to add same noise to same station in different runs
+    std = read(outpath + station_code + "*degraded*") # to add same noise to same station in different runs
     for s in range(nos):
        tro = st[s].copy() #[o]riginal signal
-       trd = st[s].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
-       trd.data = whitenoise(trd,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax)
-       #trd = std[s].copy() # to add same noise to same station in different runs
+       #########trd = st[s].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
+       #########trd.data = whitenoise(trd,picktime,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax)
+       trd = std[s].copy() # to add same noise to same station in different runs, make sure to comment out saving trd at the end of this code. 
        trn = trd.copy() #[n]oise sample with no signal (typically used to determine what to remove)
        t0 = trn.stats.starttime
        trn.trim(t0+ibegin, t0+iend) 
@@ -147,8 +147,8 @@ for e, lab in enumerate(event_id):
        if not os.path.exists(outpath):
           os.makedirs(outpath)
        #SAVE PROCESSED TRACES:
-       tro.write(outpath + tro.stats.station + "." + tro.stats.channel + ".original", format="MSEED") ###for alaska
-       trd.write(outpath + trd.stats.station + "." + trd.stats.channel + ".degraded", format="MSEED") ###for alaska
+       #tro.write(outpath + tro.stats.station + "." + tro.stats.channel + ".original", format="MSEED") ###for alaska
+       #trd.write(outpath + trd.stats.station + "." + trd.stats.channel + ".degraded", format="MSEED") ###for alaska
        trp.write(outpath + trp.stats.station + "." + trp.stats.channel + ".processed", format="MSEED")
        #FIGURES#
        fig1 = plt.figure()
