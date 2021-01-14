@@ -18,20 +18,21 @@ filename = input("Parameters file: ")
 exec(open(filename).read())
 event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
 ####for e, lab in enumerate(noe):
+file1 = open(text_output,"w")
+file1.write("EVENT_ID"+"\t"+"STN"+"\t"+"SS_Type"+"\t"+"Noise_amp"+"\t"+"a"+"\t"+"b"+"\t"+"Delta_SNR"+"\t"+"SNRd_l"+"\t"+"SNRp_l"+"\t"+"XC_l"+"\t"+"Lag_l"+"\t"+"SNRd_s"+"\t"+"SNRp_s"+" "+"XC_s"+"  "+"Lag_s"+"\n")
 for e, lab in enumerate(event_id):
-    ####st, picktime = keskin_event(db_name='events-2020-09-18T18_02_02.xml', ev_id=e, inventory='Keskin_sp.xml',start_time=start_time, end_time=end_time)
     st, picktime = event(ev_id=event_id[e], network_list=network_list, station_code=station_code, pick=pick_type, channel=channel, start_time=start_time, end_time=end_time)
     #print(station_code)
     st = prep(st,filter_type=filter_type, freqmin=filter_freqmin, freqmax=filter_freqmax)
     nos = len(st)
     #print(st)
     outpath = event_list[e] + '/' + ss_type + '/'
-    std = read(outpath + station_code + "*degraded*") # to add same noise to same station in different runs
+    std = read(outpath + station_code + "*degraded*") # to add same noise to same station in different runs, uncomment with ****
     for s in range(nos):
        tro = st[s].copy() #[o]riginal signal
-       #########trd = st[s].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
-       #########trd.data = whitenoise(trd,picktime,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax)
-       trd = std[s].copy() # to add same noise to same station in different runs, make sure to comment out saving trd at the end of this code. 
+       trd = st[s].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
+       ####trd.data = whitenoise(tro,trd,picktime,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax)
+       trd = std[s].copy() # to add same noise to same station in different runs, make sure to comment out saving trd at the end of this code. , uncomment with ****
        trn = trd.copy() #[n]oise sample with no signal (typically used to determine what to remove)
        t0 = trn.stats.starttime
        trn.trim(t0+ibegin, t0+iend) 
@@ -95,7 +96,8 @@ for e, lab in enumerate(event_id):
            elif ss_type == "non_lin":
                amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 = ss.nonlin_subtraction(amp_Xd,amp_Xn, 0.1, 0.1)
            elif ss_type == "simple_non_lin":
-               amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.05, 0.7)
+               #amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.05, 0.7)
+               amp_Xp, SNR, alpha, rho, phi, a, b, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.40, 0.005)
            #amp_Xp, SNR, alpha, beta, delta = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freqs_d)
            phase_Xd = np.angle(Xd)
            Xp = amp_Xp*(np.exp(1.j*phase_Xd))
@@ -143,12 +145,11 @@ for e, lab in enumerate(event_id):
        #np.savetxt(event_list[e] + '_phi.out', phi, delimiter=',', newline="\n")  
        #np.savetxt(event_list[e] + '_freqs_d.out', freqs_d, delimiter=',', newline="\n")  
        amp_Xo = abs(Xo)
-#       outpath = 'deneme/' + ss_type + '/'
        if not os.path.exists(outpath):
           os.makedirs(outpath)
        #SAVE PROCESSED TRACES:
-       #tro.write(outpath + tro.stats.station + "." + tro.stats.channel + ".original", format="MSEED") ###for alaska
-       #trd.write(outpath + trd.stats.station + "." + trd.stats.channel + ".degraded", format="MSEED") ###for alaska
+       #tro.write(outpath + tro.stats.station + "." + tro.stats.channel + ".original", format="MSEED") 
+       #trd.write(outpath + trd.stats.station + "." + trd.stats.channel + ".degraded", format="MSEED") 
        trp.write(outpath + trp.stats.station + "." + trp.stats.channel + ".processed", format="MSEED")
        #FIGURES#
        fig1 = plt.figure()
@@ -162,6 +163,10 @@ for e, lab in enumerate(event_id):
        fig2 = myplot.scals(t, tro, Xo, Xd, rho, alpha, Xp, abovethreshold, freq, outpath, fig2, event_list[e], station_list[s], figname="scals")
        #fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, outpath, fig2, event_list[e], station_list[s], figname="scals") 
        #fig2 = myplot.stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, fig2, event_list[e], station_list[s], figname="stft") #COMMENT OUT FOR STFT *********
+       file1.write(event_list[e] + "\t" + station_list[s] + "\t" + ss_type + "\t" + '{:.1f}'.format(round(noise_amplitude,1)) + "\t" + '{:.2f}'.format(round(a,2)) + "\t" + '{:.3f}'.format(round(b,3)) + "\t" + '{:.1f}'.format(round(100*metrics["snrp_long"]/metrics["snrd_long"],1)) + "\t" +  
+       '{:5.1f}'.format(round(metrics["snrd_long"],1)) + "\t" + '{:5.1f}'.format(round(metrics["snrp_long"],1)) + "\t" +  '{:.2f}'.format(round(metrics["maxcorr_long"],2)) + "\t" + '{:.2f}'.format(round(metrics["lag_long"]*tro.stats.delta,2)) + "\t" + 
+       '{:5.1f}'.format(round(metrics["snrd_short"],1)) + "\t" + '{:5.1f}'.format(round(metrics["snrp_short"],1)) + "\t" + '{:.2f}'.format(round(metrics["maxcorr_short"],2)) + "\t" + '{:.2f}'.format(round(metrics["lag_short"]*tro.stats.delta,2))) 
+       file1.write("\n")
        if ss_type == "simple":
            fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, event_list[e], station_list[s], phi="0", figname="subtraction_performance")
            fig4 = myplot.sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig4, event_list[e], station_list[s], timeframe=1490, figname="one_timeframe_alpha_beta")
@@ -186,7 +191,7 @@ for e, lab in enumerate(event_id):
            fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb, outpath,fig6,event_list[e],station_list[s],figname="hilbert_metrics")
        elif ss_type == "simple_non_lin":
 #           fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath,fig3, event_list[e], phi, figname="subtraction_performance")
-           fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath,fig3, event_list[e], station_list[s], phi, figname="subtraction_performance")
+           fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,ss_type, outpath,fig3, event_list[e], station_list[s], phi, figname="subtraction_performance")
            #fig4 = myplot.simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig4, event_list[e], station_list[s], timeframe=940, figname="one_timeframe_simple_nonlin")
            #fig5 = myplot.nonlin_signal_smooth(amp_Xd, amp_Xn, freqs_d, outpath, fig5, event_list[e][e], timeframe=1490, figname="signal_smooth_nonlin") # NOT UTILIZED FOR SIMPLE NON LIN YET
            #fig5 = myplot.simple_nonlin_phi(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig5, event_list[e], station_list[s], timeframe=940, figname="phi_simple_nonlin")
@@ -195,3 +200,5 @@ for e, lab in enumerate(event_id):
        #fig10 = myplot.alpha_comp_scals(t, tro, trd, amp_Xo, amp_Xd, amp_Xn, phase_Xd, scales_d, freqs_d, omega0, dj, outpath, fig10, event_list[e], station_list[s], figname="alpha_comparison_scals")
        #fig7 = myplot.spectra(amp_Xo, amp_Xd, amp_Xn, amp_Xp, freqs_d, outpath, fig7, event_list[e], station_list[s], figname="spectra_comparison")
        plt.close('all')
+file1.close()
+       
