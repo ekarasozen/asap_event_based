@@ -83,7 +83,7 @@ def scals(t, tr, Xo, Xd, rho, alpha, Xp, abovethreshold, freq, outpath, fig, eve
     fig.autofmt_xdate()    
     fig.savefig(os.path.join(outpath, event_list + '_'+ station_list + '_' + figname + '.png'))
 
-def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type,outpath,fig,event_list,station_list,phi="0",figname="subtraction_parameters"):
+def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,ss_type,outpath,fig,event_list,station_list,phi="0",figname="subtraction_parameters"):
     '''
     Creates a single uber-plot summarizing the performance of spectral subtraction.
     The many input variables for this plotting method should be pretty self-evident. This 
@@ -95,9 +95,9 @@ def subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr
                   by the measure.waveform_metrics function
     '''
     
-    alpha_beta_text = ' alpha0: ' + str(alpha0) + '    beta: ' + str(beta) 
+    #alpha_beta_text = ' alpha0: ' + str(alpha0) + '    beta: ' + str(beta) 
     #alpha0 is gamma for simple non lin. had to do this to make sure this plotting code works for other subtraction techniques
-    gamma_beta_text = ' gamma: ' + str(alpha0) + '    beta: ' + str(beta)  #need to input gamma instead of alpha0 when calling this function for non_lin ss. 
+    #gamma_beta_text = ' gamma: ' + str(alpha0) + '    beta: ' + str(beta)  #need to input gamma instead of alpha0 when calling this function for non_lin ss. 
     insetstring1 = (" xc (o,p):     long=" + str(round(metrics["maxcorr_long"],2)) + "(" + 
                      str(round(metrics["lag_long"]*tro.stats.delta,2)) + "s)  short=" + 
                      str(round(metrics["maxcorr_short"],2)) + "(" + 
