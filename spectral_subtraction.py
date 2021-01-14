@@ -175,10 +175,10 @@ def nonlin_subtraction(amp_Xd, amp_Xn, beta, gamma): #mainly from Lockwood
     return amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 
 
 
-def simple_nonlin_subtraction(amp_Xd, amp_Xn, beta, gamma): 
+def simple_nonlin_subtraction(amp_Xd, amp_Xn, a, b): 
     #alpha0 is useless here, just to make other plotting options easier. its not used in this technique. 
     #gamma = 0.3
-    alpha0 = gamma #for the subtraction performance plotting code only. we don't use alpha 0
+    alpha0 = 0.3 #for the subtraction performance plotting code only. we don't use alpha 0
     m, n = amp_Xd.shape 
     #alpha = np.zeros((1,n))
     rho = np.zeros((m,n))
@@ -206,7 +206,10 @@ def simple_nonlin_subtraction(amp_Xd, amp_Xn, beta, gamma):
     #           amp_Xp[j,i] = (beta)*(amp_Xd[j,i])
     rho = amp_Xd / amp_Xna
     SNR = 10*np.log10((rho) ** 2)
-    alpha = (18.49) / (1+(gamma*(rho**4)))
+    ###alpha = (18.49) / (1+(gamma*(rho**4))) #for turning point of 1.7, gamma 0.7
+    ###alpha = rho * 1.3 ** (-rho)    
+    alpha =  a * (rho * (1-np.tanh(b*rho**(4)))) #mike's eqn
+    ###alpha = rho * (1-np.tanh(0.90*rho**(0.40)))
     phi = alpha*amp_Xna
     abovethreshold = amp_Xd > phi
     belowthreshold = amp_Xd <= phi
@@ -220,7 +223,7 @@ def simple_nonlin_subtraction(amp_Xd, amp_Xn, beta, gamma):
 #    amp_Xp[belowthreshold] = (beta)*(amp_Xd[belowthreshold])
    #np.savetxt('rho.out', rho, delimiter=',', newline="\n")  
 #
-    return amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold 
+    return amp_Xp, SNR, alpha, rho, phi, a, b, alpha0, abovethreshold, belowthreshold 
 
 
 def mulban_subtraction(amp_Xd, amp_Xn, tro, freqs): #mainly from Upadhyay and Karmakar 2013
