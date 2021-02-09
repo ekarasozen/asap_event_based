@@ -1,6 +1,6 @@
 import numpy as np
 def whitenoise(tro,trd,t,type,amplitude,min_freq=1,max_freq=3):
-    #np.random.seed(42)
+    np.random.seed(42)
     trg = tro.copy() #garbage signal
     tro_temp = tro.copy() 
     tro_temp.trim(t - 1, t + 5)

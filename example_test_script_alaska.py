@@ -27,12 +27,12 @@ for e, lab in enumerate(event_id):
     nos = len(st)
     #print(st)
     outpath = event_list[e] + '/' + ss_type + '/'
-    std = read(outpath + station_code + "*degraded*") # to add same noise to same station in different runs, uncomment with ****
+    #####std = read(outpath + station_code + "*degraded*") # to add same noise to same station in different runs, uncomment with ****
     for s in range(nos):
        tro = st[s].copy() #[o]riginal signal
-       trd = st[s].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added)
-       ####trd.data = whitenoise(tro,trd,picktime,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax)
-       trd = std[s].copy() # to add same noise to same station in different runs, make sure to comment out saving trd at the end of this code. , uncomment with ****
+       trd = st[s].copy() #[d]egraded version of a signal (noisy real world data, or has garbage added) #needs to be commented out when trying to use same noise
+       trd.data = whitenoise(tro,trd,picktime,type=noise_type,amplitude=noise_amplitude,min_freq=noise_freqmin,max_freq=noise_freqmax) #needs to be commented out when trying to use same noise
+       ####trd = std[s].copy() # to add same noise to same station in different runs, make sure to comment out saving trd at the end of this code. , uncomment with ****
        trn = trd.copy() #[n]oise sample with no signal (typically used to determine what to remove)
        t0 = trn.stats.starttime
        trn.trim(t0+ibegin, t0+iend) 
@@ -97,7 +97,7 @@ for e, lab in enumerate(event_id):
                amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 = ss.nonlin_subtraction(amp_Xd,amp_Xn, 0.1, 0.1)
            elif ss_type == "simple_non_lin":
                #amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.05, 0.7)
-               amp_Xp, SNR, alpha, rho, phi, a, b, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.40, 0.005)
+               amp_Xp, SNR, alpha, rho, phi, a, b, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.75, 0.005) 
            #amp_Xp, SNR, alpha, beta, delta = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freqs_d)
            phase_Xd = np.angle(Xd)
            Xp = amp_Xp*(np.exp(1.j*phase_Xd))
@@ -148,8 +148,8 @@ for e, lab in enumerate(event_id):
        if not os.path.exists(outpath):
           os.makedirs(outpath)
        #SAVE PROCESSED TRACES:
-       #tro.write(outpath + tro.stats.station + "." + tro.stats.channel + ".original", format="MSEED") 
-       #trd.write(outpath + trd.stats.station + "." + trd.stats.channel + ".degraded", format="MSEED") 
+       tro.write(outpath + tro.stats.station + "." + tro.stats.channel + ".original", format="MSEED") 
+       trd.write(outpath + trd.stats.station + "." + trd.stats.channel + ".degraded", format="MSEED") 
        trp.write(outpath + trp.stats.station + "." + trp.stats.channel + ".processed", format="MSEED")
        #FIGURES#
        fig1 = plt.figure()
@@ -163,7 +163,7 @@ for e, lab in enumerate(event_id):
        fig2 = myplot.scals(t, tro, Xo, Xd, rho, alpha, Xp, abovethreshold, freq, outpath, fig2, event_list[e], station_list[s], figname="scals")
        #fig2 = myplot.scals(t, tro, Xo, Xd, Xp, freq, outpath, fig2, event_list[e], station_list[s], figname="scals") 
        #fig2 = myplot.stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, fig2, event_list[e], station_list[s], figname="stft") #COMMENT OUT FOR STFT *********
-       file1.write(event_list[e] + "\t" + station_list[s] + "\t" + ss_type + "\t" + '{:.1f}'.format(round(noise_amplitude,1)) + "\t" + '{:.2f}'.format(round(a,2)) + "\t" + '{:.3f}'.format(round(b,3)) + "\t" + '{:.1f}'.format(round(100*metrics["snrp_long"]/metrics["snrd_long"],1)) + "\t" +  
+       file1.write(event_list[e] + "\t" + station_list[s] + "\t" + ss_type + "\t" + '{:.2f}'.format(round(noise_amplitude,2)) + "\t" + '{:.2f}'.format(round(a,2)) + "\t" + '{:.3f}'.format(round(b,3)) + "\t" + '{:.1f}'.format(round(100*metrics["snrp_long"]/metrics["snrd_long"],1)) + "\t" +  
        '{:5.1f}'.format(round(metrics["snrd_long"],1)) + "\t" + '{:5.1f}'.format(round(metrics["snrp_long"],1)) + "\t" +  '{:.2f}'.format(round(metrics["maxcorr_long"],2)) + "\t" + '{:.2f}'.format(round(metrics["lag_long"]*tro.stats.delta,2)) + "\t" + 
        '{:5.1f}'.format(round(metrics["snrd_short"],1)) + "\t" + '{:5.1f}'.format(round(metrics["snrp_short"],1)) + "\t" + '{:.2f}'.format(round(metrics["maxcorr_short"],2)) + "\t" + '{:.2f}'.format(round(metrics["lag_short"]*tro.stats.delta,2))) 
        file1.write("\n")

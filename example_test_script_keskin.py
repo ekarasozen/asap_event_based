@@ -16,12 +16,14 @@ import measure
 
 filename = input("Parameters file: ")
 exec(open(filename).read())
+file1 = open(text_output,"w")
+file1.write("EVENT_ID"+"\t"+"STN"+"\t"+"SS_Type"+"\t"+"a"+"\t"+"b"+"\t"+"Delta_SNR"+"\t"+"SNRd_l"+"\t"+"SNRp_l"+"\t"+"XC_l"+"\t"+"Lag_l"+"\t"+"SNRd_s"+"\t"+"SNRp_s"+" "+"XC_s"+"  "+"Lag_s"+"\n")
 #event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
 for e, lab in enumerate(noe):
 #for e, lab in enumerate(event_id):
-    st, picktime = keskin_event(db_name='events-2020-09-18T18_02_02.xml', ev_id=e, inventory='Keskin_sp.xml',start_time=start_time, end_time=end_time)
+    st, picktime = keskin_event(db_name='events-2020-08-05T22_54_43.xml', ev_id=e, inventory='Keskin_sp.xml',start_time=start_time, end_time=end_time)
     #st, picktime = event(ev_id=event_id[e], network_list=network_list, station_code=station_code, pick=pick_type, channel=channel, start_time=start_time, end_time=end_time)
-   ########## st = prep(st,filter_type=filter_type, freqmin=filter_freqmin, freqmax=filter_freqmax)
+    st = prep(st,filter_type=filter_type, freqmin=filter_freqmin, freqmax=filter_freqmax)
     nos = len(st)
     outpath = event_list[e] + '/' + ss_type + '/'
     for s in range(nos):
@@ -91,7 +93,8 @@ for e, lab in enumerate(noe):
            elif ss_type == "non_lin":
                amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 = ss.nonlin_subtraction(amp_Xd,amp_Xn, 0.1, 0.5)
            elif ss_type == "simple_non_lin":
-               amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.05, 0.7)
+               #amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.05, 0.7)
+               amp_Xp, SNR, alpha, rho, phi, a, b, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.149, 0.000008) 
            #amp_Xp, SNR, alpha, beta, delta = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freqs_d)
            phase_Xd = np.angle(Xd)
            Xp = amp_Xp*(np.exp(1.j*phase_Xd))
@@ -156,7 +159,11 @@ for e, lab in enumerate(noe):
        #fig7 = plt.figure()
        fig1 = myplot.wfs(t, tro, trd, trp, outpath, fig1, event_list[e], station_list[s], figname="wfs") 
        fig2 = myplot.scals(t, tro, Xo, Xd, rho, alpha, Xp, abovethreshold, freq, outpath, fig2, event_list[e], station_list[s], figname="scals")
-      #fig2 = myplot.stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, fig2, event_list[e], station_list[s], figname="stft") #COMMENT OUT FOR STFT *********
+       #fig2 = myplot.stft(td, fd, tro, trd, trp, t_tmp, amp_Xd, amp_Xp, fig2, event_list[e], station_list[s], figname="stft") #COMMENT OUT FOR STFT *********
+       file1.write(event_list[e] + "\t" + station_list[s] + "\t" + ss_type + "\t" + '{:.2f}'.format(round(a,2)) + "\t" + '{:.3f}'.format(round(b,3)) + "\t" + '{:.1f}'.format(round(100*metrics["snrp_long"]/metrics["snrd_long"],1)) + "\t" +  
+       '{:5.1f}'.format(round(metrics["snrd_long"],1)) + "\t" + '{:5.1f}'.format(round(metrics["snrp_long"],1)) + "\t" +  '{:.2f}'.format(round(metrics["maxcorr_long"],2)) + "\t" + '{:.2f}'.format(round(metrics["lag_long"]*tro.stats.delta,2)) + "\t" + 
+       '{:5.1f}'.format(round(metrics["snrd_short"],1)) + "\t" + '{:5.1f}'.format(round(metrics["snrp_short"],1)) + "\t" + '{:.2f}'.format(round(metrics["maxcorr_short"],2)) + "\t" + '{:.2f}'.format(round(metrics["lag_short"]*tro.stats.delta,2))) 
+       file1.write("\n")
        if ss_type == "simple":
            fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath, fig3, event_list[e], station_list[s], phi="0", figname="subtraction_performance")
            fig4 = myplot.sub_param_one_tf(amp_Xd, amp_Xn, freqs_d, outpath, fig4, event_list[e], station_list[s], timeframe=1490, figname="one_timeframe_alpha_beta")
@@ -181,7 +188,7 @@ for e, lab in enumerate(noe):
            fig6 = myplot.hilb_plot(t,hilb_div,max_hilb,mean_hilb, outpath,fig6,event_list[e],station_list[s],figname="hilbert_metrics")
        elif ss_type == "simple_non_lin":
 #           fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath,fig3, event_list[e], phi, figname="subtraction_performance")
-           fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,beta,ss_type, outpath,fig3, event_list[e], station_list[s], phi, figname="subtraction_performance")
+           fig3 = myplot.subtraction_performance(amp_Xd,amp_Xp,freqs_d,picktime,tro,trd,trp,tr_SNR,tr_alpha,metrics,SNR,alpha,alpha0,ss_type, outpath,fig3, event_list[e], station_list[s], phi, figname="subtraction_performance")
            #fig4 = myplot.simple_nonlin_param_one_tf(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig4, event_list[e], station_list[s], timeframe=940, figname="one_timeframe_simple_nonlin")
            #fig5 = myplot.nonlin_signal_smooth(amp_Xd, amp_Xn, freqs_d, outpath, fig5, event_list[e][e], timeframe=1490, figname="signal_smooth_nonlin") # NOT UTILIZED FOR SIMPLE NON LIN YET
            #fig5 = myplot.simple_nonlin_phi(amp_Xd, amp_Xn, freqs_d, gamma, beta, outpath, fig5, event_list[e], station_list[s], timeframe=940, figname="phi_simple_nonlin")
