@@ -92,7 +92,7 @@ def waveform_metrics(tro,trd,trp,picktime):
         "snrd_short":     round(snrd_short,1),
         "snrp_short":     round(snrp_short,1)
     }
-    
+    print(ccshort_shift,cclong_shift)
     return metrics
     
 def hilb_metrics(trd,trp):

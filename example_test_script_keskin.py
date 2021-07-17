@@ -20,8 +20,10 @@ file1 = open(text_output,"w")
 file1.write("EVENT_ID"+"\t"+"STN"+"\t"+"SS_Type"+"\t"+"a"+"\t"+"b"+"\t"+"Delta_SNR"+"\t"+"SNRd_l"+"\t"+"SNRp_l"+"\t"+"XC_l"+"\t"+"Lag_l"+"\t"+"SNRd_s"+"\t"+"SNRp_s"+" "+"XC_s"+"  "+"Lag_s"+"\n")
 #event_id = ['https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=' + s for s in event_list]
 for e, lab in enumerate(noe):
+    e = 24
 #for e, lab in enumerate(event_id):
     st, picktime = keskin_event(db_name='events-2020-08-05T22_54_43.xml', ev_id=e, inventory='Keskin_sp.xml',start_time=start_time, end_time=end_time)
+    print(picktime, "this")
     #st, picktime = event(ev_id=event_id[e], network_list=network_list, station_code=station_code, pick=pick_type, channel=channel, start_time=start_time, end_time=end_time)
     st = prep(st,filter_type=filter_type, freqmin=filter_freqmin, freqmax=filter_freqmax)
     nos = len(st)
@@ -94,7 +96,7 @@ for e, lab in enumerate(noe):
                amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0 = ss.nonlin_subtraction(amp_Xd,amp_Xn, 0.1, 0.5)
            elif ss_type == "simple_non_lin":
                #amp_Xp, SNR, alpha, rho, phi, beta, gamma, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.05, 0.7)
-               amp_Xp, SNR, alpha, rho, phi, a, b, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.149, 0.000008) 
+               amp_Xp, SNR, alpha, rho, phi, a, b, alpha0, abovethreshold, belowthreshold = ss.simple_nonlin_subtraction(amp_Xd,amp_Xn, 0.75, 0.005) 
            #amp_Xp, SNR, alpha, beta, delta = ss.mulban_subtraction(amp_Xd,amp_Xn,trd,freqs_d)
            phase_Xd = np.angle(Xd)
            Xp = amp_Xp*(np.exp(1.j*phase_Xd))
